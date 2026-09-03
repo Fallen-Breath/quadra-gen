@@ -4,13 +4,13 @@
   "version": "${version}",
 
   "name": "${name}",
-  "description": "Template for my fabric mods",
+  "description": "Quadra Gen",
   "authors": [
     "Fallen_Breath"
   ],
   "contact": {
     "homepage": "https://modrinth.com",
-    "sources": "https://github.com/Fallen-Breath/fabric-mod-template"
+    "sources": "https://github.com/Fallen-Breath/quadra-gen"
   },
   "license": "LGPL-3.0",
 
@@ -19,11 +19,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.fallenbreath.template_mod.TemplateMod"
+      "me.fallenbreath.quadragen.QuadraGen"
     ]
   },
   "mixins": [
-    "template_mod.mixins.json"
+    "quadragen.mixins.json"
   ],
 
   "depends": {
