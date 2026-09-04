@@ -1,0 +1,55 @@
+/*
+ * This file is part of the Quadra Gen project, licensed under the
+ * GNU Lesser General Public License v3.0
+ *
+ * Copyright (C) 2026  Fallen_Breath and contributors
+ *
+ * Quadra Gen is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Quadra Gen is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package me.fallenbreath.quadragen.core;
+
+public enum Quadrant
+{
+	X_POSITIVE_Z_POSITIVE("x_positive_z_positive", 1, 1),
+	X_NEGATIVE_Z_POSITIVE("x_negative_z_positive", -1, 1),
+	X_NEGATIVE_Z_NEGATIVE("x_negative_z_negative", -1, -1),
+	X_POSITIVE_Z_NEGATIVE("x_positive_z_negative", 1, -1);
+
+	private final String configKey;
+	private final int xSign;
+	private final int zSign;
+
+	Quadrant(String configKey, int xSign, int zSign)
+	{
+		this.configKey = configKey;
+		this.xSign = xSign;
+		this.zSign = zSign;
+	}
+
+	public String getConfigKey()
+	{
+		return this.configKey;
+	}
+
+	public int getXSign()
+	{
+		return this.xSign;
+	}
+
+	public int getZSign()
+	{
+		return this.zSign;
+	}
+}

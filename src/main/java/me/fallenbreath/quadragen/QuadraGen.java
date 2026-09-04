@@ -20,6 +20,8 @@
 
 package me.fallenbreath.quadragen;
 
+import me.fallenbreath.quadragen.config.ConfigLoader;
+import me.fallenbreath.quadragen.config.QuadraGenConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -44,6 +46,17 @@ public class QuadraGen implements ModInitializer
 	public static final String MOD_ID = "quadragen";
 	public static String MOD_VERSION = "unknown";
 	public static String MOD_NAME = "unknown";
+	private static volatile QuadraGenConfig config;
+
+	public static QuadraGenConfig getConfig()
+	{
+		QuadraGenConfig value = config;
+		if (value == null)
+		{
+			throw new IllegalStateException("Quadra Gen config has not been loaded yet");
+		}
+		return value;
+	}
 
 	@Override
 	public void onInitialize()
@@ -51,5 +64,7 @@ public class QuadraGen implements ModInitializer
 		ModMetadata metadata = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow(RuntimeException::new).getMetadata();
 		MOD_NAME = metadata.getName();
 		MOD_VERSION = metadata.getVersion().getFriendlyString();
+		config = ConfigLoader.loadOrCreate();
+		LOGGER.info("Loaded {} {} (enabled: {})", MOD_NAME, MOD_VERSION, config.isEnabled());
 	}
 }

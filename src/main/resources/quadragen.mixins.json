@@ -4,7 +4,13 @@
   "package": "me.fallenbreath.quadragen.mixins",
   "compatibilityLevel": "{{COMPATIBILITY_LEVEL}}",
   "mixins": [
-    "MinecraftServerMixin"
+    "lifecycle.MinecraftServerMixin",
+    "lifecycle.ServerLevelMixin",
+    "spawn.PhantomSpawnerMixin",
+    "worldgen.ChunkGeneratorMixin",
+    "worldgen.ConfiguredWorldCarverMixin",
+    "worldgen.NoiseBasedChunkGeneratorMixin",
+    "worldgen.ProtoChunkMixin"
   ],
   "client": [
   ],
