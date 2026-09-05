@@ -8,9 +8,7 @@
     "lifecycle.ServerLevelMixin",
     "spawn.PhantomSpawnerMixin",
     "worldgen.ChunkGeneratorMixin",
-    "worldgen.ConfiguredWorldCarverMixin",
-    "worldgen.NoiseBasedChunkGeneratorMixin",
-    "worldgen.ProtoChunkMixin"
+    "worldgen.NoiseBasedChunkGeneratorMixin"
   ],
   "client": [
   ],

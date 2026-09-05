@@ -20,12 +20,12 @@
 
 package me.fallenbreath.quadragen.mixins.lifecycle;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.gameplay.InitialSpawnCompat;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.progress.LevelLoadListener;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.storage.ServerLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -34,23 +34,18 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class MinecraftServerMixin
 {
 	@ModifyVariable(method = "setInitialSpawn", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-	private static boolean quadragen$disableUnsafeBonusChest(boolean spawnBonusChest, ServerLevel level)
+	private static boolean disableUnsafeBonusChest(boolean spawnBonusChest, @Local(argsOnly = true) ServerLevel level)
 	{
 		return spawnBonusChest && InitialSpawnCompat.allowsBonusChest(level);
 	}
 
-	@ModifyVariable(
+	@ModifyExpressionValue(
 			method = "setInitialSpawn",
-			at = @At("STORE"),
-			ordinal = 0
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ChunkPos;containing(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/ChunkPos;")
 	)
-	private static ChunkPos quadragen$selectInitialSpawnAnchor(
+	private static ChunkPos selectInitialSpawnAnchor(
 			ChunkPos vanillaAnchor,
-			ServerLevel level,
-			ServerLevelData levelData,
-			boolean spawnBonusChest,
-			boolean isDebug,
-			LevelLoadListener levelLoadListener)
+			@Local(argsOnly = true) ServerLevel level)
 	{
 		return InitialSpawnCompat.selectAnchor(level, vanillaAnchor);
 	}

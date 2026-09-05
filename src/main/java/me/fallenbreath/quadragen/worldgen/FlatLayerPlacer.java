@@ -21,6 +21,7 @@
 package me.fallenbreath.quadragen.worldgen;
 
 import me.fallenbreath.quadragen.compat.ChunkBlockWriter;
+import me.fallenbreath.quadragen.compat.HeightCompat;
 import me.fallenbreath.quadragen.core.FlatGenerationPlan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
@@ -50,7 +51,7 @@ public final class FlatLayerPlacer
 				continue;
 			}
 			int y = plan.getBaseY() + index;
-			if (chunk.isOutsideBuildHeight(y))
+			if (!HeightCompat.contains(chunk, y))
 			{
 				continue;
 			}
@@ -79,7 +80,7 @@ public final class FlatLayerPlacer
 				continue;
 			}
 			int y = plan.getBaseY() + index;
-			if (level.isOutsideBuildHeight(y))
+			if (!HeightCompat.contains(level, y))
 			{
 				continue;
 			}

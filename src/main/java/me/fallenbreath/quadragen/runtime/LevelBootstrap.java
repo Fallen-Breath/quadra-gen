@@ -22,17 +22,17 @@ package me.fallenbreath.quadragen.runtime;
 
 import me.fallenbreath.quadragen.QuadraGen;
 import me.fallenbreath.quadragen.compat.DimensionCompat;
+import me.fallenbreath.quadragen.compat.HeightCompat;
 import me.fallenbreath.quadragen.compat.RegistryCompat;
+import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
 import me.fallenbreath.quadragen.config.ConfigValidationException;
 import me.fallenbreath.quadragen.config.FlatConfig;
 import me.fallenbreath.quadragen.config.FlatLayerConfig;
 import me.fallenbreath.quadragen.config.QuadraGenConfig;
 import me.fallenbreath.quadragen.config.QuadrantConfig;
 import me.fallenbreath.quadragen.core.FlatGenerationPlan;
-import me.fallenbreath.quadragen.core.GenerationPlan;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
-import me.fallenbreath.quadragen.core.QuadrantRouter;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import net.minecraft.core.Holder;
@@ -53,13 +53,14 @@ public final class LevelBootstrap
 	{
 	}
 
-	public static void install(ServerLevel level, ChunkGenerator generator)
+	public static void install(ServerLevel level)
 	{
 		QuadraGenConfig config = QuadraGen.getConfig();
 		if (!config.isEnabled() || !DimensionCompat.isOverworld(level))
 		{
 			return;
 		}
+		ChunkGenerator generator = level.getChunkSource().getGenerator();
 		if (!(generator instanceof NoiseBasedChunkGenerator))
 		{
 			QuadraGen.LOGGER.warn("Quadra Gen is enabled, but the Overworld generator is {}; this world is left untouched", generator.getClass().getName());
@@ -79,10 +80,10 @@ public final class LevelBootstrap
 			}
 		}
 
-		LevelContext context = new LevelContext(new GenerationPlan(resolved), new QuadrantRouter(), (NoiseBasedChunkGenerator)generator);
-		((ServerLevelContextAccess)level).quadragen$setLevelContext(context);
-		((GeneratorContextAccess)generator).quadragen$setLevelContext(context);
-		QuadraGen.LOGGER.info("Quadra Gen world-generation routing installed for {}", level.dimension().identifier());
+		LevelContext context = new LevelContext(resolved, (NoiseBasedChunkGenerator)generator);
+		((ServerLevelContextAccess)level).setLevelContext$quadragen(context);
+		((GeneratorContextAccess)generator).setLevelContext$quadragen(context);
+		QuadraGen.LOGGER.info("Quadra Gen world-generation routing installed for {}", ResourceKeyCompat.identifier(level.dimension()));
 	}
 
 	private static FlatGenerationPlan resolveFlat(ServerLevel level, Quadrant quadrant, FlatConfig raw)
@@ -90,14 +91,16 @@ public final class LevelBootstrap
 		String basePath = "$.quadrants." + quadrant.getConfigKey() + ".flat";
 		Holder<Biome> biome = RegistryCompat.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
 		List<BlockState> layers = new ArrayList<BlockState>();
+		int minY = HeightCompat.minY(level);
+		int maxY = HeightCompat.maxYInclusive(level);
 		long layerCount = 0L;
 		for (int i = 0; i < raw.getLayers().size(); i++)
 		{
 			FlatLayerConfig layer = raw.getLayers().get(i);
 			layerCount += layer.getCount();
-			if (layerCount > Integer.MAX_VALUE || level.getMinY() + layerCount - 1L > level.getMaxY())
+			if (layerCount > Integer.MAX_VALUE || minY + layerCount - 1L > maxY)
 			{
-				throw new ConfigValidationException(basePath + ".layers[" + i + "].count", "flat layers exceed the world's maximum build Y " + level.getMaxY());
+				throw new ConfigValidationException(basePath + ".layers[" + i + "].count", "flat layers exceed the world's maximum build Y " + maxY);
 			}
 			BlockState state = RegistryCompat.resolveBlock(layer.getBlock(), basePath + ".layers[" + i + "].block");
 			for (int j = 0; j < layer.getCount(); j++)
@@ -105,6 +108,6 @@ public final class LevelBootstrap
 				layers.add(state);
 			}
 		}
-		return new FlatGenerationPlan(level.getMinY(), biome, layers);
+		return new FlatGenerationPlan(minY, biome, layers);
 	}
 }

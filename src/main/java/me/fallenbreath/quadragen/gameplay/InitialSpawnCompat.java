@@ -33,13 +33,13 @@ public final class InitialSpawnCompat
 
 	public static ChunkPos selectAnchor(ServerLevel level, ChunkPos vanillaAnchor)
 	{
-		LevelContext context = ((ServerLevelContextAccess)level).quadragen$getLevelContext();
+		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
 		return context == null ? vanillaAnchor : InitialSpawnPolicy.selectAnchor(context, vanillaAnchor);
 	}
 
 	public static boolean allowsBonusChest(ServerLevel level)
 	{
-		LevelContext context = ((ServerLevelContextAccess)level).quadragen$getLevelContext();
+		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
 		return context == null || InitialSpawnPolicy.hasSpawnCandidate(context);
 	}
 }

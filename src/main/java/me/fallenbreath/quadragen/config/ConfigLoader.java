@@ -77,12 +77,12 @@ public final class ConfigLoader
 		{
 			throw new ConfigValidationException("$", "failed to read or create " + configPath.toAbsolutePath(), e);
 		}
+		catch (ConfigValidationException e)
+		{
+			throw e;
+		}
 		catch (RuntimeException e)
 		{
-			if (e instanceof ConfigValidationException)
-			{
-				throw e;
-			}
 			throw new ConfigValidationException("$", "invalid JSON in " + configPath.toAbsolutePath(), e);
 		}
 	}

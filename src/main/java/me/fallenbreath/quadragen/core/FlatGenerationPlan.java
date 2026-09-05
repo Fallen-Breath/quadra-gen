@@ -38,7 +38,7 @@ public final class FlatGenerationPlan
 	private final int baseY;
 	private final Holder<Biome> biome;
 	private final List<BlockState> layers;
-	private final List<Boolean> delayedLayers;
+	private final boolean[] delayedLayers;
 	private final boolean empty;
 	private final boolean safeSurface;
 
@@ -47,19 +47,19 @@ public final class FlatGenerationPlan
 		this.baseY = baseY;
 		this.biome = biome;
 		this.layers = Collections.unmodifiableList(new ArrayList<BlockState>(layers));
-		List<Boolean> delayed = new ArrayList<Boolean>(layers.size());
+		this.delayedLayers = new boolean[this.layers.size()];
 		boolean hasBlock = false;
-		for (BlockState state : layers)
+		for (int index = 0; index < this.layers.size(); index++)
 		{
-			delayed.add(!Heightmap.Types.MOTION_BLOCKING.isOpaque().test(state));
+			BlockState state = this.layers.get(index);
+			this.delayedLayers[index] = !Heightmap.Types.MOTION_BLOCKING.isOpaque().test(state);
 			if (!state.isAir())
 			{
 				hasBlock = true;
 			}
 		}
-		this.delayedLayers = Collections.unmodifiableList(delayed);
 		this.empty = !hasBlock;
-		this.safeSurface = hasSafeSurface(layers);
+		this.safeSurface = hasSafeSurface(this.layers);
 	}
 
 	public Holder<Biome> getBiome()
@@ -79,7 +79,7 @@ public final class FlatGenerationPlan
 
 	public boolean isDelayedLayer(int index)
 	{
-		return this.delayedLayers.get(index).booleanValue();
+		return this.delayedLayers[index];
 	}
 
 	public boolean isEmpty()

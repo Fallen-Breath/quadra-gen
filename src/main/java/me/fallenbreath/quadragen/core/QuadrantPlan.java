@@ -33,11 +33,6 @@ public final class QuadrantPlan
 		this.flat = flat;
 	}
 
-	public GeneratorKind getGeneratorKind()
-	{
-		return this.generatorKind;
-	}
-
 	public boolean isNoise()
 	{
 		return this.generatorKind == GeneratorKind.NOISE;
@@ -65,31 +60,6 @@ public final class QuadrantPlan
 	public boolean isOrdinaryNoise()
 	{
 		return this.isNoise() && !this.clearGeneratedContent;
-	}
-
-	public boolean shouldCreateStructureStarts()
-	{
-		return this.isNoise();
-	}
-
-	public boolean shouldRunSurface()
-	{
-		return this.isOrdinaryNoise();
-	}
-
-	public boolean shouldRunCarvers()
-	{
-		return this.isOrdinaryNoise();
-	}
-
-	public boolean shouldRunWorldgenMobs()
-	{
-		return this.isOrdinaryNoise();
-	}
-
-	public boolean isPhysicallyEmpty()
-	{
-		return this.clearGeneratedContent || this.isFlat() && this.getFlat().isEmpty();
 	}
 
 	public boolean hasSafeFlatSurface()

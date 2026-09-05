@@ -24,7 +24,7 @@ import me.fallenbreath.quadragen.runtime.LevelContext;
 
 public interface ServerLevelContextAccess
 {
-	LevelContext quadragen$getLevelContext();
+	LevelContext getLevelContext$quadragen();
 
-	void quadragen$setLevelContext(LevelContext context);
+	void setLevelContext$quadragen(LevelContext context);
 }

@@ -20,7 +20,7 @@
 
 package me.fallenbreath.quadragen.worldgen;
 
-import me.fallenbreath.quadragen.core.QuadrantPlan;
+import me.fallenbreath.quadragen.core.FlatGenerationPlan;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -32,9 +32,9 @@ public final class BiomeWriter
 	{
 	}
 
-	public static void fillFlatBiome(ChunkAccess chunk, RandomState randomState, QuadrantPlan plan)
+	public static void fillFlatBiome(ChunkAccess chunk, RandomState randomState, FlatGenerationPlan plan)
 	{
-		final Holder<Biome> biome = plan.getFlat().getBiome();
+		final Holder<Biome> biome = plan.getBiome();
 		chunk.fillBiomesFromNoise((quartX, quartY, quartZ, sampler) -> biome, randomState.sampler());
 	}
 }

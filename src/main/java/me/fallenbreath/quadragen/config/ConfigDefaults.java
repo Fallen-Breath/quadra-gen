@@ -39,8 +39,8 @@ public final class ConfigDefaults
 		Map<Quadrant, QuadrantConfig> quadrants = new EnumMap<Quadrant, QuadrantConfig>(Quadrant.class);
 		quadrants.put(Quadrant.X_POSITIVE_Z_POSITIVE, noise(false));
 		quadrants.put(Quadrant.X_NEGATIVE_Z_POSITIVE, noise(true));
-		quadrants.put(Quadrant.X_NEGATIVE_Z_NEGATIVE, flat("minecraft:plains", Collections.singletonList(new FlatLayerConfig("minecraft:white_stained_glass", 1))));
-		quadrants.put(Quadrant.X_POSITIVE_Z_NEGATIVE, flat("minecraft:the_void", Collections.<FlatLayerConfig>emptyList()));
+		quadrants.put(Quadrant.X_NEGATIVE_Z_NEGATIVE, flat("minecraft:the_void", Collections.<FlatLayerConfig>emptyList()));
+		quadrants.put(Quadrant.X_POSITIVE_Z_NEGATIVE, flat("minecraft:plains", Collections.singletonList(new FlatLayerConfig("minecraft:white_stained_glass", 1))));
 		return new QuadraGenConfig(true, quadrants);
 	}
 

@@ -20,23 +20,24 @@
 
 package me.fallenbreath.quadragen.mixins.worldgen;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import me.fallenbreath.quadragen.runtime.access.ProtoChunkContextAccess;
-import me.fallenbreath.quadragen.worldgen.GenerationHooks;
+import me.fallenbreath.quadragen.worldgen.BiomeWriter;
+import me.fallenbreath.quadragen.worldgen.FlatLayerPlacer;
 import me.fallenbreath.quadragen.worldgen.HeightQuery;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.StructureManager;
-import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
-import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -52,17 +53,20 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			at = @At("HEAD"),
 			cancellable = true
 	)
-	private void quadragen$createBiomes(
-			RandomState randomState,
-			Blender blender,
-			StructureManager structureManager,
-			ChunkAccess chunk,
-			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir)
+	private void createBiomes(
+			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
+			@Local(argsOnly = true) RandomState randomState,
+			@Local(argsOnly = true) ChunkAccess chunk)
 	{
-		LevelContext context = this.quadragen$getContext();
-		if (context != null && !chunk.isUpgrading() && GenerationHooks.plan(context, chunk).isFlat())
+		LevelContext context = this.getContext$quadragen();
+		if (context != null && !chunk.isUpgrading())
 		{
-			cir.setReturnValue(GenerationHooks.createBiomes(context, randomState, chunk));
+			QuadrantPlan plan = context.getPlanAt(chunk.getPos());
+			if (plan.isFlat())
+			{
+				BiomeWriter.fillFlatBiome(chunk, randomState, plan.getFlat());
+				cir.setReturnValue(CompletableFuture.completedFuture(chunk));
+			}
 		}
 	}
 
@@ -71,17 +75,22 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			at = @At("HEAD"),
 			cancellable = true
 	)
-	private void quadragen$fillFromNoise(
-			Blender blender,
-			RandomState randomState,
-			StructureManager structureManager,
-			ChunkAccess chunk,
-			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir)
+	private void fillFromNoise(
+			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
+			@Local(argsOnly = true) ChunkAccess chunk)
 	{
-		LevelContext context = this.quadragen$getContext();
-		if (context != null && !chunk.isUpgrading() && !GenerationHooks.plan(context, chunk).isOrdinaryNoise())
+		LevelContext context = this.getContext$quadragen();
+		if (context != null && !chunk.isUpgrading())
 		{
-			cir.setReturnValue(GenerationHooks.fill(context, chunk));
+			QuadrantPlan plan = context.getPlanAt(chunk.getPos());
+			if (!plan.isOrdinaryNoise())
+			{
+				if (plan.isFlat() && !plan.isClearGeneratedContent())
+				{
+					FlatLayerPlacer.placeDirectLayers(chunk, plan.getFlat());
+				}
+				cir.setReturnValue(CompletableFuture.completedFuture(chunk));
+			}
 		}
 	}
 
@@ -90,15 +99,10 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			at = @At("HEAD"),
 			cancellable = true
 	)
-	private void quadragen$buildSurface(
-			WorldGenRegion region,
-			StructureManager structureManager,
-			RandomState randomState,
-			ChunkAccess chunk,
-			CallbackInfo ci)
+	private void buildSurface(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess chunk)
 	{
-		LevelContext context = this.quadragen$getContext();
-		if (context != null && !chunk.isUpgrading() && !GenerationHooks.plan(context, chunk).shouldRunSurface())
+		LevelContext context = this.getContext$quadragen();
+		if (context != null && !chunk.isUpgrading() && !context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
 		{
 			ci.cancel();
 		}
@@ -109,48 +113,53 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			at = @At("HEAD"),
 			cancellable = true
 	)
-	private void quadragen$applyCarvers(
-			WorldGenRegion region,
-			long seed,
-			RandomState randomState,
-			BiomeManager biomeManager,
-			StructureManager structureManager,
-			ChunkAccess chunk,
-			CallbackInfo ci)
+	private void applyCarvers(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess chunk)
 	{
-		LevelContext context = this.quadragen$getContext();
+		LevelContext context = this.getContext$quadragen();
 		if (context == null || chunk.isUpgrading())
 		{
 			return;
 		}
-		if (!GenerationHooks.plan(context, chunk).shouldRunCarvers())
+		if (!context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
 		{
 			ci.cancel();
-			return;
-		}
-		if (chunk instanceof ProtoChunkContextAccess)
-		{
-			((ProtoChunkContextAccess)chunk).quadragen$setLevelContext(context);
 		}
 	}
 
-	@Inject(method = "spawnOriginalMobs", at = @At("HEAD"), cancellable = true)
-	private void quadragen$spawnOriginalMobs(WorldGenRegion region, CallbackInfo ci)
+	@ModifyExpressionValue(
+			method = "applyCarvers",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Lnet/minecraft/util/RandomSource;)Z")
+	)
+	private boolean filterCarverSource(
+			boolean isStartChunk,
+			@Local(argsOnly = true) ChunkAccess chunk,
+			@Local(ordinal = 1) ChunkPos sourcePos)
 	{
-		LevelContext context = this.quadragen$getContext();
+		if (!isStartChunk || chunk.isUpgrading())
+		{
+			return isStartChunk;
+		}
+		LevelContext context = this.getContext$quadragen();
+		return context == null || context.getPlanAt(sourcePos).isOrdinaryNoise();
+	}
+
+	@Inject(method = "spawnOriginalMobs", at = @At("HEAD"), cancellable = true)
+	private void spawnOriginalMobs(WorldGenRegion region, CallbackInfo ci)
+	{
+		LevelContext context = this.getContext$quadragen();
 		if (context == null)
 		{
 			return;
 		}
 		ChunkAccess chunk = region.getChunk(region.getCenter().x(), region.getCenter().z());
-		if (!chunk.isUpgrading() && !GenerationHooks.plan(context, chunk).shouldRunWorldgenMobs())
+		if (!chunk.isUpgrading() && !context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
 		{
 			ci.cancel();
 		}
 	}
 
 	@Inject(method = "getBaseHeight", at = @At("HEAD"), cancellable = true)
-	private void quadragen$getBaseHeight(
+	private void getBaseHeight(
 			int x,
 			int z,
 			Heightmap.Types type,
@@ -158,10 +167,10 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			RandomState randomState,
 			CallbackInfoReturnable<Integer> cir)
 	{
-		LevelContext context = this.quadragen$getContext();
+		LevelContext context = this.getContext$quadragen();
 		if (context != null)
 		{
-			QuadrantPlan plan = context.planForBlock(x, z);
+			QuadrantPlan plan = context.getPlanAt(x, z);
 			if (plan.isFlat())
 			{
 				cir.setReturnValue(HeightQuery.getBaseHeight(plan.getFlat(), type, heightAccessor));
@@ -170,17 +179,17 @@ public abstract class NoiseBasedChunkGeneratorMixin
 	}
 
 	@Inject(method = "getBaseColumn", at = @At("HEAD"), cancellable = true)
-	private void quadragen$getBaseColumn(
+	private void getBaseColumn(
 			int x,
 			int z,
 			LevelHeightAccessor heightAccessor,
 			RandomState randomState,
 			CallbackInfoReturnable<NoiseColumn> cir)
 	{
-		LevelContext context = this.quadragen$getContext();
+		LevelContext context = this.getContext$quadragen();
 		if (context != null)
 		{
-			QuadrantPlan plan = context.planForBlock(x, z);
+			QuadrantPlan plan = context.getPlanAt(x, z);
 			if (plan.isFlat())
 			{
 				cir.setReturnValue(HeightQuery.getBaseColumn(plan.getFlat(), heightAccessor));
@@ -188,8 +197,9 @@ public abstract class NoiseBasedChunkGeneratorMixin
 		}
 	}
 
-	private LevelContext quadragen$getContext()
+	@Unique
+	private LevelContext getContext$quadragen()
 	{
-		return ((GeneratorContextAccess)this).quadragen$getLevelContext();
+		return ((GeneratorContextAccess)this).getLevelContext$quadragen();
 	}
 }

@@ -20,31 +20,27 @@
 
 package me.fallenbreath.quadragen.mixins.spawn;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.gameplay.PhantomSpawnPolicy;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.levelgen.PhantomSpawner;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PhantomSpawner.class)
 public abstract class PhantomSpawnerMixin
 {
-	@Shadow
-	private int nextTick;
-
-	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-	private void quadragen$filterPlayers(ServerLevel level, boolean spawnEnemies, CallbackInfo ci)
+	@ModifyExpressionValue(
+			method = "tick",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z")
+	)
+	private boolean filterPlayer(boolean spectator, @Local(argsOnly = true) ServerLevel level, @Local ServerPlayer player)
 	{
-		LevelContext context = ((ServerLevelContextAccess)level).quadragen$getLevelContext();
-		if (context != null)
-		{
-			this.nextTick = PhantomSpawnPolicy.tick(context, level, spawnEnemies, this.nextTick);
-			ci.cancel();
-		}
+		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
+		return spectator || context != null && !PhantomSpawnPolicy.allowsSpawnAt(context, player.getBlockX(), player.getBlockZ());
 	}
 }

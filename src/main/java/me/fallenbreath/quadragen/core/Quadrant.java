@@ -52,4 +52,13 @@ public enum Quadrant
 	{
 		return this.zSign;
 	}
+
+	public static Quadrant fromCoordinates(int x, int z)
+	{
+		if (x >= 0)
+		{
+			return z >= 0 ? X_POSITIVE_Z_POSITIVE : X_POSITIVE_Z_NEGATIVE;
+		}
+		return z >= 0 ? X_NEGATIVE_Z_POSITIVE : X_NEGATIVE_Z_NEGATIVE;
+	}
 }

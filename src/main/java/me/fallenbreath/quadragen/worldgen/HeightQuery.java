@@ -20,14 +20,13 @@
 
 package me.fallenbreath.quadragen.worldgen;
 
+import me.fallenbreath.quadragen.compat.HeightCompat;
 import me.fallenbreath.quadragen.core.FlatGenerationPlan;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
-import java.util.Arrays;
 import java.util.List;
 
 public final class HeightQuery
@@ -39,32 +38,34 @@ public final class HeightQuery
 	public static int getBaseHeight(FlatGenerationPlan plan, Heightmap.Types type, LevelHeightAccessor heightAccessor)
 	{
 		List<BlockState> layers = plan.getLayers();
-		int maxIndex = Math.min(layers.size() - 1, heightAccessor.getMaxY() - plan.getBaseY());
+		int minY = HeightCompat.minY(heightAccessor);
+		int maxIndex = Math.min(layers.size() - 1, HeightCompat.maxYInclusive(heightAccessor) - plan.getBaseY());
 		for (int index = maxIndex; index >= 0; index--)
 		{
 			int y = plan.getBaseY() + index;
-			if (y >= heightAccessor.getMinY() && type.isOpaque().test(layers.get(index)))
+			if (y >= minY && type.isOpaque().test(layers.get(index)))
 			{
 				return y + 1;
 			}
 		}
-		return heightAccessor.getMinY();
+		return minY;
 	}
 
 	public static NoiseColumn getBaseColumn(FlatGenerationPlan plan, LevelHeightAccessor heightAccessor)
 	{
-		BlockState[] column = new BlockState[heightAccessor.getHeight()];
-		Arrays.fill(column, Blocks.AIR.defaultBlockState());
 		List<BlockState> layers = plan.getLayers();
-		for (int index = 0; index < layers.size(); index++)
+		int minY = HeightCompat.minY(heightAccessor);
+		int firstY = Math.max(plan.getBaseY(), minY);
+		int lastY = Math.min(plan.getBaseY() + layers.size() - 1, HeightCompat.maxYInclusive(heightAccessor));
+		if (lastY < firstY)
 		{
-			int y = plan.getBaseY() + index;
-			int columnIndex = y - heightAccessor.getMinY();
-			if (columnIndex >= 0 && columnIndex < column.length)
-			{
-				column[columnIndex] = layers.get(index);
-			}
+			return new NoiseColumn(minY, new BlockState[0]);
 		}
-		return new NoiseColumn(heightAccessor.getMinY(), column);
+		BlockState[] column = new BlockState[lastY - firstY + 1];
+		for (int y = firstY; y <= lastY; y++)
+		{
+			column[y - firstY] = layers.get(y - plan.getBaseY());
+		}
+		return new NoiseColumn(firstY, column);
 	}
 }

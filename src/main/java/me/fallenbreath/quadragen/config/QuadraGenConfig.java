@@ -53,9 +53,4 @@ public final class QuadraGenConfig
 		}
 		return config;
 	}
-
-	public Map<Quadrant, QuadrantConfig> getQuadrants()
-	{
-		return this.quadrants;
-	}
 }

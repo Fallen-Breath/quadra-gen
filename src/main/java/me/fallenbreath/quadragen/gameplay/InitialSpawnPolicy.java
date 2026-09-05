@@ -21,6 +21,7 @@
 package me.fallenbreath.quadragen.gameplay;
 
 import me.fallenbreath.quadragen.QuadraGen;
+import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
@@ -54,7 +55,7 @@ public final class InitialSpawnPolicy
 	{
 		for (Quadrant quadrant : Quadrant.values())
 		{
-			QuadrantPlan plan = context.getGenerationPlan().get(quadrant);
+			QuadrantPlan plan = context.getPlan(quadrant);
 			if (plan.isOrdinaryNoise() || plan.hasSafeFlatSurface())
 			{
 				return true;
@@ -65,20 +66,22 @@ public final class InitialSpawnPolicy
 
 	private static ChunkPos nearestEligible(LevelContext context, ChunkPos origin, boolean requireNoise)
 	{
+		int originX = ChunkPosCompat.x(origin);
+		int originZ = ChunkPosCompat.z(origin);
 		ChunkPos best = null;
 		long bestDistance = Long.MAX_VALUE;
 		for (Quadrant quadrant : Quadrant.values())
 		{
-			QuadrantPlan plan = context.getGenerationPlan().get(quadrant);
+			QuadrantPlan plan = context.getPlan(quadrant);
 			boolean eligible = requireNoise ? plan.isOrdinaryNoise() : plan.hasSafeFlatSurface();
 			if (!eligible)
 			{
 				continue;
 			}
-			int x = project(origin.x(), quadrant.getXSign());
-			int z = project(origin.z(), quadrant.getZSign());
-			long dx = (long)x - origin.x();
-			long dz = (long)z - origin.z();
+			int x = project(originX, quadrant.getXSign());
+			int z = project(originZ, quadrant.getZSign());
+			long dx = (long)x - originX;
+			long dz = (long)z - originZ;
 			long distance = dx * dx + dz * dz;
 			if (distance < bestDistance)
 			{

@@ -21,6 +21,7 @@
 package me.fallenbreath.quadragen.worldgen;
 
 import com.mojang.datafixers.util.Pair;
+import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import net.minecraft.core.BlockPos;
@@ -32,6 +33,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public final class BiomeQuery
@@ -49,6 +52,21 @@ public final class BiomeQuery
 			int horizontalResolution,
 			int verticalResolution)
 	{
+		Set<Holder<Biome>> candidates = new HashSet<Holder<Biome>>(context.getNoiseGenerator().getBiomeSource().possibleBiomes());
+		for (Quadrant quadrant : Quadrant.values())
+		{
+			QuadrantPlan plan = context.getPlan(quadrant);
+			if (plan.isFlat())
+			{
+				candidates.add(plan.getFlat().getBiome());
+			}
+		}
+		candidates.removeIf(biome -> !allowed.test(biome));
+		if (candidates.isEmpty())
+		{
+			return null;
+		}
+
 		int sampleRadius = Math.floorDiv(searchRadius, horizontalResolution);
 		int[] sampleYs = Mth.outFromOrigin(origin.getY(), level.getMinY() + 1, level.getMaxY() + 1, verticalResolution).toArray();
 		Climate.Sampler sampler = level.getChunkSource().randomState().sampler();
@@ -58,11 +76,11 @@ public final class BiomeQuery
 			int blockZ = origin.getZ() + sampleColumn.getZ() * horizontalResolution;
 			for (int blockY : sampleYs)
 			{
-				QuadrantPlan plan = context.planForBlock(blockX, blockZ);
+				QuadrantPlan plan = context.getPlanAt(blockX, blockZ);
 				Holder<Biome> biome = plan.isFlat()
 						? plan.getFlat().getBiome()
 						: context.getNoiseGenerator().getBiomeSource().getNoiseBiome(QuartPos.fromBlock(blockX), QuartPos.fromBlock(blockY), QuartPos.fromBlock(blockZ), sampler);
-				if (allowed.test(biome))
+				if (candidates.contains(biome))
 				{
 					return Pair.of(new BlockPos(blockX, blockY, blockZ), biome);
 				}

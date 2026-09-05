@@ -20,34 +20,35 @@
 
 package me.fallenbreath.quadragen.runtime;
 
-import me.fallenbreath.quadragen.core.GenerationPlan;
+import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
-import me.fallenbreath.quadragen.core.QuadrantRouter;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 
 public final class LevelContext
 {
-	private final GenerationPlan generationPlan;
-	private final QuadrantRouter router;
+	private final Map<Quadrant, QuadrantPlan> plans;
 	private final NoiseBasedChunkGenerator noiseGenerator;
 
-	public LevelContext(GenerationPlan generationPlan, QuadrantRouter router, NoiseBasedChunkGenerator noiseGenerator)
+	public LevelContext(Map<Quadrant, QuadrantPlan> plans, NoiseBasedChunkGenerator noiseGenerator)
 	{
-		this.generationPlan = generationPlan;
-		this.router = router;
+		this.plans = Collections.unmodifiableMap(new EnumMap<Quadrant, QuadrantPlan>(plans));
 		this.noiseGenerator = noiseGenerator;
 	}
 
-	public GenerationPlan getGenerationPlan()
+	public QuadrantPlan getPlan(Quadrant quadrant)
 	{
-		return this.generationPlan;
-	}
-
-	public QuadrantRouter getRouter()
-	{
-		return this.router;
+		QuadrantPlan plan = this.plans.get(quadrant);
+		if (plan == null)
+		{
+			throw new IllegalArgumentException("Missing quadrant plan " + quadrant);
+		}
+		return plan;
 	}
 
 	public NoiseBasedChunkGenerator getNoiseGenerator()
@@ -55,18 +56,13 @@ public final class LevelContext
 		return this.noiseGenerator;
 	}
 
-	public QuadrantPlan planForBlock(int blockX, int blockZ)
+	public QuadrantPlan getPlanAt(int x, int z)
 	{
-		return this.generationPlan.get(this.router.forBlock(blockX, blockZ));
+		return this.getPlan(Quadrant.fromCoordinates(x, z));
 	}
 
-	public QuadrantPlan planForChunk(int chunkX, int chunkZ)
+	public QuadrantPlan getPlanAt(ChunkPos pos)
 	{
-		return this.generationPlan.get(this.router.forChunk(chunkX, chunkZ));
-	}
-
-	public QuadrantPlan planForChunk(ChunkPos pos)
-	{
-		return this.planForChunk(pos.x(), pos.z());
+		return this.getPlanAt(ChunkPosCompat.x(pos), ChunkPosCompat.z(pos));
 	}
 }

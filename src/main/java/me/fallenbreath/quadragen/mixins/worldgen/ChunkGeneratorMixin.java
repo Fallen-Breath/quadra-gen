@@ -20,20 +20,14 @@
 
 package me.fallenbreath.quadragen.mixins.worldgen;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import me.fallenbreath.quadragen.worldgen.GenerationHooks;
-import me.fallenbreath.quadragen.worldgen.StructurePolicy;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.StructureManager;
+import me.fallenbreath.quadragen.worldgen.FlatLayerPlacer;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,35 +38,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 {
 	@Unique
-	private volatile LevelContext quadragen$levelContext;
+	private volatile LevelContext levelContext$quadragen;
 
 	@Override
-	public LevelContext quadragen$getLevelContext()
+	public LevelContext getLevelContext$quadragen()
 	{
-		return this.quadragen$levelContext;
+		return this.levelContext$quadragen;
 	}
 
 	@Override
-	public void quadragen$setLevelContext(LevelContext context)
+	public void setLevelContext$quadragen(LevelContext context)
 	{
-		this.quadragen$levelContext = context;
+		this.levelContext$quadragen = context;
 	}
 
 	@Inject(method = "createStructures", at = @At("HEAD"), cancellable = true)
-	private void quadragen$createStructures(
-			RegistryAccess registryAccess,
-			ChunkGeneratorStructureState state,
-			StructureManager structureManager,
-			ChunkAccess centerChunk,
-			StructureTemplateManager structureTemplateManager,
-			ResourceKey<Level> level,
-			CallbackInfo ci)
+	private void createStructures(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess centerChunk)
 	{
-		LevelContext context = this.quadragen$levelContext;
+		LevelContext context = this.levelContext$quadragen;
 		if (context != null && !centerChunk.isUpgrading())
 		{
-			QuadrantPlan plan = GenerationHooks.plan(context, centerChunk);
-			if (!StructurePolicy.shouldCreateStarts(plan))
+			QuadrantPlan plan = context.getPlanAt(centerChunk.getPos());
+			if (plan.isFlat())
 			{
 				ci.cancel();
 			}
@@ -80,17 +67,23 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	}
 
 	@Inject(method = "applyBiomeDecoration", at = @At("HEAD"), cancellable = true)
-	private void quadragen$applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager, CallbackInfo ci)
+	private void applyBiomeDecoration(
+			CallbackInfo ci,
+			@Local(argsOnly = true) WorldGenLevel level,
+			@Local(argsOnly = true) ChunkAccess chunk)
 	{
-		LevelContext context = this.quadragen$levelContext;
+		LevelContext context = this.levelContext$quadragen;
 		if (context == null || chunk.isUpgrading())
 		{
 			return;
 		}
-		QuadrantPlan plan = GenerationHooks.plan(context, chunk);
+		QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 		if (!plan.isOrdinaryNoise())
 		{
-			GenerationHooks.decorate(context, level, chunk);
+			if (plan.isFlat() && !plan.isClearGeneratedContent())
+			{
+				FlatLayerPlacer.placeDelayedLayers(level, chunk, plan.getFlat());
+			}
 			ci.cancel();
 		}
 	}

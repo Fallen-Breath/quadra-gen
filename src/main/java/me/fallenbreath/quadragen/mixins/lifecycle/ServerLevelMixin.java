@@ -27,15 +27,8 @@ import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import me.fallenbreath.quadragen.worldgen.BiomeQuery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.CustomSpawner;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.ServerLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,43 +36,30 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin implements ServerLevelContextAccess
 {
 	@Unique
-	private volatile LevelContext quadragen$levelContext;
+	private volatile LevelContext levelContext$quadragen;
 
 	@Override
-	public LevelContext quadragen$getLevelContext()
+	public LevelContext getLevelContext$quadragen()
 	{
-		return this.quadragen$levelContext;
+		return this.levelContext$quadragen;
 	}
 
 	@Override
-	public void quadragen$setLevelContext(LevelContext context)
+	public void setLevelContext$quadragen(LevelContext context)
 	{
-		this.quadragen$levelContext = context;
+		this.levelContext$quadragen = context;
 	}
 
 	@Inject(method = "<init>", at = @At("RETURN"))
-	private void quadragen$installContext(
-			MinecraftServer server,
-			Executor executor,
-			LevelStorageSource.LevelStorageAccess levelStorage,
-			ServerLevelData levelData,
-			ResourceKey<Level> dimension,
-			LevelStem levelStem,
-			boolean isDebug,
-			long biomeZoomSeed,
-			List<CustomSpawner> customSpawners,
-			boolean tickTime,
-			CallbackInfo ci)
+	private void installContext(CallbackInfo ci)
 	{
-		LevelBootstrap.install((ServerLevel)(Object)this, levelStem.generator());
+		LevelBootstrap.install((ServerLevel)(Object)this);
 	}
 
 	@Inject(
@@ -87,7 +67,7 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 			at = @At("HEAD"),
 			cancellable = true
 	)
-	private void quadragen$findClosestBiome3d(
+	private void findClosestBiome3d(
 			Predicate<Holder<Biome>> biomeTest,
 			BlockPos origin,
 			int maxSearchRadius,
@@ -95,7 +75,7 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 			int sampleResolutionVertical,
 			CallbackInfoReturnable<Pair<BlockPos, Holder<Biome>>> cir)
 	{
-		LevelContext context = this.quadragen$levelContext;
+		LevelContext context = this.levelContext$quadragen;
 		if (context != null)
 		{
 			cir.setReturnValue(BiomeQuery.findClosestBiome3d(
