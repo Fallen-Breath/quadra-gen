@@ -49,9 +49,9 @@ dependencies {
 	autoImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// runtime mods
-//	if (mcVersion < 11904) {
-//		autoRuntimeOnly(mcVersion < 11900 ? "com.github.astei:lazydfu:0.1.2" : "com.github.Fallen-Breath:lazydfu:a7cfc44c0c")
-//	}
+	if (mcVersion < 11904) {
+		autoRuntimeOnly(mcVersion < 11900 ? "com.github.astei:lazydfu:0.1.2" : "com.github.Fallen-Breath:lazydfu:a7cfc44c0c")
+	}
 	autoRuntimeOnly "me.fallenbreath:mixin-auditor:0.2.0-${unobfuscated ? 'u' : 'o'}"
 
 	// dependencies
