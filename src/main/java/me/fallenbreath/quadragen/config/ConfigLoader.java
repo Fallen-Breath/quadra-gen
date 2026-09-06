@@ -47,7 +47,8 @@ import java.util.Set;
 public final class ConfigLoader
 {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-	private static final Set<String> ROOT_FIELDS = setOf("schema_version", "enabled", "quadrants");
+	private static final Set<String> ROOT_FIELDS = setOf("schema_version", "enabled", "enabled_in_singleplayer", "overworld", "nether");
+	private static final Set<String> DIMENSION_FIELDS = setOf("enabled", "quadrants");
 	private static final Set<String> QUADRANT_FIELDS = setOf("generator", "clear_generated_content", "flat");
 	private static final Set<String> FLAT_FIELDS = setOf("biome", "layers");
 	private static final Set<String> LAYER_FIELDS = setOf("block", "count");
@@ -105,26 +106,36 @@ public final class ConfigLoader
 			throw error("$.schema_version", "expected " + QuadraGenConfig.SCHEMA_VERSION + ", got " + schemaVersion);
 		}
 		boolean enabled = requireBoolean(root, "enabled", "$");
-		JsonObject quadrantsObject = requireObject(require(root, "quadrants", "$"), "$.quadrants");
+		boolean enabledInSingleplayer = requireBoolean(root, "enabled_in_singleplayer", "$");
+		DimensionConfig overworld = parseDimension(requireObject(require(root, "overworld", "$"), "$.overworld"), "$.overworld");
+		DimensionConfig nether = parseDimension(requireObject(require(root, "nether", "$"), "$.nether"), "$.nether");
+		return new QuadraGenConfig(enabled, enabledInSingleplayer, overworld, nether);
+	}
+
+	private static DimensionConfig parseDimension(JsonObject object, String path)
+	{
+		checkFields(object, DIMENSION_FIELDS, path);
+		boolean enabled = requireBoolean(object, "enabled", path);
+		JsonObject quadrantsObject = requireObject(require(object, "quadrants", path), path + ".quadrants");
 		Set<String> quadrantKeys = new HashSet<String>();
 		for (Quadrant quadrant : Quadrant.values())
 		{
 			quadrantKeys.add(quadrant.getConfigKey());
 		}
-		checkFields(quadrantsObject, quadrantKeys, "$.quadrants");
+		checkFields(quadrantsObject, quadrantKeys, path + ".quadrants");
 
 		Map<Quadrant, QuadrantConfig> quadrants = new EnumMap<Quadrant, QuadrantConfig>(Quadrant.class);
 		for (Quadrant quadrant : Quadrant.values())
 		{
-			String path = "$.quadrants." + quadrant.getConfigKey();
+			String quadrantPath = path + ".quadrants." + quadrant.getConfigKey();
 			JsonElement value = quadrantsObject.get(quadrant.getConfigKey());
 			if (value == null)
 			{
-				throw error(path, "missing required quadrant");
+				throw error(quadrantPath, "missing required quadrant");
 			}
-			quadrants.put(quadrant, parseQuadrant(requireObject(value, path), path));
+			quadrants.put(quadrant, parseQuadrant(requireObject(value, quadrantPath), quadrantPath));
 		}
-		return new QuadraGenConfig(enabled, quadrants);
+		return new DimensionConfig(enabled, quadrants);
 	}
 
 	private static QuadrantConfig parseQuadrant(JsonObject object, String path)
@@ -181,6 +192,16 @@ public final class ConfigLoader
 		JsonObject root = new JsonObject();
 		root.addProperty("schema_version", QuadraGenConfig.SCHEMA_VERSION);
 		root.addProperty("enabled", config.isEnabled());
+		root.addProperty("enabled_in_singleplayer", config.isEnabledInSingleplayer());
+		root.add("overworld", toJson(config.getOverworld()));
+		root.add("nether", toJson(config.getNether()));
+		return root;
+	}
+
+	private static JsonObject toJson(DimensionConfig config)
+	{
+		JsonObject dimension = new JsonObject();
+		dimension.addProperty("enabled", config.isEnabled());
 		JsonObject quadrants = new JsonObject();
 		for (Quadrant quadrant : Quadrant.values())
 		{
@@ -205,8 +226,8 @@ public final class ConfigLoader
 			}
 			quadrants.add(quadrant.getConfigKey(), object);
 		}
-		root.add("quadrants", quadrants);
-		return root;
+		dimension.add("quadrants", quadrants);
+		return dimension;
 	}
 
 	private static JsonElement require(JsonObject object, String name, String path)

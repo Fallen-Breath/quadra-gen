@@ -36,12 +36,22 @@ public final class ConfigDefaults
 
 	public static QuadraGenConfig create()
 	{
+		return new QuadraGenConfig(
+				true,
+				false,
+				createDimension("minecraft:plains"),
+				createDimension("minecraft:nether_wastes")
+		);
+	}
+
+	private static DimensionConfig createDimension(String flatBiome)
+	{
 		Map<Quadrant, QuadrantConfig> quadrants = new EnumMap<Quadrant, QuadrantConfig>(Quadrant.class);
 		quadrants.put(Quadrant.X_POSITIVE_Z_POSITIVE, noise(false));
 		quadrants.put(Quadrant.X_NEGATIVE_Z_POSITIVE, noise(true));
 		quadrants.put(Quadrant.X_NEGATIVE_Z_NEGATIVE, flat("minecraft:the_void", Collections.<FlatLayerConfig>emptyList()));
-		quadrants.put(Quadrant.X_POSITIVE_Z_NEGATIVE, flat("minecraft:plains", Collections.singletonList(new FlatLayerConfig("minecraft:white_stained_glass", 1))));
-		return new QuadraGenConfig(true, quadrants);
+		quadrants.put(Quadrant.X_POSITIVE_Z_NEGATIVE, flat(flatBiome, Collections.singletonList(new FlatLayerConfig("minecraft:white_stained_glass", 1))));
+		return new DimensionConfig(true, quadrants);
 	}
 
 	private static QuadrantConfig noise(boolean clear)

@@ -33,4 +33,9 @@ public final class DimensionCompat
 	{
 		return Level.OVERWORLD.equals(level.dimension());
 	}
+
+	public static boolean isNether(ServerLevel level)
+	{
+		return Level.NETHER.equals(level.dimension());
+	}
 }

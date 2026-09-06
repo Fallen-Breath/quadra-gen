@@ -20,40 +20,35 @@
 
 package me.fallenbreath.quadragen.config;
 
-public final class QuadraGenConfig
+import me.fallenbreath.quadragen.core.Quadrant;
+
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+
+public final class DimensionConfig
 {
-	public static final int SCHEMA_VERSION = 1;
-
 	private final boolean enabled;
-	private final boolean enabledInSingleplayer;
-	private final DimensionConfig nether;
-	private final DimensionConfig overworld;
+	private final Map<Quadrant, QuadrantConfig> quadrants;
 
-	public QuadraGenConfig(boolean enabled, boolean enabledInSingleplayer, DimensionConfig overworld, DimensionConfig nether)
+	public DimensionConfig(boolean enabled, Map<Quadrant, QuadrantConfig> quadrants)
 	{
 		this.enabled = enabled;
-		this.enabledInSingleplayer = enabledInSingleplayer;
-		this.nether = nether;
-		this.overworld = overworld;
+		this.quadrants = Collections.unmodifiableMap(new EnumMap<Quadrant, QuadrantConfig>(quadrants));
+	}
+
+	public QuadrantConfig getQuadrant(Quadrant quadrant)
+	{
+		QuadrantConfig config = this.quadrants.get(quadrant);
+		if (config == null)
+		{
+			throw new IllegalArgumentException("Missing quadrant " + quadrant.getConfigKey());
+		}
+		return config;
 	}
 
 	public boolean isEnabled()
 	{
 		return this.enabled;
-	}
-
-	public boolean isEnabledInSingleplayer()
-	{
-		return this.enabledInSingleplayer;
-	}
-
-	public DimensionConfig getNether()
-	{
-		return this.nether;
-	}
-
-	public DimensionConfig getOverworld()
-	{
-		return this.overworld;
 	}
 }

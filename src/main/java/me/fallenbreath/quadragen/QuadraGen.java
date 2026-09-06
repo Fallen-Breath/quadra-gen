@@ -65,6 +65,14 @@ public class QuadraGen implements ModInitializer
 		MOD_NAME = metadata.getName();
 		MOD_VERSION = metadata.getVersion().getFriendlyString();
 		config = ConfigLoader.loadOrCreate();
-		LOGGER.info("Loaded {} {} (enabled: {})", MOD_NAME, MOD_VERSION, config.isEnabled());
+		LOGGER.info(
+				"Loaded {} {} (enabled: {}, enabled in singleplayer: {}, Overworld: {}, Nether: {})",
+				MOD_NAME,
+				MOD_VERSION,
+				config.isEnabled(),
+				config.isEnabledInSingleplayer(),
+				config.getOverworld().isEnabled(),
+				config.getNether().isEnabled()
+		);
 	}
 }

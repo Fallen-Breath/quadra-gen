@@ -20,6 +20,7 @@
 
 package me.fallenbreath.quadragen.gameplay;
 
+import me.fallenbreath.quadragen.compat.DimensionCompat;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import net.minecraft.server.level.ServerLevel;
@@ -33,12 +34,20 @@ public final class InitialSpawnCompat
 
 	public static ChunkPos selectAnchor(ServerLevel level, ChunkPos vanillaAnchor)
 	{
+		if (!DimensionCompat.isOverworld(level))
+		{
+			return vanillaAnchor;
+		}
 		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
 		return context == null ? vanillaAnchor : InitialSpawnPolicy.selectAnchor(context, vanillaAnchor);
 	}
 
 	public static boolean allowsBonusChest(ServerLevel level)
 	{
+		if (!DimensionCompat.isOverworld(level))
+		{
+			return true;
+		}
 		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
 		return context == null || InitialSpawnPolicy.hasSpawnCandidate(context);
 	}

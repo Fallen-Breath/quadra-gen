@@ -26,6 +26,7 @@ import me.fallenbreath.quadragen.compat.HeightCompat;
 import me.fallenbreath.quadragen.compat.RegistryCompat;
 import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
 import me.fallenbreath.quadragen.config.ConfigValidationException;
+import me.fallenbreath.quadragen.config.DimensionConfig;
 import me.fallenbreath.quadragen.config.FlatConfig;
 import me.fallenbreath.quadragen.config.FlatLayerConfig;
 import me.fallenbreath.quadragen.config.QuadraGenConfig;
@@ -56,39 +57,74 @@ public final class LevelBootstrap
 	public static void install(ServerLevel level)
 	{
 		QuadraGenConfig config = QuadraGen.getConfig();
-		if (!config.isEnabled() || !DimensionCompat.isOverworld(level))
+		String dimensionId = ResourceKeyCompat.identifier(level.dimension());
+		if (!config.isEnabled())
 		{
+			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: globally disabled", dimensionId);
 			return;
 		}
+		if (level.getServer().isSingleplayer() && !config.isEnabledInSingleplayer())
+		{
+			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: disabled in singleplayer", dimensionId);
+			return;
+		}
+
+		DimensionConfig dimensionConfig;
+		String configPath;
+		if (DimensionCompat.isOverworld(level))
+		{
+			dimensionConfig = config.getOverworld();
+			configPath = "$.overworld";
+		}
+		else if (DimensionCompat.isNether(level))
+		{
+			dimensionConfig = config.getNether();
+			configPath = "$.nether";
+		}
+		else
+		{
+			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: unsupported dimension", dimensionId);
+			return;
+		}
+		if (!dimensionConfig.isEnabled())
+		{
+			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: disabled by dimension config", dimensionId);
+			return;
+		}
+
 		ChunkGenerator generator = level.getChunkSource().getGenerator();
 		if (!(generator instanceof NoiseBasedChunkGenerator))
 		{
-			QuadraGen.LOGGER.warn("Quadra Gen is enabled, but the Overworld generator is {}; this world is left untouched", generator.getClass().getName());
+			QuadraGen.LOGGER.info(
+					"Quadra Gen world-generation routing is not installed for {}: unsupported generator {}",
+					dimensionId,
+					generator.getClass().getName()
+			);
 			return;
 		}
 		Map<Quadrant, QuadrantPlan> resolved = new EnumMap<Quadrant, QuadrantPlan>(Quadrant.class);
 		for (Quadrant quadrant : Quadrant.values())
 		{
-			QuadrantConfig raw = config.getQuadrant(quadrant);
+			QuadrantConfig raw = dimensionConfig.getQuadrant(quadrant);
 			if (raw.getFlat() == null)
 			{
 				resolved.put(quadrant, new QuadrantPlan(raw.getGenerator(), raw.isClearGeneratedContent(), null));
 			}
 			else
 			{
-				resolved.put(quadrant, new QuadrantPlan(raw.getGenerator(), raw.isClearGeneratedContent(), resolveFlat(level, quadrant, raw.getFlat())));
+				resolved.put(quadrant, new QuadrantPlan(raw.getGenerator(), raw.isClearGeneratedContent(), resolveFlat(level, configPath, quadrant, raw.getFlat())));
 			}
 		}
 
 		LevelContext context = new LevelContext(resolved, (NoiseBasedChunkGenerator)generator);
 		((ServerLevelContextAccess)level).setLevelContext$quadragen(context);
 		((GeneratorContextAccess)generator).setLevelContext$quadragen(context);
-		QuadraGen.LOGGER.info("Quadra Gen world-generation routing installed for {}", ResourceKeyCompat.identifier(level.dimension()));
+		QuadraGen.LOGGER.info("Quadra Gen world-generation routing installed for {}", dimensionId);
 	}
 
-	private static FlatGenerationPlan resolveFlat(ServerLevel level, Quadrant quadrant, FlatConfig raw)
+	private static FlatGenerationPlan resolveFlat(ServerLevel level, String dimensionPath, Quadrant quadrant, FlatConfig raw)
 	{
-		String basePath = "$.quadrants." + quadrant.getConfigKey() + ".flat";
+		String basePath = dimensionPath + ".quadrants." + quadrant.getConfigKey() + ".flat";
 		Holder<Biome> biome = RegistryCompat.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
 		List<BlockState> layers = new ArrayList<BlockState>();
 		int minY = HeightCompat.minY(level);
