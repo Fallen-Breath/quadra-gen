@@ -18,37 +18,26 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.mixins.sealevel;
 
-import net.minecraft.world.level.LevelHeightAccessor;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import me.fallenbreath.quadragen.runtime.SeaLevelQuery;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.animal.feline.Ocelot;
+import net.minecraft.world.level.LevelReader;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 
-public final class HeightCompat
+@Mixin(Ocelot.class)
+public abstract class OcelotMixin
 {
-	private HeightCompat()
+	@ModifyExpressionValue(
+			method = "checkSpawnObstruction",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelReader;getSeaLevel()I")
+	)
+	private int useSeaLevelAtPosition(int original, @Local(argsOnly = true) LevelReader level, @Local BlockPos pos)
 	{
-	}
-
-	public static int getFlatSeaLevel()
-	{
-		//#if MC >= 1.18.2
-		return -63;
-		//#else
-		//$$ return 63;
-		//#endif
-	}
-
-	public static int minY(LevelHeightAccessor accessor)
-	{
-		return accessor.getMinY();
-	}
-
-	public static int maxYInclusive(LevelHeightAccessor accessor)
-	{
-		return accessor.getMaxY();
-	}
-
-	public static boolean contains(LevelHeightAccessor accessor, int y)
-	{
-		return !accessor.isOutsideBuildHeight(y);
+		return SeaLevelQuery.getSeaLevelAt(level, pos, original);
 	}
 }

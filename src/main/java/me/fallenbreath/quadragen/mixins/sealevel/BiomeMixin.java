@@ -18,29 +18,35 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.spawn;
+package me.fallenbreath.quadragen.mixins.sealevel;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.gameplay.PhantomSpawnPolicy;
-import me.fallenbreath.quadragen.runtime.LevelContext;
-import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.levelgen.PhantomSpawner;
+import me.fallenbreath.quadragen.runtime.SeaLevelQuery;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(PhantomSpawner.class)
-public abstract class PhantomSpawnerMixin
+@Mixin(Biome.class)
+public abstract class BiomeMixin
 {
 	@ModifyExpressionValue(
-			method = "tick",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z")
+			method = "shouldFreeze(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Z)Z",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelReader;getSeaLevel()I")
 	)
-	private boolean filterPlayer(boolean spectator, @Local(argsOnly = true) ServerLevel level, @Local ServerPlayer player)
+	private int useSeaLevelAtFreezeCheck(int original, @Local(argsOnly = true) LevelReader level, @Local(argsOnly = true) BlockPos pos)
 	{
-		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
-		return spectator || context != null && !PhantomSpawnPolicy.allowsSpawnAt(context, player.getBlockX(), player.getBlockZ());
+		return SeaLevelQuery.getSeaLevelAt(level, pos, original);
+	}
+
+	@ModifyExpressionValue(
+			method = "shouldSnow",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelReader;getSeaLevel()I")
+	)
+	private int useSeaLevelAtSnowCheck(int original, @Local(argsOnly = true) LevelReader level, @Local(argsOnly = true) BlockPos pos)
+	{
+		return SeaLevelQuery.getSeaLevelAt(level, pos, original);
 	}
 }

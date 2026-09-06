@@ -18,20 +18,25 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.gameplay;
+package me.fallenbreath.quadragen.mixins.sealevel;
 
-import me.fallenbreath.quadragen.core.QuadrantPlan;
-import me.fallenbreath.quadragen.runtime.LevelContext;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import me.fallenbreath.quadragen.runtime.SeaLevelQuery;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 
-public final class PhantomSpawnPolicy
+@Mixin(ServerLevel.class)
+public abstract class ServerLevelMixin
 {
-	private PhantomSpawnPolicy()
+	@ModifyExpressionValue(
+			method = "tickPrecipitation",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getSeaLevel()I")
+	)
+	private int useSeaLevelAtPrecipitation(int original, @Local(argsOnly = true) BlockPos pos)
 	{
-	}
-
-	public static boolean allowsSpawnAt(LevelContext context, int blockX, int blockZ)
-	{
-		QuadrantPlan plan = context.getPlanAt(blockX, blockZ);
-		return !plan.isClearGeneratedContent() && !(plan.isFlat() && plan.getFlat().isEmpty());
+		return SeaLevelQuery.getSeaLevelAt((ServerLevel)(Object)this, pos, original);
 	}
 }
