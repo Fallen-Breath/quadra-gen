@@ -36,7 +36,11 @@ public abstract class PhantomSpawnerMixin
 			method = "tick",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getSeaLevel()I")
 	)
-	private int useSeaLevelAtPlayer(int original, @Local(argsOnly = true) ServerLevel level, @Local BlockPos playerPos)
+	private int useSeaLevelAtPlayer(
+			int original,
+			@Local(argsOnly = true) ServerLevel level,
+			@Local(ordinal = 0) BlockPos playerPos
+	)
 	{
 		return SeaLevelQuery.getSeaLevelAt(level, playerPos, original);
 	}

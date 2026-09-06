@@ -32,7 +32,11 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(targets = "net.minecraft.world.entity.monster.Phantom$PhantomAttackStrategyGoal")
 public abstract class PhantomAttackStrategyGoalMixin
 {
+	//#if MC >= 26.2
 	@Shadow @Final private Phantom this$0;
+	//#else
+	//$$ @Shadow @Final private Phantom field_7321;
+	//#endif
 
 	@ModifyExpressionValue(
 			method = "setAnchorAboveTarget",
@@ -40,7 +44,12 @@ public abstract class PhantomAttackStrategyGoalMixin
 	)
 	private int useSeaLevelAtTarget(int original)
 	{
+		//#if MC >= 26.2
 		LivingEntity target = this.this$0.getTarget();
 		return target == null ? original : SeaLevelQuery.getSeaLevelAt(this.this$0.level(), target.blockPosition(), original);
+		//#else
+		//$$ LivingEntity target = this.field_7321.getTarget();
+		//$$ return target == null ? original : SeaLevelQuery.getSeaLevelAt(this.field_7321.level(), target.blockPosition(), original);
+		//#endif
 	}
 }

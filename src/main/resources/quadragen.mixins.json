@@ -16,6 +16,7 @@
     "sealevel.GlowSquidMixin",
     "sealevel.LevelMixin",
     "sealevel.LevelReaderMixin",
+    "sealevel.NodeEvaluatorAccessor",
     "sealevel.OcelotMixin",
     "sealevel.PhantomAttackStrategyGoalMixin",
     "sealevel.PhantomSpawnerMixin",

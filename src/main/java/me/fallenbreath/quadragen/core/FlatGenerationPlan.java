@@ -28,6 +28,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,15 +39,17 @@ public final class FlatGenerationPlan
 	private final int baseY;
 	private final Holder<Biome> biome;
 	private final List<BlockState> layers;
+	private final FlatLevelSource generator;
 	private final boolean[] delayedLayers;
 	private final boolean empty;
 	private final boolean safeSurface;
 
-	public FlatGenerationPlan(int baseY, Holder<Biome> biome, List<BlockState> layers)
+	public FlatGenerationPlan(int baseY, Holder<Biome> biome, List<BlockState> layers, FlatLevelSource generator)
 	{
 		this.baseY = baseY;
 		this.biome = biome;
 		this.layers = Collections.unmodifiableList(new ArrayList<BlockState>(layers));
+		this.generator = generator;
 		this.delayedLayers = new boolean[this.layers.size()];
 		boolean hasBlock = false;
 		for (int index = 0; index < this.layers.size(); index++)
@@ -75,6 +78,11 @@ public final class FlatGenerationPlan
 	public List<BlockState> getLayers()
 	{
 		return this.layers;
+	}
+
+	public FlatLevelSource getFlatGenerator()
+	{
+		return this.generator;
 	}
 
 	public boolean isDelayedLayer(int index)

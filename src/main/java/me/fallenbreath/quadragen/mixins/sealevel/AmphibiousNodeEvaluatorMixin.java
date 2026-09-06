@@ -27,21 +27,18 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.pathfinder.AmphibiousNodeEvaluator;
 import net.minecraft.world.level.pathfinder.Node;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(AmphibiousNodeEvaluator.class)
 public abstract class AmphibiousNodeEvaluatorMixin
 {
-	@Shadow
-	protected Mob mob;
-
 	@ModifyExpressionValue(
 			method = "getNeighbors",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
 	)
-	private int useSeaLevelAtNode(int original, @Local(name = "neighbor") Node neighbor)
+	private int useSeaLevelAtNode(int original, @Local(ordinal = 1) Node neighbor)
 	{
-		return SeaLevelQuery.getSeaLevelAt(this.mob.level(), neighbor.x, neighbor.z, original);
+		Mob mob = ((NodeEvaluatorAccessor)(Object)this).getMob$quadragen();
+		return SeaLevelQuery.getSeaLevelAt(mob.level(), neighbor.x, neighbor.z, original);
 	}
 }

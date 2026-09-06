@@ -86,7 +86,7 @@ public final class InitialSpawnPolicy
 			if (distance < bestDistance)
 			{
 				bestDistance = distance;
-				best = new ChunkPos(x, z);
+				best = ChunkPosCompat.of(x, z);
 			}
 		}
 		return best;

@@ -22,20 +22,21 @@ package me.fallenbreath.quadragen.mixins.worldgen;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+import me.fallenbreath.quadragen.compat.FlatGeneratorCompat;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import me.fallenbreath.quadragen.worldgen.BiomeWriter;
-import me.fallenbreath.quadragen.worldgen.FlatLayerPlacer;
-import me.fallenbreath.quadragen.worldgen.HeightQuery;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -56,6 +57,8 @@ public abstract class NoiseBasedChunkGeneratorMixin
 	private void createBiomes(
 			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
 			@Local(argsOnly = true) RandomState randomState,
+			@Local(argsOnly = true) Blender blender,
+			@Local(argsOnly = true) StructureManager structureManager,
 			@Local(argsOnly = true) ChunkAccess chunk)
 	{
 		LevelContext context = this.getContext$quadragen();
@@ -64,8 +67,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 			if (plan.isFlat())
 			{
-				BiomeWriter.fillFlatBiome(chunk, randomState, plan.getFlat());
-				cir.setReturnValue(CompletableFuture.completedFuture(chunk));
+				cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(randomState, blender, structureManager, chunk));
 			}
 		}
 	}
@@ -77,6 +79,9 @@ public abstract class NoiseBasedChunkGeneratorMixin
 	)
 	private void fillFromNoise(
 			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
+			@Local(argsOnly = true) Blender blender,
+			@Local(argsOnly = true) RandomState randomState,
+			@Local(argsOnly = true) StructureManager structureManager,
 			@Local(argsOnly = true) ChunkAccess chunk)
 	{
 		LevelContext context = this.getContext$quadragen();
@@ -87,9 +92,12 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			{
 				if (plan.isFlat() && !plan.isClearGeneratedContent())
 				{
-					FlatLayerPlacer.placeDirectLayers(chunk, plan.getFlat());
+					cir.setReturnValue(plan.getFlat().getFlatGenerator().fillFromNoise(blender, randomState, structureManager, chunk));
 				}
-				cir.setReturnValue(CompletableFuture.completedFuture(chunk));
+				else
+				{
+					cir.setReturnValue(CompletableFuture.completedFuture(chunk));
+				}
 			}
 		}
 	}
@@ -151,7 +159,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 		{
 			return;
 		}
-		ChunkAccess chunk = region.getChunk(region.getCenter().x(), region.getCenter().z());
+		ChunkAccess chunk = region.getChunk(ChunkPosCompat.x(region.getCenter()), ChunkPosCompat.z(region.getCenter()));
 		if (!chunk.isUpgrading() && !context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
 		{
 			ci.cancel();
@@ -173,7 +181,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			QuadrantPlan plan = context.getPlanAt(x, z);
 			if (plan.isFlat())
 			{
-				cir.setReturnValue(HeightQuery.getBaseHeight(plan.getFlat(), type, heightAccessor));
+				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseHeight(x, z, type, heightAccessor, randomState));
 			}
 		}
 	}
@@ -192,7 +200,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			QuadrantPlan plan = context.getPlanAt(x, z);
 			if (plan.isFlat())
 			{
-				cir.setReturnValue(HeightQuery.getBaseColumn(plan.getFlat(), heightAccessor));
+				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseColumn(x, z, heightAccessor, randomState));
 			}
 		}
 	}

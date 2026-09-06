@@ -5,9 +5,9 @@
  * Copyright (C) 2026  Fallen_Breath and contributors
  *
  * Quadra Gen is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Lesser General Public License v3.0
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * Quadra Gen is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,20 +18,16 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.mixins.sealevel;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.pathfinder.NodeEvaluator;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-public final class ChunkBlockWriter
+@Mixin(NodeEvaluator.class)
+public interface NodeEvaluatorAccessor
 {
-	private ChunkBlockWriter()
-	{
-	}
-
-	public static void set(ChunkAccess chunk, BlockPos pos, BlockState state)
-	{
-		chunk.setBlockState(pos, state);
-	}
+	@Accessor("mob")
+	Mob getMob$quadragen();
 }

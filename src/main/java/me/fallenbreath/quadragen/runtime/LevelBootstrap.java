@@ -22,6 +22,7 @@ package me.fallenbreath.quadragen.runtime;
 
 import me.fallenbreath.quadragen.QuadraGen;
 import me.fallenbreath.quadragen.compat.DimensionCompat;
+import me.fallenbreath.quadragen.compat.FlatGeneratorCompat;
 import me.fallenbreath.quadragen.compat.HeightCompat;
 import me.fallenbreath.quadragen.compat.RegistryCompat;
 import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
@@ -139,6 +140,6 @@ public final class LevelBootstrap
 				layers.add(state);
 			}
 		}
-		return new FlatGenerationPlan(minY, biome, layers);
+		return new FlatGenerationPlan(minY, biome, layers, FlatGeneratorCompat.create(biome, layers));
 	}
 }

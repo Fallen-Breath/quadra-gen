@@ -39,10 +39,14 @@ public abstract class MinecraftServerMixin
 		return spawnBonusChest && InitialSpawnCompat.allowsBonusChest(level);
 	}
 
+	//#if MC >= 26.1
 	@ModifyExpressionValue(
 			method = "setInitialSpawn",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ChunkPos;containing(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/ChunkPos;")
 	)
+	//#else
+	//$$ @ModifyVariable(method = "setInitialSpawn", at = @At("STORE"), ordinal = 0)
+	//#endif
 	private static ChunkPos selectInitialSpawnAnchor(
 			ChunkPos vanillaAnchor,
 			@Local(argsOnly = true) ServerLevel level)

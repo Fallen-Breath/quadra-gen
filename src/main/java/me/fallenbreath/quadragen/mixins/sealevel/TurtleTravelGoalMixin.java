@@ -38,7 +38,11 @@ public abstract class TurtleTravelGoalMixin
 			method = "start",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
 	)
-	private int useSeaLevelAtTravelTarget(int original, @Local(name = "xt") int offsetX, @Local(name = "zt") int offsetZ)
+	private int useSeaLevelAtTravelTarget(
+			int original,
+			@Local(ordinal = 2) int offsetX,
+			@Local(ordinal = 4) int offsetZ
+	)
 	{
 		int blockX = offsetX + this.turtle.getBlockX();
 		int blockZ = offsetZ + this.turtle.getBlockZ();

@@ -21,10 +21,11 @@
 package me.fallenbreath.quadragen.mixins.worldgen;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import me.fallenbreath.quadragen.compat.FlatGeneratorCompat;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import me.fallenbreath.quadragen.worldgen.FlatLayerPlacer;
+import net.minecraft.SharedConstants;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -80,9 +81,9 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 		QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 		if (!plan.isOrdinaryNoise())
 		{
-			if (plan.isFlat() && !plan.isClearGeneratedContent())
+			if (!SharedConstants.DEBUG_DISABLE_FEATURES && plan.isFlat() && !plan.isClearGeneratedContent())
 			{
-				FlatLayerPlacer.placeDelayedLayers(level, chunk, plan.getFlat());
+				FlatGeneratorCompat.placeDelayedLayers(level, chunk, plan.getFlat());
 			}
 			ci.cancel();
 		}

@@ -18,23 +18,8 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.worldgen;
+package me.fallenbreath.quadragen.compat;
 
-import me.fallenbreath.quadragen.core.FlatGenerationPlan;
-import net.minecraft.core.Holder;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.RandomState;
-
-public final class BiomeWriter
+public class DummyClass
 {
-	private BiomeWriter()
-	{
-	}
-
-	public static void fillFlatBiome(ChunkAccess chunk, RandomState randomState, FlatGenerationPlan plan)
-	{
-		final Holder<Biome> biome = plan.getBiome();
-		chunk.fillBiomesFromNoise((quartX, quartY, quartZ, sampler) -> biome, randomState.sampler());
-	}
 }
