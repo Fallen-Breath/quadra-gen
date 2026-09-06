@@ -20,7 +20,6 @@
 
 package me.fallenbreath.quadragen.compat;
 
-import me.fallenbreath.quadragen.config.ConfigValidationException;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -29,7 +28,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Optional;
 
 public final class RegistryCompat
 {
@@ -37,21 +37,20 @@ public final class RegistryCompat
 	{
 	}
 
-	public static BlockState resolveBlock(String value, String path)
+	public static Optional<Block> findBlock(String value)
 	{
-		Identifier identifier = IdentifierCompat.parse(value, path);
-		Block block = BuiltInRegistries.BLOCK.getOptional(identifier).orElseThrow(
-				() -> new ConfigValidationException(path, "unknown block '" + value + "'")
-		);
-		return block.defaultBlockState();
+		Identifier identifier = IdentifierCompat.tryParse(value);
+		return identifier == null ? Optional.empty() : BuiltInRegistries.BLOCK.getOptional(identifier);
 	}
 
-	public static Holder<Biome> resolveBiome(RegistryAccess access, String value, String path)
+	public static Optional<Holder<Biome>> findBiome(RegistryAccess access, String value)
 	{
-		Identifier identifier = IdentifierCompat.parse(value, path);
+		Identifier identifier = IdentifierCompat.tryParse(value);
+		if (identifier == null)
+		{
+			return Optional.empty();
+		}
 		Registry<Biome> registry = access.lookupOrThrow(Registries.BIOME);
-		return registry.get(identifier).map(holder -> (Holder<Biome>)holder).orElseThrow(
-				() -> new ConfigValidationException(path, "unknown biome '" + value + "'")
-		);
+		return registry.get(identifier).map(holder -> holder);
 	}
 }

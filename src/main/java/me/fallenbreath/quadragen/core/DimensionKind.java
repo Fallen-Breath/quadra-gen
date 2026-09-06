@@ -18,24 +18,27 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.core;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-public final class DimensionCompat
+public enum DimensionKind
 {
-	private DimensionCompat()
-	{
-	}
+	OVERWORLD,
+	NETHER,
+	UNSUPPORTED;
 
-	public static boolean isOverworld(ServerLevel level)
+	public static DimensionKind from(ServerLevel level)
 	{
-		return Level.OVERWORLD.equals(level.dimension());
-	}
-
-	public static boolean isNether(ServerLevel level)
-	{
-		return Level.NETHER.equals(level.dimension());
+		if (Level.OVERWORLD.equals(level.dimension()))
+		{
+			return OVERWORLD;
+		}
+		if (Level.NETHER.equals(level.dimension()))
+		{
+			return NETHER;
+		}
+		return UNSUPPORTED;
 	}
 }

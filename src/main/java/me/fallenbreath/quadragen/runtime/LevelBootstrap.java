@@ -21,13 +21,18 @@
 package me.fallenbreath.quadragen.runtime;
 
 import me.fallenbreath.quadragen.QuadraGen;
-import me.fallenbreath.quadragen.compat.DimensionCompat;
-import me.fallenbreath.quadragen.compat.FlatGeneratorCompat;
-import me.fallenbreath.quadragen.compat.HeightCompat;
-import me.fallenbreath.quadragen.compat.RegistryCompat;
+import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
-import me.fallenbreath.quadragen.config.*;
+import me.fallenbreath.quadragen.config.ConfigValidationException;
+import me.fallenbreath.quadragen.config.ConfigValueResolver;
+import me.fallenbreath.quadragen.config.DimensionConfig;
+import me.fallenbreath.quadragen.config.FlatConfig;
+import me.fallenbreath.quadragen.config.FlatLayerConfig;
+import me.fallenbreath.quadragen.config.QuadraGenConfig;
+import me.fallenbreath.quadragen.config.QuadrantConfig;
+import me.fallenbreath.quadragen.core.DimensionKind;
 import me.fallenbreath.quadragen.core.FlatGenerationPlan;
+import me.fallenbreath.quadragen.core.FlatGeneratorFactory;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
@@ -66,13 +71,14 @@ public final class LevelBootstrap
 		}
 
 		DimensionConfig dimensionConfig;
+		DimensionKind dimensionKind = DimensionKind.from(level);
 		String configPath;
-		if (DimensionCompat.isOverworld(level))
+		if (dimensionKind == DimensionKind.OVERWORLD)
 		{
 			dimensionConfig = config.getOverworld();
 			configPath = "$.overworld";
 		}
-		else if (DimensionCompat.isNether(level))
+		else if (dimensionKind == DimensionKind.NETHER)
 		{
 			dimensionConfig = config.getNether();
 			configPath = "$.nether";
@@ -121,10 +127,10 @@ public final class LevelBootstrap
 	private static FlatGenerationPlan resolveFlat(ServerLevel level, String dimensionPath, Quadrant quadrant, FlatConfig raw)
 	{
 		String basePath = dimensionPath + ".quadrants." + quadrant.getConfigKey() + ".flat";
-		Holder<Biome> biome = RegistryCompat.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
+		Holder<Biome> biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
 		List<BlockState> layers = new ArrayList<BlockState>();
-		int minY = HeightCompat.minY(level);
-		int maxY = HeightCompat.maxYInclusive(level);
+		int minY = LevelHeightCompat.minY(level);
+		int maxY = LevelHeightCompat.maxYInclusive(level);
 		long layerCount = 0L;
 		for (int i = 0; i < raw.getLayers().size(); i++)
 		{
@@ -134,12 +140,12 @@ public final class LevelBootstrap
 			{
 				throw new ConfigValidationException(basePath + ".layers[" + i + "].count", "flat layers exceed the world's maximum build Y " + maxY);
 			}
-			BlockState state = RegistryCompat.resolveBlock(layer.getBlock(), basePath + ".layers[" + i + "].block");
+			BlockState state = ConfigValueResolver.resolveBlock(layer.getBlock(), basePath + ".layers[" + i + "].block");
 			for (int j = 0; j < layer.getCount(); j++)
 			{
 				layers.add(state);
 			}
 		}
-		return new FlatGenerationPlan(minY, biome, layers, FlatGeneratorCompat.create(biome, layers));
+		return new FlatGenerationPlan(minY, biome, layers, FlatGeneratorFactory.create(biome, layers));
 	}
 }

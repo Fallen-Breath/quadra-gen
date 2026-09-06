@@ -20,7 +20,7 @@
 
 package me.fallenbreath.quadragen.runtime;
 
-import me.fallenbreath.quadragen.compat.HeightCompat;
+import me.fallenbreath.quadragen.compat.SeaLevelCompat;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
@@ -44,7 +44,7 @@ public final class SeaLevelQuery
 			LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
 			if (context != null && context.getPlanAt(blockX, blockZ).isFlat())
 			{
-				return HeightCompat.getFlatSeaLevel();
+				return SeaLevelCompat.getFlatSeaLevel();
 			}
 		}
 		return originalSeaLevel;

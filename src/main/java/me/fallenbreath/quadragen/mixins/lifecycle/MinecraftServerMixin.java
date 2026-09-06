@@ -22,7 +22,7 @@ package me.fallenbreath.quadragen.mixins.lifecycle;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.gameplay.InitialSpawnCompat;
+import me.fallenbreath.quadragen.runtime.InitialSpawnPolicy;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -36,7 +36,7 @@ public abstract class MinecraftServerMixin
 	@ModifyVariable(method = "setInitialSpawn", at = @At("HEAD"), argsOnly = true, ordinal = 0)
 	private static boolean disableUnsafeBonusChest(boolean spawnBonusChest, @Local(argsOnly = true) ServerLevel level)
 	{
-		return spawnBonusChest && InitialSpawnCompat.allowsBonusChest(level);
+		return spawnBonusChest && InitialSpawnPolicy.allowsBonusChest(level);
 	}
 
 	//#if MC >= 26.1
@@ -51,6 +51,6 @@ public abstract class MinecraftServerMixin
 			ChunkPos vanillaAnchor,
 			@Local(argsOnly = true) ServerLevel level)
 	{
-		return InitialSpawnCompat.selectAnchor(level, vanillaAnchor);
+		return InitialSpawnPolicy.selectAnchor(level, vanillaAnchor);
 	}
 }

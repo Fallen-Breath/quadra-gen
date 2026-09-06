@@ -21,7 +21,7 @@
 package me.fallenbreath.quadragen.mixins.worldgen;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.compat.FlatGeneratorCompat;
+import me.fallenbreath.quadragen.core.FlatLayerPlacement;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
@@ -83,7 +83,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 		{
 			if (!SharedConstants.DEBUG_DISABLE_FEATURES && plan.isFlat() && !plan.isClearGeneratedContent())
 			{
-				FlatGeneratorCompat.placeDelayedLayers(level, chunk, plan.getFlat());
+				FlatLayerPlacement.placeDelayedLayers(level, chunk, plan.getFlat());
 			}
 			ci.cancel();
 		}

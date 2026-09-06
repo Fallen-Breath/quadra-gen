@@ -20,35 +20,14 @@
 
 package me.fallenbreath.quadragen.compat;
 
-import net.minecraft.world.level.LevelHeightAccessor;
-
-public final class HeightCompat
+public final class SeaLevelCompat
 {
-	private HeightCompat()
+	private SeaLevelCompat()
 	{
 	}
 
 	public static int getFlatSeaLevel()
 	{
-		//#if MC >= 1.18.2
 		return -63;
-		//#else
-		//$$ return 63;
-		//#endif
-	}
-
-	public static int minY(LevelHeightAccessor accessor)
-	{
-		return accessor.getMinY();
-	}
-
-	public static int maxYInclusive(LevelHeightAccessor accessor)
-	{
-		return accessor.getMaxY();
-	}
-
-	public static boolean contains(LevelHeightAccessor accessor, int y)
-	{
-		return !accessor.isOutsideBuildHeight(y);
 	}
 }

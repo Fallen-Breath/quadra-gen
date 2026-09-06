@@ -20,6 +20,26 @@
 
 package me.fallenbreath.quadragen.compat;
 
-public class DummyClass
+import net.minecraft.world.level.LevelHeightAccessor;
+
+public final class LevelHeightCompat
 {
+	private LevelHeightCompat()
+	{
+	}
+
+	public static int minY(LevelHeightAccessor accessor)
+	{
+		return accessor.getMinY();
+	}
+
+	public static int maxYInclusive(LevelHeightAccessor accessor)
+	{
+		return accessor.getMaxY();
+	}
+
+	public static boolean contains(LevelHeightAccessor accessor, int y)
+	{
+		return !accessor.isOutsideBuildHeight(y);
+	}
 }

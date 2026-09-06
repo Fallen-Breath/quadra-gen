@@ -24,7 +24,7 @@ import com.mojang.datafixers.util.Pair;
 import me.fallenbreath.quadragen.runtime.LevelBootstrap;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
-import me.fallenbreath.quadragen.worldgen.BiomeQuery;
+import me.fallenbreath.quadragen.runtime.BiomeQuery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;

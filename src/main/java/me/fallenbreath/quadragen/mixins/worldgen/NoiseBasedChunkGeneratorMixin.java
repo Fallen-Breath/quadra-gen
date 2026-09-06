@@ -23,7 +23,6 @@ package me.fallenbreath.quadragen.mixins.worldgen;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.compat.ChunkPosCompat;
-import me.fallenbreath.quadragen.compat.FlatGeneratorCompat;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;

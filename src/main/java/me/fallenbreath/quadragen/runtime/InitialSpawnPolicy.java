@@ -18,13 +18,15 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.gameplay;
+package me.fallenbreath.quadragen.runtime;
 
 import me.fallenbreath.quadragen.QuadraGen;
 import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+import me.fallenbreath.quadragen.core.DimensionKind;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
-import me.fallenbreath.quadragen.runtime.LevelContext;
+import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
 public final class InitialSpawnPolicy
@@ -35,7 +37,27 @@ public final class InitialSpawnPolicy
 	{
 	}
 
-	public static ChunkPos selectAnchor(LevelContext context, ChunkPos vanillaAnchor)
+	public static ChunkPos selectAnchor(ServerLevel level, ChunkPos vanillaAnchor)
+	{
+		if (DimensionKind.from(level) != DimensionKind.OVERWORLD)
+		{
+			return vanillaAnchor;
+		}
+		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
+		return context == null ? vanillaAnchor : InitialSpawnPolicy.selectAnchor(context, vanillaAnchor);
+	}
+
+	public static boolean allowsBonusChest(ServerLevel level)
+	{
+		if (DimensionKind.from(level) != DimensionKind.OVERWORLD)
+		{
+			return true;
+		}
+		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
+		return context == null || InitialSpawnPolicy.hasSpawnCandidate(context);
+	}
+
+	private static ChunkPos selectAnchor(LevelContext context, ChunkPos vanillaAnchor)
 	{
 		ChunkPos noise = nearestEligible(context, vanillaAnchor, true);
 		if (noise != null)
@@ -51,7 +73,7 @@ public final class InitialSpawnPolicy
 		return vanillaAnchor;
 	}
 
-	public static boolean hasSpawnCandidate(LevelContext context)
+	private static boolean hasSpawnCandidate(LevelContext context)
 	{
 		for (Quadrant quadrant : Quadrant.values())
 		{

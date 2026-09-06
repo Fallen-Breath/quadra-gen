@@ -20,7 +20,6 @@
 
 package me.fallenbreath.quadragen.compat;
 
-import me.fallenbreath.quadragen.config.ConfigValidationException;
 import net.minecraft.resources.Identifier;
 
 public final class IdentifierCompat
@@ -29,13 +28,13 @@ public final class IdentifierCompat
 	{
 	}
 
-	public static Identifier parse(String value, String path)
+	public static Identifier tryParse(String value)
 	{
-		Identifier identifier = Identifier.tryParse(value);
-		if (identifier == null)
-		{
-			throw new ConfigValidationException(path, "invalid identifier '" + value + "'");
-		}
-		return identifier;
+		return Identifier.tryParse(value);
+	}
+
+	public static boolean isValid(String value)
+	{
+		return IdentifierCompat.tryParse(value) != null;
 	}
 }

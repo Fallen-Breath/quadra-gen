@@ -10,31 +10,22 @@
  * (at your option) any later version.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.core;
 
-import me.fallenbreath.quadragen.core.FlatGenerationPlan;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.LayerConfiguration;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraft.world.level.levelgen.structure.StructureSet;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public final class FlatGeneratorCompat
+public final class FlatGeneratorFactory
 {
-	private FlatGeneratorCompat()
+	private FlatGeneratorFactory()
 	{
 	}
 
@@ -59,19 +50,5 @@ public final class FlatGeneratorCompat
 		// Initialize vanilla's layer split before fillFromNoise reads the settings.
 		generator.getBiomeGenerationSettings(biome);
 		return generator;
-	}
-
-	public static void placeDelayedLayers(WorldGenLevel level, ChunkAccess chunk, FlatGenerationPlan plan)
-	{
-		BlockPos origin = new BlockPos(chunk.getPos().getMinBlockX(), level.getMinY() + 1, chunk.getPos().getMinBlockZ());
-		RandomSource random = RandomSource.create();
-		List<BlockState> layers = plan.getLayers();
-		for (int index = 0; index < layers.size(); index++)
-		{
-			if (plan.isDelayedLayer(index))
-			{
-				Feature.FILL_LAYER.place(new LayerConfiguration(index, layers.get(index)), level, plan.getFlatGenerator(), random, origin);
-			}
-		}
 	}
 }

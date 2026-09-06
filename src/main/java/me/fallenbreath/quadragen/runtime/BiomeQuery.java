@@ -18,12 +18,11 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.worldgen;
+package me.fallenbreath.quadragen.runtime;
 
 import com.mojang.datafixers.util.Pair;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
-import me.fallenbreath.quadragen.runtime.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
