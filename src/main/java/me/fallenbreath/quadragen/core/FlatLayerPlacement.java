@@ -20,6 +20,7 @@
 
 package me.fallenbreath.quadragen.core;
 
+import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
@@ -38,7 +39,7 @@ public final class FlatLayerPlacement
 
 	public static void placeDelayedLayers(WorldGenLevel level, ChunkAccess chunk, FlatGenerationPlan plan)
 	{
-		BlockPos origin = new BlockPos(chunk.getPos().getMinBlockX(), level.getMinY() + 1, chunk.getPos().getMinBlockZ());
+		BlockPos origin = new BlockPos(chunk.getPos().getMinBlockX(), LevelHeightCompat.minY(level) + 1, chunk.getPos().getMinBlockZ());
 		RandomSource random = RandomSource.create();
 		List<BlockState> layers = plan.getLayers();
 		for (int index = 0; index < layers.size(); index++)

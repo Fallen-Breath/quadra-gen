@@ -20,6 +20,7 @@
 
 package me.fallenbreath.quadragen.core;
 
+import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//#if 1.21.3 <= MC && MC < 1.21.8
+//#if 1.21.1 <= MC && MC < 1.21.8
 //$$ import net.minecraft.world.level.LevelHeightAccessor;
 //$$ import net.minecraft.world.level.NoiseColumn;
 //#endif
@@ -105,14 +106,14 @@ public final class FlatGenerationPlan
 		return this.safeSurface;
 	}
 
-	//#if 1.21.3 <= MC && MC < 1.21.8
+	//#if 1.21.1 <= MC && MC < 1.21.8
 	//$$ /**
 	//$$  * Queries immutable configured layers because vanilla mutates its generation layers when splitting delayed placement.
 	//$$  */
 	//$$ public int getTheoreticalBaseHeight(Heightmap.Types type, LevelHeightAccessor heightAccessor)
 	//$$ {
-	//$$ 	int minIndex = Math.max(0, heightAccessor.getMinY() - this.baseY);
-	//$$ 	int maxIndex = Math.min(this.layers.size() - 1, heightAccessor.getMaxY() - this.baseY);
+	//$$ 	int minIndex = Math.max(0, LevelHeightCompat.minY(heightAccessor) - this.baseY);
+	//$$ 	int maxIndex = Math.min(this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor) - this.baseY);
 	//$$ 	for (int index = maxIndex; index >= minIndex; index--)
 	//$$ 	{
 	//$$ 		if (type.isOpaque().test(this.layers.get(index)))
@@ -120,7 +121,7 @@ public final class FlatGenerationPlan
 	//$$ 			return this.baseY + index + 1;
 	//$$ 		}
 	//$$ 	}
-	//$$ 	return heightAccessor.getMinY();
+	//$$ 	return LevelHeightCompat.minY(heightAccessor);
 	//$$ }
 
 	//$$ /**
@@ -128,11 +129,11 @@ public final class FlatGenerationPlan
 	//$$  */
 	//$$ public NoiseColumn getTheoreticalBaseColumn(LevelHeightAccessor heightAccessor)
 	//$$ {
-	//$$ 	int minY = Math.max(this.baseY, heightAccessor.getMinY());
-	//$$ 	int maxY = Math.min(this.baseY + this.layers.size() - 1, heightAccessor.getMaxY());
+	//$$ 	int minY = Math.max(this.baseY, LevelHeightCompat.minY(heightAccessor));
+	//$$ 	int maxY = Math.min(this.baseY + this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor));
 	//$$ 	if (maxY < minY)
 	//$$ 	{
-	//$$ 		return new NoiseColumn(heightAccessor.getMinY(), new BlockState[0]);
+	//$$ 		return new NoiseColumn(LevelHeightCompat.minY(heightAccessor), new BlockState[0]);
 	//$$ 	}
 	//$$ 	BlockState[] column = new BlockState[maxY - minY + 1];
 	//$$ 	for (int y = minY; y <= maxY; y++)

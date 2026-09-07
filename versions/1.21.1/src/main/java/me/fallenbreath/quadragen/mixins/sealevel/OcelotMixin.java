@@ -18,36 +18,13 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.mixins.sealevel;
 
-import net.minecraft.world.level.LevelHeightAccessor;
+import me.fallenbreath.quadragen.compat.DummyClass;
+import org.spongepowered.asm.mixin.Mixin;
 
-public final class LevelHeightCompat
+// Runtime sea-level routing is not used in MC <= 1.21.1.
+@Mixin(DummyClass.class)
+public abstract class OcelotMixin
 {
-	private LevelHeightCompat()
-	{
-	}
-
-	public static int minY(LevelHeightAccessor accessor)
-	{
-		//#if MC >= 1.21.3
-		return accessor.getMinY();
-		//#else
-		//$$ return accessor.getMinBuildHeight();
-		//#endif
-	}
-
-	public static int maxYInclusive(LevelHeightAccessor accessor)
-	{
-		//#if MC >= 1.21.3
-		return accessor.getMaxY();
-		//#else
-		//$$ return accessor.getMaxBuildHeight() - 1;
-		//#endif
-	}
-
-	public static boolean contains(LevelHeightAccessor accessor, int y)
-	{
-		return !accessor.isOutsideBuildHeight(y);
-	}
 }

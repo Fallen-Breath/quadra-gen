@@ -50,7 +50,16 @@ public final class RegistryCompat
 		{
 			return Optional.empty();
 		}
-		Registry<Biome> registry = access.lookupOrThrow(Registries.BIOME);
+		Registry<Biome> registry =
+				//#if MC >= 1.21.3
+				access.lookupOrThrow(Registries.BIOME);
+				//#else
+				//$$ access.registryOrThrow(Registries.BIOME);
+				//#endif
+		//#if MC >= 1.21.3
 		return registry.get(identifier).map(holder -> holder);
+		//#else
+		//$$ return registry.getHolder(identifier).map(holder -> holder);
+		//#endif
 	}
 }

@@ -21,6 +21,7 @@
 package me.fallenbreath.quadragen.runtime;
 
 import com.mojang.datafixers.util.Pair;
+import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import net.minecraft.core.BlockPos;
@@ -67,7 +68,12 @@ public final class BiomeQuery
 		}
 
 		int sampleRadius = Math.floorDiv(searchRadius, horizontalResolution);
-		int[] sampleYs = Mth.outFromOrigin(origin.getY(), level.getMinY() + 1, level.getMaxY() + 1, verticalResolution).toArray();
+		int[] sampleYs = Mth.outFromOrigin(
+				origin.getY(),
+				LevelHeightCompat.minY(level) + 1,
+				LevelHeightCompat.maxYInclusive(level) + 1,
+				verticalResolution
+		).toArray();
 		Climate.Sampler sampler = level.getChunkSource().randomState().sampler();
 		for (BlockPos.MutableBlockPos sampleColumn : BlockPos.spiralAround(BlockPos.ZERO, sampleRadius, Direction.EAST, Direction.SOUTH))
 		{
