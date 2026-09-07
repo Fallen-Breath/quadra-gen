@@ -43,7 +43,7 @@ public abstract class LevelMixin
 	@ModifyExpressionValue(
 			//#if MC >= 1.21.8
 			method = "precipitationAt",
-			//#elseif MC >= 1.21.5
+			//#elseif MC >= 1.21.4
 			//$$ method = "isRainingAt",
 			//#else
 			//$$ method = "precipitationAt",

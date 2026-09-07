@@ -182,7 +182,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			{
 				//#if MC >= 1.21.8
 				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseHeight(x, z, type, heightAccessor, randomState));
-				//#elseif MC >= 1.21.5
+				//#elseif MC >= 1.21.4
 				//$$ cir.setReturnValue(plan.getFlat().getTheoreticalBaseHeight(type, heightAccessor));
 				//#else
 				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseHeight(x, z, type, heightAccessor, randomState));
@@ -207,7 +207,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			{
 				//#if MC >= 1.21.8
 				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseColumn(x, z, heightAccessor, randomState));
-				//#elseif MC >= 1.21.5
+				//#elseif MC >= 1.21.4
 				//$$ cir.setReturnValue(plan.getFlat().getTheoreticalBaseColumn(heightAccessor));
 				//#else
 				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseColumn(x, z, heightAccessor, randomState));
