@@ -37,7 +37,7 @@ public abstract class ServerLevelMixin
 	)
 	private int useSeaLevelAtPrecipitation(
 			int original,
-			//#if MC == 1.21.10
+			//#if 1.21.8 <= MC && MC < 1.21.11
 			//$$ @Local(ordinal = 2) BlockPos pos
 			//#else
 			@Local(argsOnly = true) BlockPos pos
