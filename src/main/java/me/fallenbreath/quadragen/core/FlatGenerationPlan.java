@@ -34,6 +34,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+//#if 1.21.5 <= MC && MC < 1.21.8
+//$$ import net.minecraft.world.level.LevelHeightAccessor;
+//$$ import net.minecraft.world.level.NoiseColumn;
+//#endif
+
 public final class FlatGenerationPlan
 {
 	private final int baseY;
@@ -99,6 +104,44 @@ public final class FlatGenerationPlan
 	{
 		return this.safeSurface;
 	}
+
+	//#if 1.21.5 <= MC && MC < 1.21.8
+	//$$ /**
+	//$$  * Queries immutable configured layers because vanilla mutates its generation layers when splitting delayed placement.
+	//$$  */
+	//$$ public int getTheoreticalBaseHeight(Heightmap.Types type, LevelHeightAccessor heightAccessor)
+	//$$ {
+	//$$ 	int minIndex = Math.max(0, heightAccessor.getMinY() - this.baseY);
+	//$$ 	int maxIndex = Math.min(this.layers.size() - 1, heightAccessor.getMaxY() - this.baseY);
+	//$$ 	for (int index = maxIndex; index >= minIndex; index--)
+	//$$ 	{
+	//$$ 		if (type.isOpaque().test(this.layers.get(index)))
+	//$$ 		{
+	//$$ 			return this.baseY + index + 1;
+	//$$ 		}
+	//$$ 	}
+	//$$ 	return heightAccessor.getMinY();
+	//$$ }
+
+	//$$ /**
+	//$$  * Preserves the theoretical column because vanilla represents delayed generation layers as null entries.
+	//$$  */
+	//$$ public NoiseColumn getTheoreticalBaseColumn(LevelHeightAccessor heightAccessor)
+	//$$ {
+	//$$ 	int minY = Math.max(this.baseY, heightAccessor.getMinY());
+	//$$ 	int maxY = Math.min(this.baseY + this.layers.size() - 1, heightAccessor.getMaxY());
+	//$$ 	if (maxY < minY)
+	//$$ 	{
+	//$$ 		return new NoiseColumn(heightAccessor.getMinY(), new BlockState[0]);
+	//$$ 	}
+	//$$ 	BlockState[] column = new BlockState[maxY - minY + 1];
+	//$$ 	for (int y = minY; y <= maxY; y++)
+	//$$ 	{
+	//$$ 		column[y - minY] = this.layers.get(y - this.baseY);
+	//$$ 	}
+	//$$ 	return new NoiseColumn(minY, column);
+	//$$ }
+	//#endif
 
 	private static boolean hasSafeSurface(List<BlockState> layers)
 	{

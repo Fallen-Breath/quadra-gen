@@ -41,7 +41,13 @@ public abstract class LevelMixin
 	}
 
 	@ModifyExpressionValue(
+			//#if MC >= 1.21.8
 			method = "precipitationAt",
+			//#elseif MC >= 1.21.5
+			//$$ method = "isRainingAt",
+			//#else
+			//$$ method = "precipitationAt",
+			//#endif
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
 	)
 	private int useSeaLevelAtPrecipitation(int original, @Local(argsOnly = true) BlockPos pos)

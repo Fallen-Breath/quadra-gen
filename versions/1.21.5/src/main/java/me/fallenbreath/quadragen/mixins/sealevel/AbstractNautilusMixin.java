@@ -20,32 +20,11 @@
 
 package me.fallenbreath.quadragen.mixins.sealevel;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.runtime.SeaLevelQuery;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
+import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin
+// AbstractNautilus does not exist in MC 1.21.5.
+@Mixin(DummyClass.class)
+public abstract class AbstractNautilusMixin
 {
-	@ModifyExpressionValue(
-			method = "tickPrecipitation",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getSeaLevel()I")
-	)
-	private int useSeaLevelAtPrecipitation(
-			int original,
-			//#if MC >= 1.21.11
-			@Local(argsOnly = true) BlockPos pos
-			//#elseif MC >= 1.21.8
-			//$$ @Local(ordinal = 2) BlockPos pos
-			//#else
-			//$$ @Local(argsOnly = true) BlockPos pos
-			//#endif
-	)
-	{
-		return SeaLevelQuery.getSeaLevelAt((ServerLevel)(Object)this, pos, original);
-	}
 }
