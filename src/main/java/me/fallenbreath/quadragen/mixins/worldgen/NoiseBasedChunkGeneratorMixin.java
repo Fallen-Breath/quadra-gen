@@ -45,16 +45,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.concurrent.CompletableFuture;
 
+//#if 1.20.6 <= MC && MC < 1.21.1
+//$$ import java.util.concurrent.Executor;
+//#endif
+
 @Mixin(NoiseBasedChunkGenerator.class)
 public abstract class NoiseBasedChunkGeneratorMixin
 {
 	@Inject(
+			//#if MC >= 1.21.1
 			method = "createBiomes(Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
+			//#elseif MC >= 1.20.6
+			//$$ method = "createBiomes(Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
+			//#else
+			//$$ // TODO: Port this descriptor against the target MC source.
+			//$$ method = TODO_PORT_MC_VERSION,
+			//#endif
 			at = @At("HEAD"),
 			cancellable = true
 	)
 	private void createBiomes(
 			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
+			//#if 1.20.6 <= MC && MC < 1.21.1
+			//$$ @Local(argsOnly = true) Executor executor,
+			//#endif
 			@Local(argsOnly = true) RandomState randomState,
 			@Local(argsOnly = true) Blender blender,
 			@Local(argsOnly = true) StructureManager structureManager,
@@ -66,18 +80,35 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 			if (plan.isFlat())
 			{
+				//#if MC >= 1.21.1
 				cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(randomState, blender, structureManager, chunk));
+				//#elseif MC >= 1.20.6
+				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(executor, randomState, blender, structureManager, chunk));
+				//#else
+				//$$ // TODO: Port this call against the target MC source.
+				//$$ TODO_PORT_MC_VERSION();
+				//#endif
 			}
 		}
 	}
 
 	@Inject(
+			//#if MC >= 1.21.1
 			method = "fillFromNoise(Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
+			//#elseif MC >= 1.20.6
+			//$$ method = "fillFromNoise(Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
+			//#else
+			//$$ // TODO: Port this descriptor against the target MC source.
+			//$$ method = TODO_PORT_MC_VERSION,
+			//#endif
 			at = @At("HEAD"),
 			cancellable = true
 	)
 	private void fillFromNoise(
 			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
+			//#if 1.20.6 <= MC && MC < 1.21.1
+			//$$ @Local(argsOnly = true) Executor executor,
+			//#endif
 			@Local(argsOnly = true) Blender blender,
 			@Local(argsOnly = true) RandomState randomState,
 			@Local(argsOnly = true) StructureManager structureManager,
@@ -91,7 +122,14 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			{
 				if (plan.isFlat() && !plan.isClearGeneratedContent())
 				{
+					//#if MC >= 1.21.1
 					cir.setReturnValue(plan.getFlat().getFlatGenerator().fillFromNoise(blender, randomState, structureManager, chunk));
+					//#elseif MC >= 1.20.6
+					//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().fillFromNoise(executor, blender, randomState, structureManager, chunk));
+					//#else
+					//$$ // TODO: Port this call against the target MC source.
+					//$$ TODO_PORT_MC_VERSION();
+					//#endif
 				}
 				else
 				{
@@ -182,10 +220,11 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			{
 				//#if MC >= 1.21.8
 				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseHeight(x, z, type, heightAccessor, randomState));
-				//#elseif MC >= 1.21.1
+				//#elseif MC >= 1.20.6
 				//$$ cir.setReturnValue(plan.getFlat().getTheoreticalBaseHeight(type, heightAccessor));
 				//#else
-				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseHeight(x, z, type, heightAccessor, randomState));
+				//$$ // TODO: Port this query against the target MC source.
+				//$$ TODO_PORT_MC_VERSION();
 				//#endif
 			}
 		}
@@ -207,10 +246,11 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			{
 				//#if MC >= 1.21.8
 				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseColumn(x, z, heightAccessor, randomState));
-				//#elseif MC >= 1.21.1
+				//#elseif MC >= 1.20.6
 				//$$ cir.setReturnValue(plan.getFlat().getTheoreticalBaseColumn(heightAccessor));
 				//#else
-				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseColumn(x, z, heightAccessor, randomState));
+				//$$ // TODO: Port this query against the target MC source.
+				//$$ TODO_PORT_MC_VERSION();
 				//#endif
 			}
 		}

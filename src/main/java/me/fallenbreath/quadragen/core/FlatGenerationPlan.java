@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//#if 1.21.1 <= MC && MC < 1.21.8
+//#if 1.20.6 <= MC && MC < 1.21.8
 //$$ import net.minecraft.world.level.LevelHeightAccessor;
 //$$ import net.minecraft.world.level.NoiseColumn;
 //#endif
@@ -106,7 +106,7 @@ public final class FlatGenerationPlan
 		return this.safeSurface;
 	}
 
-	//#if 1.21.1 <= MC && MC < 1.21.8
+	//#if 1.20.6 <= MC && MC < 1.21.8
 	//$$ /**
 	//$$  * Queries immutable configured layers because vanilla mutates its generation layers when splitting delayed placement.
 	//$$  */
