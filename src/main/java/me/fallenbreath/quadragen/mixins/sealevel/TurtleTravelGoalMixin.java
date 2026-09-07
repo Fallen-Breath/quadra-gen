@@ -29,7 +29,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
+//#if MC >= 1.21.11
 @Mixin(targets = "net.minecraft.world.entity.animal.turtle.Turtle$TurtleTravelGoal")
+//#else
+//$$ @Mixin(targets = "net.minecraft.world.entity.animal.Turtle$TurtleTravelGoal")
+//#endif
 public abstract class TurtleTravelGoalMixin
 {
 	@Shadow @Final private Turtle turtle;

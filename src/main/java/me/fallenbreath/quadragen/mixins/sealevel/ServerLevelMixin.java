@@ -35,7 +35,14 @@ public abstract class ServerLevelMixin
 			method = "tickPrecipitation",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getSeaLevel()I")
 	)
-	private int useSeaLevelAtPrecipitation(int original, @Local(argsOnly = true) BlockPos pos)
+	private int useSeaLevelAtPrecipitation(
+			int original,
+			//#if MC == 1.21.10
+			//$$ @Local(ordinal = 2) BlockPos pos
+			//#else
+			@Local(argsOnly = true) BlockPos pos
+			//#endif
+	)
 	{
 		return SeaLevelQuery.getSeaLevelAt((ServerLevel)(Object)this, pos, original);
 	}

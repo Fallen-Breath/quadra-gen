@@ -20,29 +20,10 @@
 
 package me.fallenbreath.quadragen.mixins.sealevel;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import me.fallenbreath.quadragen.runtime.SeaLevelQuery;
-import net.minecraft.world.entity.monster.zombie.Drowned;
-import org.spongepowered.asm.mixin.Final;
+import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
 
-//#if MC >= 1.21.11
-@Mixin(targets = "net.minecraft.world.entity.monster.zombie.Drowned$DrownedGoToBeachGoal")
-//#else
-//$$ @Mixin(targets = "net.minecraft.world.entity.monster.Drowned$DrownedGoToBeachGoal")
-//#endif
-public abstract class DrownedGoToBeachGoalMixin
+@Mixin(DummyClass.class)
+public abstract class AbstractNautilusMixin
 {
-	@Shadow @Final private Drowned drowned;
-
-	@ModifyExpressionValue(
-			method = "canUse",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
-	)
-	private int useSeaLevelAtDrowned(int original)
-	{
-		return SeaLevelQuery.getSeaLevelAt(this.drowned.level(), this.drowned.blockPosition(), original);
-	}
 }

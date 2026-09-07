@@ -1,0 +1,7 @@
+net.minecraft.resources.ResourceLocation net.minecraft.resources.Identifier
+net.minecraft.resources.ResourceKey location() identifier()
+net.minecraft.world.entity.GlowSquid net.minecraft.world.entity.animal.squid.GlowSquid
+net.minecraft.world.entity.animal.Ocelot net.minecraft.world.entity.animal.feline.Ocelot
+net.minecraft.world.entity.animal.Turtle net.minecraft.world.entity.animal.turtle.Turtle
+net.minecraft.world.entity.animal.WaterAnimal net.minecraft.world.entity.animal.fish.WaterAnimal
+net.minecraft.world.entity.monster.Drowned net.minecraft.world.entity.monster.zombie.Drowned

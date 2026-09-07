@@ -28,14 +28,22 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
+//#if MC >= 1.21.11
 @Mixin(targets = "net.minecraft.world.entity.monster.zombie.Drowned$DrownedSwimUpGoal")
+//#else
+//$$ @Mixin(targets = "net.minecraft.world.entity.monster.Drowned$DrownedSwimUpGoal")
+//#endif
 public abstract class DrownedSwimUpGoalMixin
 {
 	@Shadow @Final private Drowned drowned;
 
 	@ModifyExpressionValue(
 			method = {"canUse", "tick"},
+			//#if MC >= 1.21.11
 			at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/monster/zombie/Drowned$DrownedSwimUpGoal;seaLevel:I")
+			//#else
+			//$$ at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/monster/Drowned$DrownedSwimUpGoal;seaLevel:I")
+			//#endif
 	)
 	private int useSeaLevelAtDrowned(int original)
 	{
