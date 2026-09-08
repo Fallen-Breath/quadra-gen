@@ -47,7 +47,9 @@ public final class FlatGeneratorFactory
 		}
 		settings.updateLayers();
 		FlatLevelSource generator = new FlatLevelSource(settings);
-		// Initialize vanilla's layer split before fillFromNoise reads the settings.
+		// Initialize {@link net.minecraft.world.level.levelgen.ChunkGenerator#getBiomeGenerationSettings} so the layer split
+		// performed by {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#adjustGenerationSettings} is ready before
+		// {@link net.minecraft.world.level.levelgen.FlatLevelSource#fillFromNoise} reads the settings.
 		generator.getBiomeGenerationSettings(biome);
 		return generator;
 	}

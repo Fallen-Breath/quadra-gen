@@ -26,8 +26,12 @@ import me.fallenbreath.quadragen.core.DimensionKind;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class InitialSpawnPolicy
 {
@@ -47,14 +51,14 @@ public final class InitialSpawnPolicy
 		return context == null ? vanillaAnchor : InitialSpawnPolicy.selectAnchor(context, vanillaAnchor);
 	}
 
-	public static boolean allowsBonusChest(ServerLevel level)
+	public static boolean allowsBonusChest(ServerLevel level, BlockPos spawnPos)
 	{
 		if (DimensionKind.from(level) != DimensionKind.OVERWORLD)
 		{
 			return true;
 		}
 		LevelContext context = ((ServerLevelContextAccess)level).getLevelContext$quadragen();
-		return context == null || InitialSpawnPolicy.hasSpawnCandidate(context);
+		return context == null || InitialSpawnPolicy.hasSafeGround(level, spawnPos);
 	}
 
 	private static ChunkPos selectAnchor(LevelContext context, ChunkPos vanillaAnchor)
@@ -73,17 +77,20 @@ public final class InitialSpawnPolicy
 		return vanillaAnchor;
 	}
 
-	private static boolean hasSpawnCandidate(LevelContext context)
+	/**
+	 * Mirrors the ground acceptance checks in
+	 * {@link net.minecraft.server.level.PlayerRespawnLogic#getOverworldRespawnPos} and
+	 * {@link net.minecraft.server.level.PlayerSpawnFinder#getLevelRespawnPos} for the final vanilla spawn position.
+	 */
+	private static boolean hasSafeGround(ServerLevel level, BlockPos spawnPos)
 	{
-		for (Quadrant quadrant : Quadrant.values())
+		BlockPos groundPos = spawnPos.below();
+		if (level.isOutsideBuildHeight(groundPos))
 		{
-			QuadrantPlan plan = context.getPlan(quadrant);
-			if (plan.isOrdinaryNoise() || plan.hasSafeFlatSurface())
-			{
-				return true;
-			}
+			return false;
 		}
-		return false;
+		BlockState groundState = level.getBlockState(groundPos);
+		return groundState.getFluidState().isEmpty() && Block.isFaceFull(groundState.getCollisionShape(level, groundPos), Direction.UP);
 	}
 
 	private static ChunkPos nearestEligible(LevelContext context, ChunkPos origin, boolean requireNoise)

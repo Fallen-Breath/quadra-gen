@@ -25,6 +25,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,11 +36,6 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-//#if 1.20.6 <= MC && MC < 1.21.8
-//$$ import net.minecraft.world.level.LevelHeightAccessor;
-//$$ import net.minecraft.world.level.NoiseColumn;
-//#endif
 
 public final class FlatGenerationPlan
 {
@@ -61,6 +58,8 @@ public final class FlatGenerationPlan
 		for (int index = 0; index < this.layers.size(); index++)
 		{
 			BlockState state = this.layers.get(index);
+			// See {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#adjustGenerationSettings}:
+			// non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
 			this.delayedLayers[index] = !Heightmap.Types.MOTION_BLOCKING.isOpaque().test(state);
 			if (!state.isAir())
 			{
@@ -106,44 +105,49 @@ public final class FlatGenerationPlan
 		return this.safeSurface;
 	}
 
-	//#if 1.20.6 <= MC && MC < 1.21.8
-	//$$ /**
-	//$$  * Queries immutable configured layers because vanilla mutates its generation layers when splitting delayed placement.
-	//$$  */
-	//$$ public int getTheoreticalBaseHeight(Heightmap.Types type, LevelHeightAccessor heightAccessor)
-	//$$ {
-	//$$ 	int minIndex = Math.max(0, LevelHeightCompat.minY(heightAccessor) - this.baseY);
-	//$$ 	int maxIndex = Math.min(this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor) - this.baseY);
-	//$$ 	for (int index = maxIndex; index >= minIndex; index--)
-	//$$ 	{
-	//$$ 		if (type.isOpaque().test(this.layers.get(index)))
-	//$$ 		{
-	//$$ 			return this.baseY + index + 1;
-	//$$ 		}
-	//$$ 	}
-	//$$ 	return LevelHeightCompat.minY(heightAccessor);
-	//$$ }
+	/**
+	 * Mirrors {@link net.minecraft.world.level.levelgen.FlatLevelSource#getBaseHeight} using immutable configured layers
+	 * because vanilla mutates its generation layers when splitting delayed placement.
+	 */
+	public int getBaseHeightFromConfiguredLayers(Heightmap.Types type, LevelHeightAccessor heightAccessor)
+	{
+		int minIndex = Math.max(0, LevelHeightCompat.minY(heightAccessor) - this.baseY);
+		int maxIndex = Math.min(this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor) - this.baseY);
+		for (int index = maxIndex; index >= minIndex; index--)
+		{
+			if (type.isOpaque().test(this.layers.get(index)))
+			{
+				return this.baseY + index + 1;
+			}
+		}
+		return LevelHeightCompat.minY(heightAccessor);
+	}
 
-	//$$ /**
-	//$$  * Preserves the theoretical column because vanilla represents delayed generation layers as null entries.
-	//$$  */
-	//$$ public NoiseColumn getTheoreticalBaseColumn(LevelHeightAccessor heightAccessor)
-	//$$ {
-	//$$ 	int minY = Math.max(this.baseY, LevelHeightCompat.minY(heightAccessor));
-	//$$ 	int maxY = Math.min(this.baseY + this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor));
-	//$$ 	if (maxY < minY)
-	//$$ 	{
-	//$$ 		return new NoiseColumn(LevelHeightCompat.minY(heightAccessor), new BlockState[0]);
-	//$$ 	}
-	//$$ 	BlockState[] column = new BlockState[maxY - minY + 1];
-	//$$ 	for (int y = minY; y <= maxY; y++)
-	//$$ 	{
-	//$$ 		column[y - minY] = this.layers.get(y - this.baseY);
-	//$$ 	}
-	//$$ 	return new NoiseColumn(minY, column);
-	//$$ }
-	//#endif
+	/**
+	 * Mirrors {@link net.minecraft.world.level.levelgen.FlatLevelSource#getBaseColumn} while preserving configured layers
+	 * that vanilla represents as null after splitting delayed placement.
+	 */
+	public NoiseColumn getBaseColumnFromConfiguredLayers(LevelHeightAccessor heightAccessor)
+	{
+		int minY = Math.max(this.baseY, LevelHeightCompat.minY(heightAccessor));
+		int maxY = Math.min(this.baseY + this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor));
+		if (maxY < minY)
+		{
+			return new NoiseColumn(LevelHeightCompat.minY(heightAccessor), new BlockState[0]);
+		}
+		BlockState[] column = new BlockState[maxY - minY + 1];
+		for (int y = minY; y <= maxY; y++)
+		{
+			column[y - minY] = this.layers.get(y - this.baseY);
+		}
+		return new NoiseColumn(minY, column);
+	}
 
+	/**
+	 * Mirrors the ground acceptance checks in
+	 * {@link net.minecraft.server.level.PlayerRespawnLogic#getOverworldRespawnPos} and
+	 * {@link net.minecraft.server.level.PlayerSpawnFinder#getLevelRespawnPos} for a configured Flat column.
+	 */
 	private static boolean hasSafeSurface(List<BlockState> layers)
 	{
 		int motionBlocking = -1;

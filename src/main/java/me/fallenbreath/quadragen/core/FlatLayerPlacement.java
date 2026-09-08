@@ -40,6 +40,8 @@ public final class FlatLayerPlacement
 	public static void placeDelayedLayers(WorldGenLevel level, ChunkAccess chunk, FlatGenerationPlan plan)
 	{
 		BlockPos origin = new BlockPos(chunk.getPos().getMinBlockX(), LevelHeightCompat.minY(level) + 1, chunk.getPos().getMinBlockZ());
+		// NOTE: {@link net.minecraft.world.level.levelgen.feature.FillLayerFeature#place} does not consume random in supported versions;
+		// re-audit before relying on this unseeded source.
 		RandomSource random = RandomSource.create();
 		List<BlockState> layers = plan.getLayers();
 		for (int index = 0; index < layers.size(); index++)

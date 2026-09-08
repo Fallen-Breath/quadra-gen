@@ -43,6 +43,10 @@ public final class BiomeQuery
 	{
 	}
 
+	/**
+	 * Mirrors {@link net.minecraft.world.level.biome.BiomeSource#findClosestBiome3d} search order while extending its candidate
+	 * set and sampled biome source with quadrant-aware Flat biomes.
+	 */
 	public static Pair<BlockPos, Holder<Biome>> findClosestBiome3d(
 			LevelContext context,
 			ServerLevel level,

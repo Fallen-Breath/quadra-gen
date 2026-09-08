@@ -26,6 +26,7 @@ import me.fallenbreath.quadragen.runtime.InitialSpawnPolicy;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.storage.ServerLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -33,10 +34,21 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin
 {
-	@ModifyVariable(method = "setInitialSpawn", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-	private static boolean disableUnsafeBonusChest(boolean spawnBonusChest, @Local(argsOnly = true) ServerLevel level)
+	@ModifyVariable(method = "setInitialSpawn", at = @At("LOAD"), argsOnly = true, ordinal = 0)
+	private static boolean disableUnsafeBonusChest(
+			boolean spawnBonusChest,
+			@Local(argsOnly = true) ServerLevel level,
+			@Local(argsOnly = true) ServerLevelData levelData)
 	{
-		return spawnBonusChest && InitialSpawnPolicy.allowsBonusChest(level);
+		if (!spawnBonusChest)
+		{
+			return false;
+		}
+		//#if MC >= 1.21.10
+		return InitialSpawnPolicy.allowsBonusChest(level, levelData.getRespawnData().pos());
+		//#else
+		//$$ return InitialSpawnPolicy.allowsBonusChest(level, levelData.getSpawnPos());
+		//#endif
 	}
 
 	//#if MC >= 26.1

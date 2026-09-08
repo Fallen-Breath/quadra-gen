@@ -45,6 +45,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.concurrent.CompletableFuture;
 
+//#if MC >= 1.20.6
+import net.minecraft.world.level.levelgen.BelowZeroRetrogen;
+//#else
+//$$ // TODO: Port upgrading-height detection against the target MC source.
+//#endif
+
 //#if 1.20.6 <= MC && MC < 1.21.1
 //$$ import java.util.concurrent.Executor;
 //#endif
@@ -213,19 +219,12 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			CallbackInfoReturnable<Integer> cir)
 	{
 		LevelContext context = this.getContext$quadragen();
-		if (context != null)
+		if (context != null && !this.isUpgradingHeightAccessor$quadragen(heightAccessor))
 		{
 			QuadrantPlan plan = context.getPlanAt(x, z);
 			if (plan.isFlat())
 			{
-				//#if MC >= 1.21.8
-				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseHeight(x, z, type, heightAccessor, randomState));
-				//#elseif MC >= 1.20.6
-				//$$ cir.setReturnValue(plan.getFlat().getTheoreticalBaseHeight(type, heightAccessor));
-				//#else
-				//$$ // TODO: Port this query against the target MC source.
-				//$$ TODO_PORT_MC_VERSION();
-				//#endif
+				cir.setReturnValue(plan.getFlat().getBaseHeightFromConfiguredLayers(type, heightAccessor));
 			}
 		}
 	}
@@ -239,21 +238,25 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			CallbackInfoReturnable<NoiseColumn> cir)
 	{
 		LevelContext context = this.getContext$quadragen();
-		if (context != null)
+		if (context != null && !this.isUpgradingHeightAccessor$quadragen(heightAccessor))
 		{
 			QuadrantPlan plan = context.getPlanAt(x, z);
 			if (plan.isFlat())
 			{
-				//#if MC >= 1.21.8
-				cir.setReturnValue(plan.getFlat().getFlatGenerator().getBaseColumn(x, z, heightAccessor, randomState));
-				//#elseif MC >= 1.20.6
-				//$$ cir.setReturnValue(plan.getFlat().getTheoreticalBaseColumn(heightAccessor));
-				//#else
-				//$$ // TODO: Port this query against the target MC source.
-				//$$ TODO_PORT_MC_VERSION();
-				//#endif
+				cir.setReturnValue(plan.getFlat().getBaseColumnFromConfiguredLayers(heightAccessor));
 			}
 		}
+	}
+
+	@Unique
+	private boolean isUpgradingHeightAccessor$quadragen(LevelHeightAccessor heightAccessor)
+	{
+		//#if MC >= 1.20.6
+		return heightAccessor == BelowZeroRetrogen.UPGRADE_HEIGHT_ACCESSOR || heightAccessor instanceof ChunkAccess && ((ChunkAccess)heightAccessor).isUpgrading();
+		//#else
+		//$$ // TODO: Port upgrading-height detection against the target MC source.
+		//$$ return TODO_PORT_MC_VERSION;
+		//#endif
 	}
 
 	@Unique
