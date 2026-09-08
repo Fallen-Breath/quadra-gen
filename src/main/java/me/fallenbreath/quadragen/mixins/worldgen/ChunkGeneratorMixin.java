@@ -35,6 +35,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//#if 1.18.2 <= MC && MC < 1.19.4
+//$$ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+//$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+//$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+//$$ import net.minecraft.core.BlockPos;
+//$$ import net.minecraft.core.Vec3i;
+//$$ import net.minecraft.world.level.ChunkPos;
+//$$ import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
+//$$ import java.util.ArrayList;
+//$$ import java.util.List;
+//#endif
+
 @Mixin(ChunkGenerator.class)
 public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 {
@@ -88,4 +100,42 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 			ci.cancel();
 		}
 	}
+
+	//#if 1.18.2 <= MC && MC < 1.19.4
+	//$$ /**
+	//$$  * Filters the precomputed positions consumed by
+	//$$  * {@link net.minecraft.world.level.chunk.ChunkGenerator#getNearestGeneratedStructure} because this version does not
+	//$$  * validate concentric-ring structure starts during locate.
+	//$$  */
+	//$$ @ModifyExpressionValue(
+	//$$ 		method = "getNearestGeneratedStructure(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/levelgen/structure/placement/ConcentricRingsStructurePlacement;)Lnet/minecraft/core/BlockPos;",
+	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkGenerator;getRingPositionsFor(Lnet/minecraft/world/level/levelgen/structure/placement/ConcentricRingsStructurePlacement;)Ljava/util/List;")
+	//$$ )
+	//$$ private List<ChunkPos> filterConcentricRingCandidates(List<ChunkPos> original)
+	//$$ {
+	//$$ 	LevelContext context = this.levelContext$quadragen;
+	//$$ 	if (context == null)
+	//$$ 	{
+	//$$ 		return original;
+	//$$ 	}
+	//$$ 	List<ChunkPos> filtered = new ArrayList<ChunkPos>();
+	//$$ 	for (ChunkPos candidate : original)
+	//$$ 	{
+	//$$ 		if (context.getPlanAt(candidate).isNoise())
+	//$$ 		{
+	//$$ 			filtered.add(candidate);
+	//$$ 		}
+	//$$ 	}
+	//$$ 	return filtered;
+	//$$ }
+
+	//$$ @WrapOperation(
+	//$$ 		method = "findNearestMapFeature",
+	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;distSqr(Lnet/minecraft/core/Vec3i;)D", ordinal = 0)
+	//$$ )
+	//$$ private double ignoreMissingConcentricRingCandidate(BlockPos origin, Vec3i candidate, Operation<Double> original)
+	//$$ {
+	//$$ 	return candidate == null ? Double.MAX_VALUE : original.call(origin, candidate);
+	//$$ }
+	//#endif
 }

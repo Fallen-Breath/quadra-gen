@@ -24,13 +24,16 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Optional;
+
+//#if MC >= 1.19.4
+import net.minecraft.core.registries.Registries;
+//#endif
 
 public final class RegistryCompat
 {
@@ -56,6 +59,8 @@ public final class RegistryCompat
 				access.lookupOrThrow(Registries.BIOME);
 				//#elseif MC >= 1.19.4
 				//$$ access.registryOrThrow(Registries.BIOME);
+				//#elseif MC >= 1.18.2
+				//$$ access.registryOrThrow(Registry.BIOME_REGISTRY);
 				//#else
 				//$$ // TODO: Port this lookup against the target MC source.
 				//$$ TODO_PORT_MC_VERSION;
@@ -64,7 +69,7 @@ public final class RegistryCompat
 		return registry.get(identifier).map(holder -> holder);
 		//#elseif MC >= 1.20.6
 		//$$ return registry.getHolder(identifier).map(holder -> holder);
-		//#elseif MC >= 1.19.4
+		//#elseif MC >= 1.18.2
 		//$$ return registry.getHolder(ResourceKey.create(registry.key(), identifier)).map(holder -> holder);
 		//#else
 		//$$ // TODO: Port this lookup against the target MC source.

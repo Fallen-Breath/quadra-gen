@@ -63,7 +63,13 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 	}
 
 	@Inject(
+			//#if MC >= 1.19.4
 			method = "findClosestBiome3d",
+			//#elseif MC >= 1.18.2
+			//$$ method = "findNearestBiome",
+			//#else
+			//$$ method = TODO_PORT_MC_VERSION,
+			//#endif
 			at = @At("HEAD"),
 			cancellable = true
 	)
@@ -72,12 +78,15 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 			BlockPos origin,
 			int maxSearchRadius,
 			int sampleResolutionHorizontal,
+			//#if MC >= 1.19.4
 			int sampleResolutionVertical,
+			//#endif
 			CallbackInfoReturnable<Pair<BlockPos, Holder<Biome>>> cir)
 	{
 		LevelContext context = this.levelContext$quadragen;
 		if (context != null)
 		{
+			//#if MC >= 1.19.4
 			cir.setReturnValue(BiomeQuery.findClosestBiome3d(
 					context,
 					(ServerLevel)(Object)this,
@@ -87,6 +96,11 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 					sampleResolutionHorizontal,
 					sampleResolutionVertical
 			));
+			//#elseif MC >= 1.18.2
+			//$$ cir.setReturnValue(BiomeQuery.findNearestBiome(context, biomeTest, origin, maxSearchRadius, sampleResolutionHorizontal));
+			//#else
+			//$$ TODO_PORT_MC_VERSION();
+			//#endif
 		}
 	}
 }

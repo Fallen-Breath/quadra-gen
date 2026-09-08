@@ -146,6 +146,6 @@ public final class LevelBootstrap
 				layers.add(state);
 			}
 		}
-		return new FlatGenerationPlan(minY, biome, layers, FlatGeneratorFactory.create(biome, layers));
+		return new FlatGenerationPlan(minY, biome, layers, FlatGeneratorFactory.create(level.registryAccess(), biome, layers));
 	}
 }

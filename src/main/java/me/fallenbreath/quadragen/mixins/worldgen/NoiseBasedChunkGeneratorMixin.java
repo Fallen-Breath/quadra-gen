@@ -30,11 +30,9 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -45,13 +43,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.concurrent.CompletableFuture;
 
-//#if MC >= 1.19.4
+//#if MC >= 1.18.2
 import net.minecraft.world.level.levelgen.BelowZeroRetrogen;
 //#else
 //$$ // TODO: Port upgrading-height detection against the target MC source.
 //#endif
 
-//#if 1.19.4 <= MC && MC < 1.21.1
+//#if MC >= 1.19.4
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.levelgen.RandomState;
+//#elseif MC >= 1.18.2
+//$$ import net.minecraft.core.Registry;
+//$$ import net.minecraft.world.level.StructureFeatureManager;
+//$$ import net.minecraft.world.level.biome.Biome;
+//#endif
+
+//#if 1.18.2 <= MC && MC < 1.21.1
 //$$ import java.util.concurrent.Executor;
 //#endif
 
@@ -63,6 +70,8 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			method = "createBiomes(Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
 			//#elseif MC >= 1.19.4
 			//$$ method = "createBiomes(Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
+			//#elseif MC >= 1.18.2
+			//$$ method = "createBiomes(Lnet/minecraft/core/Registry;Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureFeatureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
 			//#else
 			//$$ // TODO: Port this descriptor against the target MC source.
 			//$$ method = TODO_PORT_MC_VERSION,
@@ -72,12 +81,21 @@ public abstract class NoiseBasedChunkGeneratorMixin
 	)
 	private void createBiomes(
 			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
-			//#if 1.19.4 <= MC && MC < 1.21.1
+			//#if 1.18.2 <= MC && MC < 1.19.4
+			//$$ @Local(argsOnly = true) Registry<Biome> biomeRegistry,
+			//#endif
+			//#if 1.18.2 <= MC && MC < 1.21.1
 			//$$ @Local(argsOnly = true) Executor executor,
 			//#endif
+			//#if MC >= 1.19.4
 			@Local(argsOnly = true) RandomState randomState,
+			//#endif
 			@Local(argsOnly = true) Blender blender,
+			//#if MC >= 1.19.4
 			@Local(argsOnly = true) StructureManager structureManager,
+			//#elseif MC >= 1.18.2
+			//$$ @Local(argsOnly = true) StructureFeatureManager structureManager,
+			//#endif
 			@Local(argsOnly = true) ChunkAccess chunk)
 	{
 		LevelContext context = this.getContext$quadragen();
@@ -90,6 +108,8 @@ public abstract class NoiseBasedChunkGeneratorMixin
 				cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(randomState, blender, structureManager, chunk));
 				//#elseif MC >= 1.19.4
 				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(executor, randomState, blender, structureManager, chunk));
+				//#elseif MC >= 1.18.2
+				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(biomeRegistry, executor, blender, structureManager, chunk));
 				//#else
 				//$$ // TODO: Port this call against the target MC source.
 				//$$ TODO_PORT_MC_VERSION();
@@ -103,6 +123,8 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			method = "fillFromNoise(Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
 			//#elseif MC >= 1.19.4
 			//$$ method = "fillFromNoise(Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
+			//#elseif MC >= 1.18.2
+			//$$ method = "fillFromNoise(Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureFeatureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
 			//#else
 			//$$ // TODO: Port this descriptor against the target MC source.
 			//$$ method = TODO_PORT_MC_VERSION,
@@ -112,12 +134,18 @@ public abstract class NoiseBasedChunkGeneratorMixin
 	)
 	private void fillFromNoise(
 			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
-			//#if 1.19.4 <= MC && MC < 1.21.1
+			//#if 1.18.2 <= MC && MC < 1.21.1
 			//$$ @Local(argsOnly = true) Executor executor,
 			//#endif
 			@Local(argsOnly = true) Blender blender,
+			//#if MC >= 1.19.4
 			@Local(argsOnly = true) RandomState randomState,
+			//#endif
+			//#if MC >= 1.19.4
 			@Local(argsOnly = true) StructureManager structureManager,
+			//#elseif MC >= 1.18.2
+			//$$ @Local(argsOnly = true) StructureFeatureManager structureManager,
+			//#endif
 			@Local(argsOnly = true) ChunkAccess chunk)
 	{
 		LevelContext context = this.getContext$quadragen();
@@ -132,6 +160,8 @@ public abstract class NoiseBasedChunkGeneratorMixin
 					cir.setReturnValue(plan.getFlat().getFlatGenerator().fillFromNoise(blender, randomState, structureManager, chunk));
 					//#elseif MC >= 1.19.4
 					//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().fillFromNoise(executor, blender, randomState, structureManager, chunk));
+					//#elseif MC >= 1.18.2
+					//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().fillFromNoise(executor, blender, structureManager, chunk));
 					//#else
 					//$$ // TODO: Port this call against the target MC source.
 					//$$ TODO_PORT_MC_VERSION();
@@ -146,7 +176,13 @@ public abstract class NoiseBasedChunkGeneratorMixin
 	}
 
 	@Inject(
+			//#if MC >= 1.19.4
 			method = "buildSurface(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/chunk/ChunkAccess;)V",
+			//#elseif MC >= 1.18.2
+			//$$ method = "buildSurface(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureFeatureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)V",
+			//#else
+			//$$ method = TODO_PORT_MC_VERSION,
+			//#endif
 			at = @At("HEAD"),
 			cancellable = true
 	)
@@ -179,7 +215,13 @@ public abstract class NoiseBasedChunkGeneratorMixin
 
 	@ModifyExpressionValue(
 			method = "applyCarvers",
+			//#if MC >= 1.19.4
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Lnet/minecraft/util/RandomSource;)Z")
+			//#elseif MC >= 1.18.2
+			//$$ at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Ljava/util/Random;)Z")
+			//#else
+			//$$ at = @At(value = "INVOKE", target = TODO_PORT_MC_VERSION)
+			//#endif
 	)
 	private boolean filterCarverSource(
 			boolean isStartChunk,
@@ -215,7 +257,9 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			int z,
 			Heightmap.Types type,
 			LevelHeightAccessor heightAccessor,
+			//#if MC >= 1.19.4
 			RandomState randomState,
+			//#endif
 			CallbackInfoReturnable<Integer> cir)
 	{
 		LevelContext context = this.getContext$quadragen();
@@ -234,7 +278,9 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			int x,
 			int z,
 			LevelHeightAccessor heightAccessor,
+			//#if MC >= 1.19.4
 			RandomState randomState,
+			//#endif
 			CallbackInfoReturnable<NoiseColumn> cir)
 	{
 		LevelContext context = this.getContext$quadragen();
@@ -251,7 +297,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 	@Unique
 	private boolean isUpgradingHeightAccessor$quadragen(LevelHeightAccessor heightAccessor)
 	{
-		//#if MC >= 1.19.4
+		//#if MC >= 1.18.2
 		return heightAccessor == BelowZeroRetrogen.UPGRADE_HEIGHT_ACCESSOR || heightAccessor instanceof ChunkAccess && ((ChunkAccess)heightAccessor).isUpgrading();
 		//#else
 		//$$ // TODO: Port upgrading-height detection against the target MC source.

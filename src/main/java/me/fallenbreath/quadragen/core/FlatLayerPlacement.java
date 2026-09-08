@@ -22,7 +22,6 @@ package me.fallenbreath.quadragen.core;
 
 import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -30,6 +29,12 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.LayerConfiguration;
 
 import java.util.List;
+
+//#if MC >= 1.19.4
+import net.minecraft.util.RandomSource;
+//#elseif MC >= 1.18.2
+//$$ import java.util.Random;
+//#endif
 
 public final class FlatLayerPlacement
 {
@@ -42,7 +47,14 @@ public final class FlatLayerPlacement
 		BlockPos origin = new BlockPos(chunk.getPos().getMinBlockX(), LevelHeightCompat.minY(level) + 1, chunk.getPos().getMinBlockZ());
 		// NOTE: {@link net.minecraft.world.level.levelgen.feature.FillLayerFeature#place} does not consume random in supported versions;
 		// re-audit before relying on this unseeded source.
+		//#if MC >= 1.19.4
 		RandomSource random = RandomSource.create();
+		//#elseif MC >= 1.18.2
+		//$$ Random random = new Random();
+		//#else
+		//$$ // TODO: Port the feature random source against the target MC source.
+		//$$ TODO_PORT_MC_VERSION random = TODO_PORT_MC_VERSION;
+		//#endif
 		List<BlockState> layers = plan.getLayers();
 		for (int index = 0; index < layers.size(); index++)
 		{
