@@ -23,7 +23,6 @@ package me.fallenbreath.quadragen.core;
 import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
@@ -37,17 +36,39 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+//#if MC >= 1.18.2
+import net.minecraft.core.Holder;
+//#endif
+
 public final class FlatGenerationPlan
 {
 	private final int baseY;
-	private final Holder<Biome> biome;
+	private final
+			//#if MC >= 1.18.2
+			Holder<Biome>
+			//#elseif MC >= 1.17.1
+			//$$ Biome
+			//#else
+			//$$ TODO_PORT_MC_VERSION
+			//#endif
+			biome;
 	private final List<BlockState> layers;
 	private final FlatLevelSource generator;
 	private final boolean[] delayedLayers;
 	private final boolean empty;
 	private final boolean safeSurface;
 
-	public FlatGenerationPlan(int baseY, Holder<Biome> biome, List<BlockState> layers, FlatLevelSource generator)
+	public FlatGenerationPlan(
+			int baseY,
+			//#if MC >= 1.18.2
+			Holder<Biome> biome,
+			//#elseif MC >= 1.17.1
+			//$$ Biome biome,
+			//#else
+			//$$ TODO_PORT_MC_VERSION biome,
+			//#endif
+			List<BlockState> layers,
+			FlatLevelSource generator)
 	{
 		this.baseY = baseY;
 		this.biome = biome;
@@ -58,8 +79,15 @@ public final class FlatGenerationPlan
 		for (int index = 0; index < this.layers.size(); index++)
 		{
 			BlockState state = this.layers.get(index);
+			//#if MC >= 1.18.2
 			// See {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#adjustGenerationSettings}:
 			// non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
+			//#elseif MC >= 1.17.1
+			//$$ // See {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#getBiomeFromSettings}:
+			//$$ // non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
+			//#else
+			//$$ // TODO: Audit delayed Flat layers against the target MC source.
+			//#endif
 			this.delayedLayers[index] = !Heightmap.Types.MOTION_BLOCKING.isOpaque().test(state);
 			if (!state.isAir())
 			{
@@ -70,7 +98,15 @@ public final class FlatGenerationPlan
 		this.safeSurface = hasSafeSurface(this.layers);
 	}
 
-	public Holder<Biome> getBiome()
+	public
+			//#if MC >= 1.18.2
+			Holder<Biome>
+			//#elseif MC >= 1.17.1
+			//$$ Biome
+			//#else
+			//$$ TODO_PORT_MC_VERSION
+			//#endif
+			getBiome()
 	{
 		return this.biome;
 	}

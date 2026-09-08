@@ -60,7 +60,14 @@ public final class ConfigLoader
 			}
 			try (Reader reader = Files.newBufferedReader(configPath, StandardCharsets.UTF_8))
 			{
+				//#if MC >= 1.18.2
 				JsonElement root = JsonParser.parseReader(reader);
+				//#elseif MC >= 1.17.1
+				//$$ JsonElement root = new JsonParser().parse(reader);
+				//#else
+				//$$ // TODO: Port JSON parsing against the target Gson version.
+				//$$ JsonElement root = TODO_PORT_MC_VERSION;
+				//#endif
 				return parseRoot(requireObject(root, "$"));
 			}
 		}
@@ -289,8 +296,9 @@ public final class ConfigLoader
 
 	private static void checkFields(JsonObject object, Set<String> allowed, String path)
 	{
-		for (String key : object.keySet())
+		for (Map.Entry<String, JsonElement> entry : object.entrySet())
 		{
+			String key = entry.getKey();
 			if (!allowed.contains(key))
 			{
 				throw error(path + "." + key, "unknown field");

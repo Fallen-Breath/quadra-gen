@@ -20,15 +20,15 @@
 
 package me.fallenbreath.quadragen;
 
-import com.mojang.logging.LogUtils;
 import me.fallenbreath.quadragen.config.ConfigLoader;
 import me.fallenbreath.quadragen.config.QuadraGenConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import org.slf4j.Logger;
 
 //#if MC >= 1.18.2
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 //#else
 //$$ import org.apache.logging.log4j.LogManager;
 //$$ import org.apache.logging.log4j.Logger;

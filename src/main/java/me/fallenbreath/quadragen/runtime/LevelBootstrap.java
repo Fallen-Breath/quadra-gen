@@ -37,7 +37,6 @@ import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -48,6 +47,10 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+
+//#if MC >= 1.18.2
+import net.minecraft.core.Holder;
+//#endif
 
 public final class LevelBootstrap
 {
@@ -127,7 +130,13 @@ public final class LevelBootstrap
 	private static FlatGenerationPlan resolveFlat(ServerLevel level, String dimensionPath, Quadrant quadrant, FlatConfig raw)
 	{
 		String basePath = dimensionPath + ".quadrants." + quadrant.getConfigKey() + ".flat";
+		//#if MC >= 1.18.2
 		Holder<Biome> biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
+		//#elseif MC >= 1.17.1
+		//$$ Biome biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
+		//#else
+		//$$ TODO_PORT_MC_VERSION biome = TODO_PORT_MC_VERSION;
+		//#endif
 		List<BlockState> layers = new ArrayList<BlockState>();
 		int minY = LevelHeightCompat.minY(level);
 		int maxY = LevelHeightCompat.maxYInclusive(level);

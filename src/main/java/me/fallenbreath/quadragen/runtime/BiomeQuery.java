@@ -28,7 +28,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
-import net.minecraft.SharedConstants;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
@@ -38,13 +37,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * mc >= 1.19: subproject 26.2 (main project)        <--------
+ * mc < 1.19: subproject 1.18.2
+ */
 public final class BiomeQuery
 {
 	private BiomeQuery()
 	{
 	}
 
-	//#if MC >= 1.19.4
 	/**
 	 * Mirrors {@link net.minecraft.world.level.biome.BiomeSource#findClosestBiome3d} search order while extending its candidate
 	 * set and sampled biome source with quadrant-aware Flat biomes.
@@ -99,51 +101,4 @@ public final class BiomeQuery
 		}
 		return null;
 	}
-	//#elseif MC >= 1.18.2
-	//$$ /**
-	//$$  * Mirrors the closest-first branch of {@link net.minecraft.world.level.biome.BiomeSource#findBiomeHorizontal}
-	//$$  * while sampling quadrant-aware Flat biomes.
-	//$$  */
-	//$$ public static Pair<BlockPos, Holder<Biome>> findNearestBiome(
-	//$$ 		LevelContext context,
-	//$$ 		Predicate<Holder<Biome>> allowed,
-	//$$ 		BlockPos origin,
-	//$$ 		int searchRadius,
-	//$$ 		int sampleResolution)
-	//$$ {
-	//$$ 	int originQuartX = QuartPos.fromBlock(origin.getX());
-	//$$ 	int originQuartY = QuartPos.fromBlock(origin.getY());
-	//$$ 	int originQuartZ = QuartPos.fromBlock(origin.getZ());
-	//$$ 	int sampleRadius = QuartPos.fromBlock(searchRadius);
-	//$$ 	Climate.Sampler sampler = context.getNoiseGenerator().climateSampler();
-	//$$ 	for (int radius = 0; radius <= sampleRadius; radius += sampleResolution)
-	//$$ 	{
-	//$$ 		int startZ = SharedConstants.debugGenerateSquareTerrainWithoutNoise ? 0 : -radius;
-	//$$ 		for (int offsetZ = startZ; offsetZ <= radius; offsetZ += sampleResolution)
-	//$$ 		{
-	//$$ 			boolean zEdge = Math.abs(offsetZ) == radius;
-	//$$ 			for (int offsetX = -radius; offsetX <= radius; offsetX += sampleResolution)
-	//$$ 			{
-	//$$ 				if (Math.abs(offsetX) != radius && !zEdge)
-	//$$ 				{
-	//$$ 					continue;
-	//$$ 				}
-	//$$ 				int quartX = originQuartX + offsetX;
-	//$$ 				int quartZ = originQuartZ + offsetZ;
-	//$$ 				int blockX = QuartPos.toBlock(quartX);
-	//$$ 				int blockZ = QuartPos.toBlock(quartZ);
-	//$$ 				QuadrantPlan plan = context.getPlanAt(blockX, blockZ);
-	//$$ 				Holder<Biome> biome = plan.isFlat()
-	//$$ 						? plan.getFlat().getBiome()
-	//$$ 						: context.getNoiseGenerator().getBiomeSource().getNoiseBiome(quartX, originQuartY, quartZ, sampler);
-	//$$ 				if (allowed.test(biome))
-	//$$ 				{
-	//$$ 					return Pair.of(new BlockPos(blockX, origin.getY(), blockZ), biome);
-	//$$ 				}
-	//$$ 			}
-	//$$ 		}
-	//$$ 	}
-	//$$ 	return null;
-	//$$ }
-	//#endif
 }

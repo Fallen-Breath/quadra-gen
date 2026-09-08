@@ -22,11 +22,14 @@ package me.fallenbreath.quadragen.config;
 
 import me.fallenbreath.quadragen.compat.IdentifierCompat;
 import me.fallenbreath.quadragen.compat.RegistryCompat;
-import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+//#if MC >= 1.18.2
+import net.minecraft.core.Holder;
+//#endif
 
 public final class ConfigValueResolver
 {
@@ -45,10 +48,24 @@ public final class ConfigValueResolver
 		return block.defaultBlockState();
 	}
 
-	public static Holder<Biome> resolveBiome(RegistryAccess access, String value, String path)
+	public static
+			//#if MC >= 1.18.2
+			Holder<Biome>
+			//#elseif MC >= 1.17.1
+			//$$ Biome
+			//#else
+			//$$ TODO_PORT_MC_VERSION
+			//#endif
+			resolveBiome(RegistryAccess access, String value, String path)
 	{
 		ConfigValueResolver.validateIdentifier(value, path);
+		//#if MC >= 1.18.2
 		Holder<Biome> biome = RegistryCompat.findBiome(access, value).orElse(null);
+		//#elseif MC >= 1.17.1
+		//$$ Biome biome = RegistryCompat.findBiome(access, value).orElse(null);
+		//#else
+		//$$ TODO_PORT_MC_VERSION biome = TODO_PORT_MC_VERSION;
+		//#endif
 		if (biome == null)
 		{
 			throw new ConfigValidationException(path, "unknown biome '" + value + "'");

@@ -26,7 +26,6 @@ import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import me.fallenbreath.quadragen.runtime.BiomeQuery;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,6 +36,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
+
+//#if MC >= 1.18.2
+import net.minecraft.core.Holder;
+//#endif
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin implements ServerLevelContextAccess
@@ -62,13 +65,12 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 		LevelBootstrap.install((ServerLevel)(Object)this);
 	}
 
+	//#if MC >= 1.18.2
 	@Inject(
 			//#if MC >= 1.19.4
 			method = "findClosestBiome3d",
-			//#elseif MC >= 1.18.2
-			//$$ method = "findNearestBiome",
 			//#else
-			//$$ method = TODO_PORT_MC_VERSION,
+			//$$ method = "findNearestBiome",
 			//#endif
 			at = @At("HEAD"),
 			cancellable = true
@@ -96,11 +98,28 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 					sampleResolutionHorizontal,
 					sampleResolutionVertical
 			));
-			//#elseif MC >= 1.18.2
-			//$$ cir.setReturnValue(BiomeQuery.findNearestBiome(context, biomeTest, origin, maxSearchRadius, sampleResolutionHorizontal));
 			//#else
-			//$$ TODO_PORT_MC_VERSION();
+			//$$ cir.setReturnValue(BiomeQuery.findNearestBiome(context, biomeTest, origin, maxSearchRadius, sampleResolutionHorizontal));
 			//#endif
 		}
 	}
+	//#elseif MC >= 1.17.1
+	//$$ @Inject(method = "findNearestBiome", at = @At("HEAD"), cancellable = true)
+	//$$ private void findNearestBiome(
+	//$$ 		Biome biome,
+	//$$ 		BlockPos origin,
+	//$$ 		int maxSearchRadius,
+	//$$ 		int sampleResolution,
+	//$$ 		CallbackInfoReturnable<BlockPos> cir)
+	//$$ {
+	//$$ 	LevelContext context = this.levelContext$quadragen;
+	//$$ 	if (context != null)
+	//$$ 	{
+	//$$ 		cir.setReturnValue(BiomeQuery.findNearestBiome(context, biome, origin, maxSearchRadius, sampleResolution));
+	//$$ 	}
+	//$$ }
+	//#else
+	//$$ // TODO: Port biome lookup against the target MC source.
+	//$$ TODO_PORT_MC_VERSION;
+	//#endif
 }

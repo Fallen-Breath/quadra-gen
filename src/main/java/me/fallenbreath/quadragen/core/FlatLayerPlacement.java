@@ -32,7 +32,7 @@ import java.util.List;
 
 //#if MC >= 1.19.4
 import net.minecraft.util.RandomSource;
-//#elseif MC >= 1.18.2
+//#elseif MC >= 1.17.1
 //$$ import java.util.Random;
 //#endif
 
@@ -49,7 +49,7 @@ public final class FlatLayerPlacement
 		// re-audit before relying on this unseeded source.
 		//#if MC >= 1.19.4
 		RandomSource random = RandomSource.create();
-		//#elseif MC >= 1.18.2
+		//#elseif MC >= 1.17.1
 		//$$ Random random = new Random();
 		//#else
 		//$$ // TODO: Port the feature random source against the target MC source.
@@ -60,7 +60,13 @@ public final class FlatLayerPlacement
 		{
 			if (plan.isDelayedLayer(index))
 			{
+				//#if MC >= 1.18.2
 				Feature.FILL_LAYER.place(new LayerConfiguration(index, layers.get(index)), level, plan.getFlatGenerator(), random, origin);
+				//#elseif MC >= 1.17.1
+				//$$ Feature.FILL_LAYER.configured(new LayerConfiguration(index, layers.get(index))).place(level, plan.getFlatGenerator(), random, origin);
+				//#else
+				//$$ TODO_PORT_MC_VERSION();
+				//#endif
 			}
 		}
 	}

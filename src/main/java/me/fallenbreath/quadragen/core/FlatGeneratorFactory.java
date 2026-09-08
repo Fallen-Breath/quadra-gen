@@ -12,7 +12,6 @@
 
 package me.fallenbreath.quadragen.core;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
@@ -25,6 +24,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+//#if MC >= 1.18.2
+import net.minecraft.core.Holder;
+//#elseif MC >= 1.17.1
+//$$ import net.minecraft.world.level.levelgen.StructureSettings;
+//#endif
+
 public final class FlatGeneratorFactory
 {
 	private FlatGeneratorFactory()
@@ -32,13 +37,28 @@ public final class FlatGeneratorFactory
 	}
 
 	@SuppressWarnings("deprecation")
-	public static FlatLevelSource create(RegistryAccess registryAccess, Holder<Biome> biome, List<BlockState> layers)
+	public static FlatLevelSource create(
+			RegistryAccess registryAccess,
+			//#if MC >= 1.18.2
+			Holder<Biome> biome,
+			//#elseif MC >= 1.17.1
+			//$$ Biome biome,
+			//#else
+			//$$ TODO_PORT_MC_VERSION biome,
+			//#endif
+			List<BlockState> layers)
 	{
 		//#if MC >= 1.19.4
 		FlatLevelGeneratorSettings settings = new FlatLevelGeneratorSettings(Optional.empty(), biome, Collections.emptyList());
 		//#elseif MC >= 1.18.2
 		//$$ FlatLevelGeneratorSettings settings = new FlatLevelGeneratorSettings(Optional.empty(), registryAccess.registryOrThrow(Registry.BIOME_REGISTRY));
 		//$$ settings.setBiome(biome);
+		//#elseif MC >= 1.17.1
+		//$$ FlatLevelGeneratorSettings settings = new FlatLevelGeneratorSettings(
+		//$$ 		new StructureSettings(Optional.empty(), Collections.emptyMap()),
+		//$$ 		registryAccess.registryOrThrow(Registry.BIOME_REGISTRY)
+		//$$ );
+		//$$ settings.setBiome(() -> biome);
 		//#else
 		//$$ // TODO: Port Flat settings construction against the target MC source.
 		//$$ FlatLevelGeneratorSettings settings = TODO_PORT_MC_VERSION;
@@ -67,6 +87,10 @@ public final class FlatGeneratorFactory
 		//$$ // {@link net.minecraft.world.level.levelgen.FlatLevelSource#FlatLevelSource} invokes
 		//$$ // {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#getBiomeFromSettings}, which splits delayed layers.
 		//$$ return new FlatLevelSource(registryAccess.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY), settings);
+		//#elseif MC >= 1.17.1
+		//$$ // {@link net.minecraft.world.level.levelgen.FlatLevelSource#FlatLevelSource} invokes
+		//$$ // {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#getBiomeFromSettings}, which splits delayed layers.
+		//$$ return new FlatLevelSource(settings);
 		//#else
 		//$$ // TODO: Port Flat generator construction against the target MC source.
 		//$$ return TODO_PORT_MC_VERSION;
