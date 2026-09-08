@@ -32,7 +32,7 @@ public final class LevelHeightCompat
 	{
 		//#if MC >= 1.21.3
 		return accessor.getMinY();
-		//#elseif MC >= 1.20.1
+		//#elseif MC >= 1.19.4
 		//$$ return accessor.getMinBuildHeight();
 		//#else
 		//$$ // TODO: Port this method against the target MC source.
@@ -44,7 +44,7 @@ public final class LevelHeightCompat
 	{
 		//#if MC >= 1.21.3
 		return accessor.getMaxY();
-		//#elseif MC >= 1.20.1
+		//#elseif MC >= 1.19.4
 		//$$ return accessor.getMaxBuildHeight() - 1;
 		//#else
 		//$$ // TODO: Port this method against the target MC source.
