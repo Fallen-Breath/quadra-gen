@@ -20,13 +20,14 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 //#if MC >= 1.18.2
 import net.minecraft.core.Holder;
-//#elseif MC >= 1.17.1
+//#elseif MC >= 1.16.5
 //$$ import net.minecraft.world.level.levelgen.StructureSettings;
 //#endif
 
@@ -41,7 +42,7 @@ public final class FlatGeneratorFactory
 			RegistryAccess registryAccess,
 			//#if MC >= 1.18.2
 			Holder<Biome> biome,
-			//#elseif MC >= 1.17.1
+			//#elseif MC >= 1.16.5
 			//$$ Biome biome,
 			//#else
 			//$$ TODO_PORT_MC_VERSION biome,
@@ -59,11 +60,16 @@ public final class FlatGeneratorFactory
 		//$$ 		registryAccess.registryOrThrow(Registry.BIOME_REGISTRY)
 		//$$ );
 		//$$ settings.setBiome(() -> biome);
+		//#elseif MC >= 1.16.5
+		//$$ List<FlatLayerInfo> layerInfos = new ArrayList<FlatLayerInfo>();
 		//#else
 		//$$ // TODO: Port Flat settings construction against the target MC source.
 		//$$ FlatLevelGeneratorSettings settings = TODO_PORT_MC_VERSION;
+		//$$ List<FlatLayerInfo> layerInfos = TODO_PORT_MC_VERSION;
 		//#endif
+		//#if MC >= 1.17.1
 		List<FlatLayerInfo> layerInfos = settings.getLayersInfo();
+		//#endif
 		for (int index = 0; index < layers.size(); )
 		{
 			BlockState state = layers.get(index);
@@ -75,7 +81,21 @@ public final class FlatGeneratorFactory
 			layerInfos.add(new FlatLayerInfo(end - index, state.getBlock()));
 			index = end;
 		}
+		//#if MC >= 1.17.1
 		settings.updateLayers();
+		//#elseif MC >= 1.16.5
+		//$$ // Use the complete server-available constructor: setBiome is client-only in this version.
+		//$$ FlatLevelGeneratorSettings settings = new FlatLevelGeneratorSettings(
+		//$$ 		registryAccess.registryOrThrow(Registry.BIOME_REGISTRY),
+		//$$ 		new StructureSettings(Optional.empty(), Collections.emptyMap()),
+		//$$ 		layerInfos,
+		//$$ 		false,
+		//$$ 		false,
+		//$$ 		Optional.<java.util.function.Supplier<Biome>>of(() -> biome)
+		//$$ );
+		//#else
+		//$$ TODO_PORT_MC_VERSION;
+		//#endif
 		//#if MC >= 1.19.4
 		FlatLevelSource generator = new FlatLevelSource(settings);
 		// Initialize {@link net.minecraft.world.level.levelgen.ChunkGenerator#getBiomeGenerationSettings} so the layer split
@@ -87,7 +107,7 @@ public final class FlatGeneratorFactory
 		//$$ // {@link net.minecraft.world.level.levelgen.FlatLevelSource#FlatLevelSource} invokes
 		//$$ // {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#getBiomeFromSettings}, which splits delayed layers.
 		//$$ return new FlatLevelSource(registryAccess.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY), settings);
-		//#elseif MC >= 1.17.1
+		//#elseif MC >= 1.16.5
 		//$$ // {@link net.minecraft.world.level.levelgen.FlatLevelSource#FlatLevelSource} invokes
 		//$$ // {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#getBiomeFromSettings}, which splits delayed layers.
 		//$$ return new FlatLevelSource(settings);

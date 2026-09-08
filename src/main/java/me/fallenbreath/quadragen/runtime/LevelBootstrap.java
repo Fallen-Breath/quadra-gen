@@ -132,7 +132,7 @@ public final class LevelBootstrap
 		String basePath = dimensionPath + ".quadrants." + quadrant.getConfigKey() + ".flat";
 		//#if MC >= 1.18.2
 		Holder<Biome> biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
-		//#elseif MC >= 1.17.1
+		//#elseif MC >= 1.16.5
 		//$$ Biome biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
 		//#else
 		//$$ TODO_PORT_MC_VERSION biome = TODO_PORT_MC_VERSION;

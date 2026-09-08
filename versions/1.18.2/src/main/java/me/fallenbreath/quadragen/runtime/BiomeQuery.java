@@ -24,10 +24,13 @@ import com.mojang.datafixers.util.Pair;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.function.Predicate;
+
+//#if MC >= 1.17.1
+import net.minecraft.core.QuartPos;
+//#endif
 
 //#if MC >= 1.18.2
 import net.minecraft.core.Holder;
@@ -36,7 +39,7 @@ import net.minecraft.world.level.biome.Climate;
 
 /**
  * mc >= 1.19: subproject 26.2 (main project)        <--------
- * mc < 1.19: subproject 1.18.2
+ * mc < 1.19: subproject 1.18.2 (supports mc >= 1.16.5)
  * <p>
  */
 public final class BiomeQuery
@@ -52,7 +55,7 @@ public final class BiomeQuery
 	public static
 			//#if MC >= 1.18.2
 			Pair<BlockPos, Holder<Biome>>
-			//#elseif MC >= 1.17.1
+			//#elseif MC >= 1.16.5
 			//$$ BlockPos
 			//#else
 			//$$ TODO_PORT_MC_VERSION
@@ -61,7 +64,7 @@ public final class BiomeQuery
 			LevelContext context,
 			//#if MC >= 1.18.2
 			Predicate<Holder<Biome>> allowed,
-			//#elseif MC >= 1.17.1
+			//#elseif MC >= 1.16.5
 			//$$ Biome allowed,
 			//#else
 			//$$ TODO_PORT_MC_VERSION allowed,
@@ -70,10 +73,22 @@ public final class BiomeQuery
 			int searchRadius,
 			int sampleResolution)
 	{
+		//#if MC >= 1.17.1
 		int originQuartX = QuartPos.fromBlock(origin.getX());
 		int originQuartY = QuartPos.fromBlock(origin.getY());
 		int originQuartZ = QuartPos.fromBlock(origin.getZ());
 		int sampleRadius = QuartPos.fromBlock(searchRadius);
+		//#elseif MC >= 1.16.5
+		//$$ int originQuartX = origin.getX() >> 2;
+		//$$ int originQuartY = origin.getY() >> 2;
+		//$$ int originQuartZ = origin.getZ() >> 2;
+		//$$ int sampleRadius = searchRadius >> 2;
+		//#else
+		//$$ int originQuartX = TODO_PORT_MC_VERSION;
+		//$$ int originQuartY = TODO_PORT_MC_VERSION;
+		//$$ int originQuartZ = TODO_PORT_MC_VERSION;
+		//$$ int sampleRadius = TODO_PORT_MC_VERSION;
+		//#endif
 		//#if MC >= 1.18.2
 		Climate.Sampler sampler = context.getNoiseGenerator().climateSampler();
 		//#endif
@@ -95,8 +110,16 @@ public final class BiomeQuery
 					}
 					int quartX = originQuartX + offsetX;
 					int quartZ = originQuartZ + offsetZ;
+					//#if MC >= 1.17.1
 					int blockX = QuartPos.toBlock(quartX);
 					int blockZ = QuartPos.toBlock(quartZ);
+					//#elseif MC >= 1.16.5
+					//$$ int blockX = quartX << 2;
+					//$$ int blockZ = quartZ << 2;
+					//#else
+					//$$ int blockX = TODO_PORT_MC_VERSION;
+					//$$ int blockZ = TODO_PORT_MC_VERSION;
+					//#endif
 					QuadrantPlan plan = context.getPlanAt(blockX, blockZ);
 					//#if MC >= 1.18.2
 					Holder<Biome> biome = plan.isFlat()
@@ -106,7 +129,7 @@ public final class BiomeQuery
 					{
 						return Pair.of(new BlockPos(blockX, origin.getY(), blockZ), biome);
 					}
-					//#elseif MC >= 1.17.1
+					//#elseif MC >= 1.16.5
 					//$$ Biome biome = plan.isFlat()
 					//$$ 		? plan.getFlat().getBiome()
 					//$$ 		: context.getNoiseGenerator().getBiomeSource().getNoiseBiome(quartX, originQuartY, quartZ);

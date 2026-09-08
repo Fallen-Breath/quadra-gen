@@ -20,7 +20,12 @@
 
 package me.fallenbreath.quadragen.compat;
 
+//#if MC >= 1.17.1
 import net.minecraft.world.level.LevelHeightAccessor;
+//#elseif MC >= 1.16.5
+//$$ import net.minecraft.world.level.Level;
+//$$ import net.minecraft.world.level.LevelAccessor;
+//#endif
 
 public final class LevelHeightCompat
 {
@@ -28,32 +33,67 @@ public final class LevelHeightCompat
 	{
 	}
 
-	public static int minY(LevelHeightAccessor accessor)
+	public static int minY(
+			//#if MC >= 1.17.1
+			LevelHeightAccessor accessor
+			//#elseif MC >= 1.16.5
+			//$$ LevelAccessor accessor
+			//#else
+			//$$ TODO_PORT_MC_VERSION accessor
+			//#endif
+	)
 	{
 		//#if MC >= 1.21.3
 		return accessor.getMinY();
 		//#elseif MC >= 1.17.1
 		//$$ return accessor.getMinBuildHeight();
+		//#elseif MC >= 1.16.5
+		//$$ return 0;
 		//#else
 		//$$ // TODO: Port this method against the target MC source.
 		//$$ return TODO_PORT_MC_VERSION;
 		//#endif
 	}
 
-	public static int maxYInclusive(LevelHeightAccessor accessor)
+	public static int maxYInclusive(
+			//#if MC >= 1.17.1
+			LevelHeightAccessor accessor
+			//#elseif MC >= 1.16.5
+			//$$ LevelAccessor accessor
+			//#else
+			//$$ TODO_PORT_MC_VERSION accessor
+			//#endif
+	)
 	{
 		//#if MC >= 1.21.3
 		return accessor.getMaxY();
 		//#elseif MC >= 1.17.1
 		//$$ return accessor.getMaxBuildHeight() - 1;
+		//#elseif MC >= 1.16.5
+		//$$ return 255;
 		//#else
 		//$$ // TODO: Port this method against the target MC source.
 		//$$ return TODO_PORT_MC_VERSION;
 		//#endif
 	}
 
-	public static boolean contains(LevelHeightAccessor accessor, int y)
+	public static boolean contains(
+			//#if MC >= 1.17.1
+			LevelHeightAccessor accessor,
+			//#elseif MC >= 1.16.5
+			//$$ LevelAccessor accessor,
+			//#else
+			//$$ TODO_PORT_MC_VERSION accessor,
+			//#endif
+			int y)
 	{
+		//#if MC >= 1.17.1
 		return !accessor.isOutsideBuildHeight(y);
+		//#elseif MC >= 1.16.5
+		//$$ return !Level.isOutsideBuildHeight(y);
+		//#else
+		//$$ // TODO: Port this method against the target MC source.
+		//$$ return TODO_PORT_MC_VERSION;
+		//#endif
 	}
 }

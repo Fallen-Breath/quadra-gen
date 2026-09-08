@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//#if 1.17.1 <= MC && MC < 1.19.4
+//#if 1.16.5 <= MC && MC < 1.19.4
 //$$ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 //$$ import net.minecraft.world.level.ChunkPos;
 //$$ import java.util.ArrayList;
@@ -50,7 +50,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 //#endif
 
-//#if 1.17.1 <= MC && MC < 1.18.2
+//#if 1.16.5 <= MC && MC < 1.18.2
 //$$ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 //$$ import net.minecraft.core.Registry;
 //$$ import net.minecraft.server.level.WorldGenRegion;
@@ -59,6 +59,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 //$$ import net.minecraft.world.level.chunk.ProtoChunk;
 //$$ import java.util.Arrays;
+//#endif
+
+//#if 1.16.5 <= MC && MC < 1.17.1
+//$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+//$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+//$$ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+//$$ import java.util.Random;
 //#endif
 
 @Mixin(ChunkGenerator.class)
@@ -79,9 +86,9 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 		this.levelContext$quadragen = context;
 	}
 
-	//#if 1.17.1 <= MC && MC < 1.18.2
+	//#if 1.16.5 <= MC && MC < 1.18.2
 	//$$ /**
-	//$$  * Mirrors {@link net.minecraft.world.level.chunk.ChunkGenerator#createBiomes} with a constant raw-ID biome container
+	//$$  * Mirrors {@link net.minecraft.world.level.chunk.ChunkGenerator#createBiomes} with a constant biome container
 	//$$  * for Flat quadrants.
 	//$$  */
 	//$$ @Inject(
@@ -100,9 +107,15 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ 		QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 	//$$ 		if (plan.isFlat())
 	//$$ 		{
+	//$$ //#if MC >= 1.17.1
 	//$$ 			int[] biomeIds = new int[16 * ((chunk.getHeight() + 3) / 4)];
 	//$$ 			Arrays.fill(biomeIds, biomeRegistry.getId(plan.getFlat().getBiome()));
 	//$$ 			((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, chunk, biomeIds));
+	//$$ //#else
+	//$$ //$$ 			Biome[] biomes = new Biome[ChunkBiomeContainer.BIOMES_SIZE];
+	//$$ //$$ 			Arrays.fill(biomes, plan.getFlat().getBiome());
+	//$$ //$$ 			((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, biomes));
+	//$$ //#endif
 	//$$ 			ci.cancel();
 	//$$ 		}
 	//$$ 	}
@@ -145,7 +158,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 			ci.cancel();
 		}
 	}
-	//#elseif MC >= 1.17.1
+	//#elseif MC >= 1.16.5
 	//$$ @Inject(
 	//$$ 		method = "applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureFeatureManager;)V",
 	//$$ 		at = @At("HEAD"),
@@ -158,11 +171,20 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ 	{
 	//$$ 		return;
 	//$$ 	}
+	//$$ //#if MC >= 1.17.1
 	//$$ 	ChunkAccess chunk = level.getChunk(ChunkPosCompat.x(level.getCenter()), ChunkPosCompat.z(level.getCenter()));
+	//$$ //#else
+	//$$ //$$ 	ChunkAccess chunk = level.getChunk(level.getCenterX(), level.getCenterZ());
+	//$$ //#endif
 	//$$ 	QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 	//$$ 	if (!plan.isOrdinaryNoise())
 	//$$ 	{
-	//$$ 		if (!SharedConstants.DEBUG_DISABLE_FEATURES && plan.isFlat() && !plan.isClearGeneratedContent())
+	//$$ 		if (
+	//$$ //#if MC >= 1.17.1
+	//$$ 				!SharedConstants.DEBUG_DISABLE_FEATURES &&
+	//$$ //#endif
+	//$$ 				plan.isFlat() && !plan.isClearGeneratedContent()
+	//$$ 		)
 	//$$ 		{
 	//$$ 			FlatLayerPlacement.placeDelayedLayers(level, chunk, plan.getFlat());
 	//$$ 		}
@@ -212,7 +234,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ }
 	//#endif
 
-	//#if 1.17.1 <= MC && MC < 1.18.2
+	//#if 1.16.5 <= MC && MC < 1.18.2
 	//$$ @Inject(method = "applyCarvers", at = @At("HEAD"), cancellable = true)
 	//$$ private void applyCarvers(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess chunk)
 	//$$ {
@@ -223,6 +245,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ 	}
 	//$$ }
 
+	//$$ //#if MC >= 1.17.1
 	//$$ @ModifyExpressionValue(
 	//$$ 		method = "applyCarvers",
 	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Ljava/util/Random;)Z")
@@ -236,6 +259,26 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ 	LevelContext context = this.levelContext$quadragen;
 	//$$ 	return context == null || context.getPlanAt(sourcePos).isOrdinaryNoise();
 	//$$ }
+	//$$ //#else
+	//$$ //$$ @WrapOperation(
+	//$$ //$$ 		method = "applyCarvers",
+	//$$ //$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Ljava/util/Random;II)Z")
+	//$$ //$$ )
+	//$$ //$$ private boolean filterCarverSource(
+	//$$ //$$ 		ConfiguredWorldCarver<?> carver,
+	//$$ //$$ 		Random random,
+	//$$ //$$ 		int sourceX,
+	//$$ //$$ 		int sourceZ,
+	//$$ //$$ 		Operation<Boolean> original)
+	//$$ //$$ {
+	//$$ //$$ 	if (!original.call(carver, random, sourceX, sourceZ))
+	//$$ //$$ 	{
+	//$$ //$$ 		return false;
+	//$$ //$$ 	}
+	//$$ //$$ 	LevelContext context = this.levelContext$quadragen;
+	//$$ //$$ 	return context == null || context.getPlanAt(new ChunkPos(sourceX, sourceZ)).isOrdinaryNoise();
+	//$$ //$$ }
+	//$$ //#endif
 
 	//$$ /**
 	//$$  * Filters the precomputed positions read by {@link net.minecraft.world.level.chunk.ChunkGenerator#findNearestMapFeature}
@@ -269,7 +312,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	{
 		//#if MC >= 1.18.2
 		return chunk.isUpgrading();
-		//#elseif MC >= 1.17.1
+		//#elseif MC >= 1.16.5
 		//$$ return false;
 		//#else
 		//$$ // TODO: Port upgrading detection against the target MC source.

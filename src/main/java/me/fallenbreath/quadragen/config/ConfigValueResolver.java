@@ -51,7 +51,7 @@ public final class ConfigValueResolver
 	public static
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.17.1
+			//#elseif MC >= 1.16.5
 			//$$ Biome
 			//#else
 			//$$ TODO_PORT_MC_VERSION
@@ -61,7 +61,7 @@ public final class ConfigValueResolver
 		ConfigValueResolver.validateIdentifier(value, path);
 		//#if MC >= 1.18.2
 		Holder<Biome> biome = RegistryCompat.findBiome(access, value).orElse(null);
-		//#elseif MC >= 1.17.1
+		//#elseif MC >= 1.16.5
 		//$$ Biome biome = RegistryCompat.findBiome(access, value).orElse(null);
 		//#else
 		//$$ TODO_PORT_MC_VERSION biome = TODO_PORT_MC_VERSION;

@@ -103,7 +103,7 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 			//#endif
 		}
 	}
-	//#elseif MC >= 1.17.1
+	//#elseif MC >= 1.16.5
 	//$$ @Inject(method = "findNearestBiome", at = @At("HEAD"), cancellable = true)
 	//$$ private void findNearestBiome(
 	//$$ 		Biome biome,

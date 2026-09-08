@@ -53,7 +53,7 @@ public final class RegistryCompat
 	public static Optional<
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.17.1
+			//#elseif MC >= 1.16.5
 			//$$ Biome
 			//#else
 			//$$ TODO_PORT_MC_VERSION
@@ -70,7 +70,7 @@ public final class RegistryCompat
 				access.lookupOrThrow(Registries.BIOME);
 				//#elseif MC >= 1.19.4
 				//$$ access.registryOrThrow(Registries.BIOME);
-				//#elseif MC >= 1.17.1
+				//#elseif MC >= 1.16.5
 				//$$ access.registryOrThrow(Registry.BIOME_REGISTRY);
 				//#else
 				//$$ // TODO: Port this lookup against the target MC source.
@@ -82,7 +82,7 @@ public final class RegistryCompat
 		//$$ return registry.getHolder(identifier).map(holder -> holder);
 		//#elseif MC >= 1.18.2
 		//$$ return registry.getHolder(ResourceKey.create(registry.key(), identifier)).map(holder -> holder);
-		//#elseif MC >= 1.17.1
+		//#elseif MC >= 1.16.5
 		//$$ return registry.getOptional(identifier);
 		//#else
 		//$$ // TODO: Port this lookup against the target MC source.
