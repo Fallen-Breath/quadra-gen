@@ -23,6 +23,7 @@ package me.fallenbreath.quadragen.mixins.lifecycle;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.InitialSpawnPolicy;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -47,7 +48,7 @@ public abstract class MinecraftServerMixin
 		//#if MC >= 1.21.10
 		return InitialSpawnPolicy.allowsBonusChest(level, levelData.getRespawnData().pos());
 		//#else
-		//$$ return InitialSpawnPolicy.allowsBonusChest(level, levelData.getSpawnPos());
+		//$$ return InitialSpawnPolicy.allowsBonusChest(level, new BlockPos(levelData.getXSpawn(), levelData.getYSpawn(), levelData.getZSpawn()));
 		//#endif
 	}
 

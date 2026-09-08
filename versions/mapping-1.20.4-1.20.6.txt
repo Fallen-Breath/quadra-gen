@@ -1,0 +1,2 @@
+net.minecraft.resources.ResourceLocation net.minecraft.resources.Identifier
+net.minecraft.resources.ResourceKey location() identifier()
