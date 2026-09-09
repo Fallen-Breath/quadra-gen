@@ -44,7 +44,7 @@ public enum DimensionKind
 		{
 			return NETHER;
 		}
-		//#elseif MC >= 1.15.2
+		//#else
 		//$$ if (level.getDimension().getType() == DimensionType.OVERWORLD)
 		//$$ {
 		//$$ 	return OVERWORLD;
@@ -53,8 +53,6 @@ public enum DimensionKind
 		//$$ {
 		//$$ 	return NETHER;
 		//$$ }
-		//#else
-		//$$ TODO_PORT_MC_VERSION;
 		//#endif
 		return UNSUPPORTED;
 	}

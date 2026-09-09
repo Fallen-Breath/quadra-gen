@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import java.util.List;
 //#endif
 
-//#if 1.15.2 <= MC && MC < 1.18.2
+//#if MC < 1.18.2
 //$$ import net.minecraft.world.level.ChunkPos;
 //#endif
 
@@ -56,21 +56,27 @@ import net.minecraft.world.level.WorldGenLevel;
 //$$ import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 //#endif
 
-//#if 1.15.2 <= MC && MC < 1.18.2
+//#if MC < 1.18.2
 //$$ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
-//$$ import net.minecraft.core.Registry;
 //$$ import net.minecraft.server.level.WorldGenRegion;
 //$$ import net.minecraft.world.level.biome.Biome;
+//$$ import java.util.Arrays;
+//#endif
+
+//#if 1.15.2 <= MC && MC < 1.18.2
 //$$ import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 //$$ import net.minecraft.world.level.chunk.ProtoChunk;
-//$$ import java.util.Arrays;
+//#endif
+
+//#if 1.16.5 <= MC && MC < 1.18.2
+//$$ import net.minecraft.core.Registry;
 //#endif
 
 //#if 1.16.5 <= MC && MC < 1.18.2
 //$$ import net.minecraft.world.level.StructureFeatureManager;
 //#endif
 
-//#if 1.15.2 <= MC && MC < 1.17.1
+//#if MC < 1.17.1
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 //$$ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
@@ -95,9 +101,9 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 		this.levelContext$quadragen = context;
 	}
 
-	//#if 1.15.2 <= MC && MC < 1.18.2
+	//#if MC < 1.18.2
 	//$$ /**
-	//$$  * Mirrors {@link net.minecraft.world.level.chunk.ChunkGenerator#createBiomes} with a constant biome container
+	//$$  * Mirrors {@link net.minecraft.world.level.chunk.ChunkGenerator#createBiomes} with constant biome storage
 	//$$  * for Flat quadrants.
 	//$$  */
 	//$$ @Inject(
@@ -127,7 +133,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ 			int[] biomeIds = new int[16 * ((chunk.getHeight() + 3) / 4)];
 	//$$ 			Arrays.fill(biomeIds, biomeRegistry.getId(plan.getFlat().getBiome()));
 	//$$ 			((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, chunk, biomeIds));
-	//$$ //#else
+	//$$ //#elseif MC >= 1.15.2
 	//$$ //$$ 			Biome[] biomes = new Biome[ChunkBiomeContainer.BIOMES_SIZE];
 	//$$ //$$ 			Arrays.fill(biomes, plan.getFlat().getBiome());
 	//$$ //$$ //#if MC >= 1.16.5
@@ -135,6 +141,10 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ //$$ //#else
 	//$$ //$$ //$$ 			((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomes));
 	//$$ //$$ //#endif
+	//$$ //#else
+	//$$ //$$ 			Biome[] biomes = new Biome[256];
+	//$$ //$$ 			Arrays.fill(biomes, plan.getFlat().getBiome());
+	//$$ //$$ 			chunk.setBiomes(biomes);
 	//$$ //#endif
 	//$$ 			ci.cancel();
 	//$$ 		}
@@ -178,7 +188,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 			ci.cancel();
 		}
 	}
-	//#elseif MC >= 1.15.2
+	//#else
 	//$$ @Inject(
 	//$$ 		method =
 	//$$ //#if MC >= 1.16.5
@@ -216,9 +226,6 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ 		ci.cancel();
 	//$$ 	}
 	//$$ }
-	//#else
-	//$$ // TODO: Port decoration routing against the target MC source.
-	//$$ TODO_PORT_MC_VERSION;
 	//#endif
 
 	//#if 1.18.2 <= MC && MC < 1.19.4
@@ -259,7 +266,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ }
 	//#endif
 
-	//#if 1.15.2 <= MC && MC < 1.18.2
+	//#if MC < 1.18.2
 	//$$ @Inject(method = "applyCarvers", at = @At("HEAD"), cancellable = true)
 	//$$ private void applyCarvers(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess chunk)
 	//$$ {
@@ -339,11 +346,8 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	{
 		//#if MC >= 1.18.2
 		return chunk.isUpgrading();
-		//#elseif MC >= 1.15.2
-		//$$ return false;
 		//#else
-		//$$ // TODO: Port upgrading detection against the target MC source.
-		//$$ return TODO_PORT_MC_VERSION;
+		//$$ return false;
 		//#endif
 	}
 }

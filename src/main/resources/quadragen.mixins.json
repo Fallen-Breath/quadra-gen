@@ -28,7 +28,8 @@
     "spawning.PatrolSpawnerMixin",
     "spawning.VillageSiegeMixin",
     "worldgen.ChunkGeneratorMixin",
-    "worldgen.NoiseBasedChunkGeneratorMixin"
+    "worldgen.NoiseBasedChunkGeneratorMixin",
+    "worldgen.StrongholdFeatureMixin"
   ],
   "client": [
   ],

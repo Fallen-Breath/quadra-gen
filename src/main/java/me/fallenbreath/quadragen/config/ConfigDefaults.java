@@ -43,10 +43,8 @@ public final class ConfigDefaults
 				createDimension(
 						//#if MC >= 1.16.5
 						"minecraft:nether_wastes"
-						//#elseif MC >= 1.15.2
-						//$$ "minecraft:nether"
 						//#else
-						//$$ TODO_PORT_MC_VERSION
+						//$$ "minecraft:nether"
 						//#endif
 				)
 		);

@@ -62,11 +62,8 @@ public final class ConfigLoader
 			{
 				//#if MC >= 1.18.2
 				JsonElement root = JsonParser.parseReader(reader);
-				//#elseif MC >= 1.15.2
-				//$$ JsonElement root = new JsonParser().parse(reader);
 				//#else
-				//$$ // TODO: Port JSON parsing against the target Gson version.
-				//$$ JsonElement root = TODO_PORT_MC_VERSION;
+				//$$ JsonElement root = new JsonParser().parse(reader);
 				//#endif
 				return parseRoot(requireObject(root, "$"));
 			}

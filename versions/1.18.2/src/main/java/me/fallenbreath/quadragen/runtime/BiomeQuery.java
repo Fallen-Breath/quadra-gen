@@ -56,19 +56,15 @@ public final class BiomeQuery
 	public static
 			//#if MC >= 1.18.2
 			Pair<BlockPos, Holder<Biome>>
-			//#elseif MC >= 1.16.5
-			//$$ BlockPos
 			//#else
-			//$$ TODO_PORT_MC_VERSION
+			//$$ BlockPos
 			//#endif
 			findNearestBiome(
 			LevelContext context,
 			//#if MC >= 1.18.2
 			Predicate<Holder<Biome>> allowed,
-			//#elseif MC >= 1.16.5
-			//$$ Biome allowed,
 			//#else
-			//$$ TODO_PORT_MC_VERSION allowed,
+			//$$ Biome allowed,
 			//#endif
 			BlockPos origin,
 			int searchRadius,
@@ -84,11 +80,6 @@ public final class BiomeQuery
 		//$$ int originQuartY = origin.getY() >> 2;
 		//$$ int originQuartZ = origin.getZ() >> 2;
 		//$$ int sampleRadius = searchRadius >> 2;
-		//#else
-		//$$ int originQuartX = TODO_PORT_MC_VERSION;
-		//$$ int originQuartY = TODO_PORT_MC_VERSION;
-		//$$ int originQuartZ = TODO_PORT_MC_VERSION;
-		//$$ int sampleRadius = TODO_PORT_MC_VERSION;
 		//#endif
 		//#if MC >= 1.18.2
 		Climate.Sampler sampler = context.getNoiseGenerator().climateSampler();
@@ -117,9 +108,6 @@ public final class BiomeQuery
 					//#elseif MC >= 1.16.5
 					//$$ int blockX = quartX << 2;
 					//$$ int blockZ = quartZ << 2;
-					//#else
-					//$$ int blockX = TODO_PORT_MC_VERSION;
-					//$$ int blockZ = TODO_PORT_MC_VERSION;
 					//#endif
 					QuadrantPlan plan = context.getPlanAt(blockX, blockZ);
 					//#if MC >= 1.18.2
@@ -138,8 +126,6 @@ public final class BiomeQuery
 					//$$ {
 					//$$ 	return new BlockPos(blockX, origin.getY(), blockZ);
 					//$$ }
-					//#else
-					//$$ TODO_PORT_MC_VERSION();
 					//#endif
 				}
 			}

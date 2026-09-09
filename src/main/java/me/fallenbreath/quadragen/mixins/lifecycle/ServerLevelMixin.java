@@ -75,7 +75,7 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 		LevelBootstrap.install((ServerLevel)(Object)this);
 	}
 
-	//#if 1.15.2 <= MC && MC < 1.16.5
+	//#if MC < 1.16.5
 	//$$ @ModifyVariable(method = "setInitialSpawn", at = @At("STORE"), ordinal = 0)
 	//$$ private ChunkPos selectInitialSpawnAnchor(ChunkPos vanillaAnchor)
 	//$$ {
@@ -179,10 +179,7 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 	//$$ 		cir.setReturnValue(BiomeQuery.findNearestBiome(context, biome, origin, maxSearchRadius, sampleResolution));
 	//$$ 	}
 	//$$ }
-	//#elseif MC >= 1.15.2
-	//$$ // This version has no server biome-locate entry point.
 	//#else
-	//$$ // TODO: Port biome lookup against the target MC source.
-	//$$ TODO_PORT_MC_VERSION;
+	//$$ // This version has no server biome-locate entry point.
 	//#endif
 }

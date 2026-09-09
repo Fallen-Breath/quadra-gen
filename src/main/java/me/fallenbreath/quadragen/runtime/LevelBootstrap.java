@@ -53,7 +53,7 @@ import net.minecraft.core.Holder;
 
 //#if MC >= 1.16.5
 import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
-//#elseif MC >= 1.15.2
+//#else
 //$$ import net.minecraft.world.level.levelgen.NetherLevelSource;
 //$$ import net.minecraft.world.level.levelgen.OverworldLevelSource;
 //#endif
@@ -70,10 +70,8 @@ public final class LevelBootstrap
 		String dimensionId =
 				//#if MC >= 1.16.5
 				ResourceKeyCompat.identifier(level.dimension());
-				//#elseif MC >= 1.15.2
-				//$$ level.getDimension().getType().toString();
 				//#else
-				//$$ TODO_PORT_MC_VERSION;
+				//$$ level.getDimension().getType().toString();
 				//#endif
 		if (!config.isEnabled())
 		{
@@ -147,10 +145,8 @@ public final class LevelBootstrap
 		Holder<Biome> biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
 		//#elseif MC >= 1.16.5
 		//$$ Biome biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
-		//#elseif MC >= 1.15.2
-		//$$ Biome biome = ConfigValueResolver.resolveBiome(raw.getBiome(), basePath + ".biome");
 		//#else
-		//$$ TODO_PORT_MC_VERSION biome = TODO_PORT_MC_VERSION;
+		//$$ Biome biome = ConfigValueResolver.resolveBiome(raw.getBiome(), basePath + ".biome");
 		//#endif
 		List<BlockState> layers = new ArrayList<BlockState>();
 		int minY = LevelHeightCompat.minY(level);
@@ -177,7 +173,7 @@ public final class LevelBootstrap
 				FlatGeneratorFactory.create(
 						//#if MC >= 1.16.5
 						level.registryAccess(),
-						//#elseif MC >= 1.15.2
+						//#else
 						//$$ level,
 						//#endif
 						biome,
@@ -190,11 +186,9 @@ public final class LevelBootstrap
 	{
 		//#if MC >= 1.16.5
 		return generator instanceof NoiseBasedChunkGenerator;
-		//#elseif MC >= 1.15.2
+		//#else
 		//$$ return dimensionKind == DimensionKind.OVERWORLD && generator instanceof OverworldLevelSource
 		//$$ 		|| dimensionKind == DimensionKind.NETHER && generator instanceof NetherLevelSource;
-		//#else
-		//$$ return TODO_PORT_MC_VERSION;
 		//#endif
 	}
 }

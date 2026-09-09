@@ -25,19 +25,24 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.LayerConfiguration;
 
 import java.util.List;
 
+//#if MC < 1.15.2
+//$$ import net.minecraft.world.level.levelgen.feature.LayerConfiguration;
+//#else
+import net.minecraft.world.level.levelgen.feature.configurations.LayerConfiguration;
+//#endif
+
 //#if MC >= 1.19.4
 import net.minecraft.util.RandomSource;
-//#elseif MC >= 1.15.2
+//#else
 //$$ import java.util.Random;
 //#endif
 
 //#if MC >= 1.16.5
 import net.minecraft.world.level.WorldGenLevel;
-//#elseif MC >= 1.15.2
+//#else
 //$$ import net.minecraft.server.level.WorldGenRegion;
 //#endif
 
@@ -50,10 +55,8 @@ public final class FlatLayerPlacement
 	public static void placeDelayedLayers(
 			//#if MC >= 1.16.5
 			WorldGenLevel level,
-			//#elseif MC >= 1.15.2
-			//$$ WorldGenRegion level,
 			//#else
-			//$$ TODO_PORT_MC_VERSION level,
+			//$$ WorldGenRegion level,
 			//#endif
 			ChunkAccess chunk, FlatGenerationPlan plan)
 	{
@@ -62,11 +65,8 @@ public final class FlatLayerPlacement
 		// re-audit before relying on this unseeded source.
 		//#if MC >= 1.19.4
 		RandomSource random = RandomSource.create();
-		//#elseif MC >= 1.15.2
-		//$$ Random random = new Random();
 		//#else
-		//$$ // TODO: Port the feature random source against the target MC source.
-		//$$ TODO_PORT_MC_VERSION random = TODO_PORT_MC_VERSION;
+		//$$ Random random = new Random();
 		//#endif
 		List<BlockState> layers = plan.getLayers();
 		for (int index = 0; index < layers.size(); index++)
@@ -78,7 +78,7 @@ public final class FlatLayerPlacement
 				//#elseif MC >= 1.15.2
 				//$$ Feature.FILL_LAYER.configured(new LayerConfiguration(index, layers.get(index))).place(level, plan.getFlatGenerator(), random, origin);
 				//#else
-				//$$ TODO_PORT_MC_VERSION();
+				//$$ Feature.FILL_LAYER.place(level, plan.getFlatGenerator(), random, origin, new LayerConfiguration(index, layers.get(index)));
 				//#endif
 			}
 		}

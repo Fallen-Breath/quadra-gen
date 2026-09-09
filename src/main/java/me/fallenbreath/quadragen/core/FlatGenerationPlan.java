@@ -54,10 +54,8 @@ public final class FlatGenerationPlan
 	private final
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.15.2
-			//$$ Biome
 			//#else
-			//$$ TODO_PORT_MC_VERSION
+			//$$ Biome
 			//#endif
 			biome;
 	private final List<BlockState> layers;
@@ -70,10 +68,8 @@ public final class FlatGenerationPlan
 			int baseY,
 			//#if MC >= 1.18.2
 			Holder<Biome> biome,
-			//#elseif MC >= 1.15.2
-			//$$ Biome biome,
 			//#else
-			//$$ TODO_PORT_MC_VERSION biome,
+			//$$ Biome biome,
 			//#endif
 			List<BlockState> layers,
 			FlatLevelSource generator)
@@ -93,11 +89,9 @@ public final class FlatGenerationPlan
 			//#elseif MC >= 1.16.5
 			//$$ // See {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#getBiomeFromSettings}:
 			//$$ // non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
-			//#elseif MC >= 1.15.2
+			//#else
 			//$$ // See {@link net.minecraft.world.level.levelgen.FlatLevelSource#getBiomeFromSettings}:
 			//$$ // non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
-			//#else
-			//$$ // TODO: Audit delayed Flat layers against the target MC source.
 			//#endif
 			this.delayedLayers[index] = !Heightmap.Types.MOTION_BLOCKING.isOpaque().test(state);
 			if (!state.isAir())
@@ -112,10 +106,8 @@ public final class FlatGenerationPlan
 	public
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.15.2
-			//$$ Biome
 			//#else
-			//$$ TODO_PORT_MC_VERSION
+			//$$ Biome
 			//#endif
 			getBiome()
 	{
@@ -166,12 +158,9 @@ public final class FlatGenerationPlan
 		//#if MC >= 1.17.1
 		int minIndex = Math.max(0, LevelHeightCompat.minY(heightAccessor) - this.baseY);
 		int maxIndex = Math.min(this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor) - this.baseY);
-		//#elseif MC >= 1.15.2
+		//#else
 		//$$ int minIndex = Math.max(0, -this.baseY);
 		//$$ int maxIndex = Math.min(this.layers.size() - 1, 255 - this.baseY);
-		//#else
-		//$$ int minIndex = TODO_PORT_MC_VERSION;
-		//$$ int maxIndex = TODO_PORT_MC_VERSION;
 		//#endif
 		for (int index = maxIndex; index >= minIndex; index--)
 		{
@@ -182,10 +171,8 @@ public final class FlatGenerationPlan
 		}
 		//#if MC >= 1.17.1
 		return LevelHeightCompat.minY(heightAccessor);
-		//#elseif MC >= 1.15.2
-		//$$ return 0;
 		//#else
-		//$$ return TODO_PORT_MC_VERSION;
+		//$$ return 0;
 		//#endif
 	}
 
@@ -213,10 +200,6 @@ public final class FlatGenerationPlan
 		//$$ int maxY = Math.min(this.baseY + this.layers.size() - 1, 255);
 		//$$ BlockState[] column = new BlockState[256];
 		//$$ Arrays.fill(column, Blocks.AIR.defaultBlockState());
-		//#else
-		//$$ int minY = TODO_PORT_MC_VERSION;
-		//$$ int maxY = TODO_PORT_MC_VERSION;
-		//$$ BlockState[] column = TODO_PORT_MC_VERSION;
 		//#endif
 		for (int y = minY; y <= maxY; y++)
 		{
@@ -224,16 +207,12 @@ public final class FlatGenerationPlan
 			column[y - minY] = this.layers.get(y - this.baseY);
 			//#elseif MC >= 1.16.5
 			//$$ column[y] = this.layers.get(y - this.baseY);
-			//#else
-			//$$ TODO_PORT_MC_VERSION;
 			//#endif
 		}
 		//#if MC >= 1.17.1
 		return new NoiseColumn(minY, column);
 		//#elseif MC >= 1.16.5
 		//$$ return new NoiseColumn(column);
-		//#else
-		//$$ return TODO_PORT_MC_VERSION;
 		//#endif
 	}
 	//#endif
