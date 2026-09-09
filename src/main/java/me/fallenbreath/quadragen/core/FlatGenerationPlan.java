@@ -24,7 +24,6 @@ import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.EmptyBlockGetter;
-import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -41,6 +40,10 @@ import java.util.List;
 import net.minecraft.world.level.LevelHeightAccessor;
 //#endif
 
+//#if MC >= 1.16.5
+import net.minecraft.world.level.NoiseColumn;
+//#endif
+
 //#if MC >= 1.18.2
 import net.minecraft.core.Holder;
 //#endif
@@ -51,7 +54,7 @@ public final class FlatGenerationPlan
 	private final
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ Biome
 			//#else
 			//$$ TODO_PORT_MC_VERSION
@@ -67,7 +70,7 @@ public final class FlatGenerationPlan
 			int baseY,
 			//#if MC >= 1.18.2
 			Holder<Biome> biome,
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ Biome biome,
 			//#else
 			//$$ TODO_PORT_MC_VERSION biome,
@@ -90,6 +93,9 @@ public final class FlatGenerationPlan
 			//#elseif MC >= 1.16.5
 			//$$ // See {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#getBiomeFromSettings}:
 			//$$ // non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
+			//#elseif MC >= 1.15.2
+			//$$ // See {@link net.minecraft.world.level.levelgen.FlatLevelSource#getBiomeFromSettings}:
+			//$$ // non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
 			//#else
 			//$$ // TODO: Audit delayed Flat layers against the target MC source.
 			//#endif
@@ -106,7 +112,7 @@ public final class FlatGenerationPlan
 	public
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ Biome
 			//#else
 			//$$ TODO_PORT_MC_VERSION
@@ -160,7 +166,7 @@ public final class FlatGenerationPlan
 		//#if MC >= 1.17.1
 		int minIndex = Math.max(0, LevelHeightCompat.minY(heightAccessor) - this.baseY);
 		int maxIndex = Math.min(this.layers.size() - 1, LevelHeightCompat.maxYInclusive(heightAccessor) - this.baseY);
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ int minIndex = Math.max(0, -this.baseY);
 		//$$ int maxIndex = Math.min(this.layers.size() - 1, 255 - this.baseY);
 		//#else
@@ -176,13 +182,14 @@ public final class FlatGenerationPlan
 		}
 		//#if MC >= 1.17.1
 		return LevelHeightCompat.minY(heightAccessor);
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ return 0;
 		//#else
 		//$$ return TODO_PORT_MC_VERSION;
 		//#endif
 	}
 
+	//#if MC >= 1.16.5
 	/**
 	 * Mirrors {@link net.minecraft.world.level.levelgen.FlatLevelSource#getBaseColumn} while preserving configured layers
 	 * that vanilla represents as null after splitting delayed placement.
@@ -229,6 +236,7 @@ public final class FlatGenerationPlan
 		//$$ return TODO_PORT_MC_VERSION;
 		//#endif
 	}
+	//#endif
 
 	/**
 	 * Mirrors the ground acceptance checks in

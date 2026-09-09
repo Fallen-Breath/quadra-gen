@@ -32,6 +32,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+/**
+ * mc >= 1.16.5: main project  <--------
+ * mc <= 1.15.2: subproject 1.15.2
+ * <p>
+ * Initial-spawn selection moved from ServerLevel to MinecraftServer in 1.16.5.
+ */
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin
 {

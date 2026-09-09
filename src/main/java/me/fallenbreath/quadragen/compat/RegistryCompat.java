@@ -21,10 +21,8 @@
 package me.fallenbreath.quadragen.compat;
 
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
@@ -32,6 +30,11 @@ import java.util.Optional;
 
 //#if MC >= 1.18.2
 import net.minecraft.core.Holder;
+//#endif
+
+//#if MC >= 1.16.5
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 //#endif
 
 //#if MC >= 1.19.4
@@ -53,12 +56,16 @@ public final class RegistryCompat
 	public static Optional<
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ Biome
 			//#else
 			//$$ TODO_PORT_MC_VERSION
 			//#endif
-			> findBiome(RegistryAccess access, String value)
+			> findBiome(
+			//#if MC >= 1.16.5
+			RegistryAccess access,
+			//#endif
+			String value)
 	{
 		Identifier identifier = IdentifierCompat.tryParse(value);
 		if (identifier == null)
@@ -72,6 +79,8 @@ public final class RegistryCompat
 				//$$ access.registryOrThrow(Registries.BIOME);
 				//#elseif MC >= 1.16.5
 				//$$ access.registryOrThrow(Registry.BIOME_REGISTRY);
+				//#elseif MC >= 1.15.2
+				//$$ Registry.BIOME;
 				//#else
 				//$$ // TODO: Port this lookup against the target MC source.
 				//$$ TODO_PORT_MC_VERSION;
@@ -82,7 +91,7 @@ public final class RegistryCompat
 		//$$ return registry.getHolder(identifier).map(holder -> holder);
 		//#elseif MC >= 1.18.2
 		//$$ return registry.getHolder(ResourceKey.create(registry.key(), identifier)).map(holder -> holder);
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ return registry.getOptional(identifier);
 		//#else
 		//$$ // TODO: Port this lookup against the target MC source.

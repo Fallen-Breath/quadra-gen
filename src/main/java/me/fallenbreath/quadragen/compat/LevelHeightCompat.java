@@ -22,7 +22,7 @@ package me.fallenbreath.quadragen.compat;
 
 //#if MC >= 1.17.1
 import net.minecraft.world.level.LevelHeightAccessor;
-//#elseif MC >= 1.16.5
+//#elseif MC >= 1.15.2
 //$$ import net.minecraft.world.level.Level;
 //$$ import net.minecraft.world.level.LevelAccessor;
 //#endif
@@ -36,7 +36,7 @@ public final class LevelHeightCompat
 	public static int minY(
 			//#if MC >= 1.17.1
 			LevelHeightAccessor accessor
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ LevelAccessor accessor
 			//#else
 			//$$ TODO_PORT_MC_VERSION accessor
@@ -47,7 +47,7 @@ public final class LevelHeightCompat
 		return accessor.getMinY();
 		//#elseif MC >= 1.17.1
 		//$$ return accessor.getMinBuildHeight();
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ return 0;
 		//#else
 		//$$ // TODO: Port this method against the target MC source.
@@ -58,7 +58,7 @@ public final class LevelHeightCompat
 	public static int maxYInclusive(
 			//#if MC >= 1.17.1
 			LevelHeightAccessor accessor
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ LevelAccessor accessor
 			//#else
 			//$$ TODO_PORT_MC_VERSION accessor
@@ -69,7 +69,7 @@ public final class LevelHeightCompat
 		return accessor.getMaxY();
 		//#elseif MC >= 1.17.1
 		//$$ return accessor.getMaxBuildHeight() - 1;
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ return 255;
 		//#else
 		//$$ // TODO: Port this method against the target MC source.
@@ -80,7 +80,7 @@ public final class LevelHeightCompat
 	public static boolean contains(
 			//#if MC >= 1.17.1
 			LevelHeightAccessor accessor,
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ LevelAccessor accessor,
 			//#else
 			//$$ TODO_PORT_MC_VERSION accessor,
@@ -89,7 +89,7 @@ public final class LevelHeightCompat
 	{
 		//#if MC >= 1.17.1
 		return !accessor.isOutsideBuildHeight(y);
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ return !Level.isOutsideBuildHeight(y);
 		//#else
 		//$$ // TODO: Port this method against the target MC source.

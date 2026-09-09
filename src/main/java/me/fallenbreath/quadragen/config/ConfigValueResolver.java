@@ -22,13 +22,16 @@ package me.fallenbreath.quadragen.config;
 
 import me.fallenbreath.quadragen.compat.IdentifierCompat;
 import me.fallenbreath.quadragen.compat.RegistryCompat;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 //#if MC >= 1.18.2
 import net.minecraft.core.Holder;
+//#endif
+
+//#if MC >= 1.16.5
+import net.minecraft.core.RegistryAccess;
 //#endif
 
 public final class ConfigValueResolver
@@ -51,18 +54,24 @@ public final class ConfigValueResolver
 	public static
 			//#if MC >= 1.18.2
 			Holder<Biome>
-			//#elseif MC >= 1.16.5
+			//#elseif MC >= 1.15.2
 			//$$ Biome
 			//#else
 			//$$ TODO_PORT_MC_VERSION
 			//#endif
-			resolveBiome(RegistryAccess access, String value, String path)
+			resolveBiome(
+			//#if MC >= 1.16.5
+			RegistryAccess access,
+			//#endif
+			String value, String path)
 	{
 		ConfigValueResolver.validateIdentifier(value, path);
 		//#if MC >= 1.18.2
 		Holder<Biome> biome = RegistryCompat.findBiome(access, value).orElse(null);
 		//#elseif MC >= 1.16.5
 		//$$ Biome biome = RegistryCompat.findBiome(access, value).orElse(null);
+		//#elseif MC >= 1.15.2
+		//$$ Biome biome = RegistryCompat.findBiome(value).orElse(null);
 		//#else
 		//$$ TODO_PORT_MC_VERSION biome = TODO_PORT_MC_VERSION;
 		//#endif

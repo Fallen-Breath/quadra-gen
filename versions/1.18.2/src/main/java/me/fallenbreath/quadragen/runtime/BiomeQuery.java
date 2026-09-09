@@ -48,6 +48,7 @@ public final class BiomeQuery
 	{
 	}
 
+	//#if MC >= 1.16.5
 	/**
 	 * Mirrors the closest-first branch of {@link net.minecraft.world.level.biome.BiomeSource#findBiomeHorizontal}
 	 * while sampling quadrant-aware Flat biomes.
@@ -145,4 +146,5 @@ public final class BiomeQuery
 		}
 		return null;
 	}
+	//#endif
 }

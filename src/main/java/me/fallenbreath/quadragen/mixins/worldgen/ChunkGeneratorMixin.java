@@ -26,7 +26,6 @@ import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import net.minecraft.SharedConstants;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,9 +36,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if 1.16.5 <= MC && MC < 1.19.4
 //$$ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-//$$ import net.minecraft.world.level.ChunkPos;
 //$$ import java.util.ArrayList;
 //$$ import java.util.List;
+//#endif
+
+//#if 1.15.2 <= MC && MC < 1.18.2
+//$$ import net.minecraft.world.level.ChunkPos;
+//#endif
+
+//#if MC >= 1.16.5
+import net.minecraft.world.level.WorldGenLevel;
 //#endif
 
 //#if 1.18.2 <= MC && MC < 1.19.4
@@ -50,18 +56,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 //#endif
 
-//#if 1.16.5 <= MC && MC < 1.18.2
+//#if 1.15.2 <= MC && MC < 1.18.2
 //$$ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 //$$ import net.minecraft.core.Registry;
 //$$ import net.minecraft.server.level.WorldGenRegion;
-//$$ import net.minecraft.world.level.StructureFeatureManager;
 //$$ import net.minecraft.world.level.biome.Biome;
 //$$ import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 //$$ import net.minecraft.world.level.chunk.ProtoChunk;
 //$$ import java.util.Arrays;
 //#endif
 
-//#if 1.16.5 <= MC && MC < 1.17.1
+//#if 1.16.5 <= MC && MC < 1.18.2
+//$$ import net.minecraft.world.level.StructureFeatureManager;
+//#endif
+
+//#if 1.15.2 <= MC && MC < 1.17.1
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 //$$ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
@@ -86,20 +95,27 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 		this.levelContext$quadragen = context;
 	}
 
-	//#if 1.16.5 <= MC && MC < 1.18.2
+	//#if 1.15.2 <= MC && MC < 1.18.2
 	//$$ /**
 	//$$  * Mirrors {@link net.minecraft.world.level.chunk.ChunkGenerator#createBiomes} with a constant biome container
 	//$$  * for Flat quadrants.
 	//$$  */
 	//$$ @Inject(
-	//$$ 		method = "createBiomes(Lnet/minecraft/core/Registry;Lnet/minecraft/world/level/chunk/ChunkAccess;)V",
+	//$$ 		method =
+	//$$ //#if MC >= 1.16.5
+	//$$ 		"createBiomes(Lnet/minecraft/core/Registry;Lnet/minecraft/world/level/chunk/ChunkAccess;)V",
+	//$$ //#else
+	//$$ //$$ 		"createBiomes(Lnet/minecraft/world/level/chunk/ChunkAccess;)V",
+	//$$ //#endif
 	//$$ 		at = @At("HEAD"),
 	//$$ 		cancellable = true
 	//$$ )
 	//$$ private void createBiomes(
-	//$$ 		Registry<Biome> biomeRegistry,
-	//$$ 		ChunkAccess chunk,
-	//$$ 		CallbackInfo ci)
+	//$$ 		CallbackInfo ci,
+	//$$ //#if MC >= 1.16.5
+	//$$ 		@Local(argsOnly = true) Registry<Biome> biomeRegistry,
+	//$$ //#endif
+	//$$ 		@Local(argsOnly = true) ChunkAccess chunk)
 	//$$ {
 	//$$ 	LevelContext context = this.levelContext$quadragen;
 	//$$ 	if (context != null)
@@ -114,7 +130,11 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ //#else
 	//$$ //$$ 			Biome[] biomes = new Biome[ChunkBiomeContainer.BIOMES_SIZE];
 	//$$ //$$ 			Arrays.fill(biomes, plan.getFlat().getBiome());
+	//$$ //$$ //#if MC >= 1.16.5
 	//$$ //$$ 			((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, biomes));
+	//$$ //$$ //#else
+	//$$ //$$ //$$ 			((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomes));
+	//$$ //$$ //#endif
 	//$$ //#endif
 	//$$ 			ci.cancel();
 	//$$ 		}
@@ -158,13 +178,18 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 			ci.cancel();
 		}
 	}
-	//#elseif MC >= 1.16.5
+	//#elseif MC >= 1.15.2
 	//$$ @Inject(
-	//$$ 		method = "applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureFeatureManager;)V",
+	//$$ 		method =
+	//$$ //#if MC >= 1.16.5
+	//$$ 		"applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureFeatureManager;)V",
+	//$$ //#else
+	//$$ //$$ 		"applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;)V",
+	//$$ //#endif
 	//$$ 		at = @At("HEAD"),
 	//$$ 		cancellable = true
 	//$$ )
-	//$$ private void applyBiomeDecoration(WorldGenRegion level, StructureFeatureManager structureManager, CallbackInfo ci)
+	//$$ private void applyBiomeDecoration(CallbackInfo ci, @Local(argsOnly = true) WorldGenRegion level)
 	//$$ {
 	//$$ 	LevelContext context = this.levelContext$quadragen;
 	//$$ 	if (context == null)
@@ -234,7 +259,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ }
 	//#endif
 
-	//#if 1.16.5 <= MC && MC < 1.18.2
+	//#if 1.15.2 <= MC && MC < 1.18.2
 	//$$ @Inject(method = "applyCarvers", at = @At("HEAD"), cancellable = true)
 	//$$ private void applyCarvers(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess chunk)
 	//$$ {
@@ -279,7 +304,9 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ //$$ 	return context == null || context.getPlanAt(new ChunkPos(sourceX, sourceZ)).isOrdinaryNoise();
 	//$$ //$$ }
 	//$$ //#endif
+	//#endif
 
+	//#if 1.16.5 <= MC && MC < 1.18.2
 	//$$ /**
 	//$$  * Filters the precomputed positions read by {@link net.minecraft.world.level.chunk.ChunkGenerator#findNearestMapFeature}
 	//$$  * because its stronghold branch does not validate structure starts.
@@ -312,7 +339,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	{
 		//#if MC >= 1.18.2
 		return chunk.isUpgrading();
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ return false;
 		//#else
 		//$$ // TODO: Port upgrading detection against the target MC source.

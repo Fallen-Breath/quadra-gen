@@ -20,7 +20,9 @@
 
 package me.fallenbreath.quadragen.compat;
 
+//#if MC >= 1.16.5
 import net.minecraft.resources.ResourceKey;
+//#endif
 
 public final class ResourceKeyCompat
 {
@@ -28,8 +30,10 @@ public final class ResourceKeyCompat
 	{
 	}
 
+	//#if MC >= 1.16.5
 	public static String identifier(ResourceKey<?> key)
 	{
 		return key.identifier().toString();
 	}
+	//#endif
 }

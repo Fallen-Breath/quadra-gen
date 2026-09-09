@@ -22,7 +22,6 @@ package me.fallenbreath.quadragen.core;
 
 import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -32,8 +31,14 @@ import java.util.List;
 
 //#if MC >= 1.19.4
 import net.minecraft.util.RandomSource;
-//#elseif MC >= 1.16.5
+//#elseif MC >= 1.15.2
 //$$ import java.util.Random;
+//#endif
+
+//#if MC >= 1.16.5
+import net.minecraft.world.level.WorldGenLevel;
+//#elseif MC >= 1.15.2
+//$$ import net.minecraft.server.level.WorldGenRegion;
 //#endif
 
 public final class FlatLayerPlacement
@@ -42,14 +47,22 @@ public final class FlatLayerPlacement
 	{
 	}
 
-	public static void placeDelayedLayers(WorldGenLevel level, ChunkAccess chunk, FlatGenerationPlan plan)
+	public static void placeDelayedLayers(
+			//#if MC >= 1.16.5
+			WorldGenLevel level,
+			//#elseif MC >= 1.15.2
+			//$$ WorldGenRegion level,
+			//#else
+			//$$ TODO_PORT_MC_VERSION level,
+			//#endif
+			ChunkAccess chunk, FlatGenerationPlan plan)
 	{
 		BlockPos origin = new BlockPos(chunk.getPos().getMinBlockX(), LevelHeightCompat.minY(level) + 1, chunk.getPos().getMinBlockZ());
 		// NOTE: {@link net.minecraft.world.level.levelgen.feature.FillLayerFeature#place} does not consume random in supported versions;
 		// re-audit before relying on this unseeded source.
 		//#if MC >= 1.19.4
 		RandomSource random = RandomSource.create();
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ Random random = new Random();
 		//#else
 		//$$ // TODO: Port the feature random source against the target MC source.
@@ -62,7 +75,7 @@ public final class FlatLayerPlacement
 			{
 				//#if MC >= 1.18.2
 				Feature.FILL_LAYER.place(new LayerConfiguration(index, layers.get(index)), level, plan.getFlatGenerator(), random, origin);
-				//#elseif MC >= 1.16.5
+				//#elseif MC >= 1.15.2
 				//$$ Feature.FILL_LAYER.configured(new LayerConfiguration(index, layers.get(index))).place(level, plan.getFlatGenerator(), random, origin);
 				//#else
 				//$$ TODO_PORT_MC_VERSION();

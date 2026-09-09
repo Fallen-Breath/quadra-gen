@@ -24,6 +24,9 @@
     "sealevel.TurtleMixin",
     "sealevel.TurtleTravelGoalMixin",
     "sealevel.WaterAnimalMixin",
+    "spawning.OverworldLevelSourceMixin",
+    "spawning.PatrolSpawnerMixin",
+    "spawning.VillageSiegeMixin",
     "worldgen.ChunkGeneratorMixin",
     "worldgen.NoiseBasedChunkGeneratorMixin"
   ],

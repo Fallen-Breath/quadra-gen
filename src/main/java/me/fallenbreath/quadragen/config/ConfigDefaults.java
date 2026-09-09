@@ -40,7 +40,15 @@ public final class ConfigDefaults
 				true,
 				false,
 				createDimension("minecraft:plains"),
-				createDimension("minecraft:nether_wastes")
+				createDimension(
+						//#if MC >= 1.16.5
+						"minecraft:nether_wastes"
+						//#elseif MC >= 1.15.2
+						//$$ "minecraft:nether"
+						//#else
+						//$$ TODO_PORT_MC_VERSION
+						//#endif
+				)
 		);
 	}
 

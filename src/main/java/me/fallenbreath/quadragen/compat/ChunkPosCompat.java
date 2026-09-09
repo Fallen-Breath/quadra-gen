@@ -85,7 +85,7 @@ public final class ChunkPosCompat
 		return ChunkPos.pack(pos);
 		//#elseif MC >= 1.17.1
 		//$$ return ChunkPos.asLong(pos);
-		//#elseif MC >= 1.16.5
+		//#elseif MC >= 1.15.2
 		//$$ return ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
 		//#else
 		//$$ return ChunkPos.asLong(pos);

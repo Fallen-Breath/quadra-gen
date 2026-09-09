@@ -18,44 +18,18 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.core;
+package me.fallenbreath.quadragen.mixins.lifecycle;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
+import me.fallenbreath.quadragen.compat.DummyClass;
+import org.spongepowered.asm.mixin.Mixin;
 
-//#if MC < 1.16.5
-//$$ import net.minecraft.world.level.dimension.DimensionType;
-//#endif
-
-public enum DimensionKind
+/**
+ * mc >= 1.16.5: main project
+ * mc <= 1.15.2: subproject 1.15.2  <--------
+ * <p>
+ * Initial-spawn selection still belongs to ServerLevel in 1.15.2.
+ */
+@Mixin(DummyClass.class)
+public abstract class MinecraftServerMixin
 {
-	OVERWORLD,
-	NETHER,
-	UNSUPPORTED;
-
-	public static DimensionKind from(ServerLevel level)
-	{
-		//#if MC >= 1.16.5
-		if (Level.OVERWORLD.equals(level.dimension()))
-		{
-			return OVERWORLD;
-		}
-		if (Level.NETHER.equals(level.dimension()))
-		{
-			return NETHER;
-		}
-		//#elseif MC >= 1.15.2
-		//$$ if (level.getDimension().getType() == DimensionType.OVERWORLD)
-		//$$ {
-		//$$ 	return OVERWORLD;
-		//$$ }
-		//$$ if (level.getDimension().getType() == DimensionType.NETHER)
-		//$$ {
-		//$$ 	return NETHER;
-		//$$ }
-		//#else
-		//$$ TODO_PORT_MC_VERSION;
-		//#endif
-		return UNSUPPORTED;
-	}
 }

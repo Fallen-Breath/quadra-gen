@@ -22,7 +22,6 @@ package me.fallenbreath.quadragen.runtime;
 
 import me.fallenbreath.quadragen.QuadraGen;
 import me.fallenbreath.quadragen.compat.LevelHeightCompat;
-import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
 import me.fallenbreath.quadragen.config.ConfigValidationException;
 import me.fallenbreath.quadragen.config.ConfigValueResolver;
 import me.fallenbreath.quadragen.config.DimensionConfig;
@@ -52,6 +51,13 @@ import java.util.Map;
 import net.minecraft.core.Holder;
 //#endif
 
+//#if MC >= 1.16.5
+import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
+//#elseif MC >= 1.15.2
+//$$ import net.minecraft.world.level.levelgen.NetherLevelSource;
+//$$ import net.minecraft.world.level.levelgen.OverworldLevelSource;
+//#endif
+
 public final class LevelBootstrap
 {
 	private LevelBootstrap()
@@ -61,7 +67,14 @@ public final class LevelBootstrap
 	public static void install(ServerLevel level)
 	{
 		QuadraGenConfig config = QuadraGen.getConfig();
-		String dimensionId = ResourceKeyCompat.identifier(level.dimension());
+		String dimensionId =
+				//#if MC >= 1.16.5
+				ResourceKeyCompat.identifier(level.dimension());
+				//#elseif MC >= 1.15.2
+				//$$ level.getDimension().getType().toString();
+				//#else
+				//$$ TODO_PORT_MC_VERSION;
+				//#endif
 		if (!config.isEnabled())
 		{
 			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: globally disabled", dimensionId);
@@ -98,7 +111,7 @@ public final class LevelBootstrap
 		}
 
 		ChunkGenerator generator = level.getChunkSource().getGenerator();
-		if (!(generator instanceof NoiseBasedChunkGenerator))
+		if (!isSupportedNoiseGenerator(dimensionKind, generator))
 		{
 			QuadraGen.LOGGER.info(
 					"Quadra Gen world-generation routing is not installed for {}: unsupported generator {}",
@@ -134,6 +147,8 @@ public final class LevelBootstrap
 		Holder<Biome> biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
 		//#elseif MC >= 1.16.5
 		//$$ Biome biome = ConfigValueResolver.resolveBiome(level.registryAccess(), raw.getBiome(), basePath + ".biome");
+		//#elseif MC >= 1.15.2
+		//$$ Biome biome = ConfigValueResolver.resolveBiome(raw.getBiome(), basePath + ".biome");
 		//#else
 		//$$ TODO_PORT_MC_VERSION biome = TODO_PORT_MC_VERSION;
 		//#endif
@@ -155,6 +170,31 @@ public final class LevelBootstrap
 				layers.add(state);
 			}
 		}
-		return new FlatGenerationPlan(minY, biome, layers, FlatGeneratorFactory.create(level.registryAccess(), biome, layers));
+		return new FlatGenerationPlan(
+				minY,
+				biome,
+				layers,
+				FlatGeneratorFactory.create(
+						//#if MC >= 1.16.5
+						level.registryAccess(),
+						//#elseif MC >= 1.15.2
+						//$$ level,
+						//#endif
+						biome,
+						layers
+				)
+		);
+	}
+
+	private static boolean isSupportedNoiseGenerator(DimensionKind dimensionKind, ChunkGenerator generator)
+	{
+		//#if MC >= 1.16.5
+		return generator instanceof NoiseBasedChunkGenerator;
+		//#elseif MC >= 1.15.2
+		//$$ return dimensionKind == DimensionKind.OVERWORLD && generator instanceof OverworldLevelSource
+		//$$ 		|| dimensionKind == DimensionKind.NETHER && generator instanceof NetherLevelSource;
+		//#else
+		//$$ return TODO_PORT_MC_VERSION;
+		//#endif
 	}
 }

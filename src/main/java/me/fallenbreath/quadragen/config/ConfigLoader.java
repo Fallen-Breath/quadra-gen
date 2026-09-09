@@ -62,7 +62,7 @@ public final class ConfigLoader
 			{
 				//#if MC >= 1.18.2
 				JsonElement root = JsonParser.parseReader(reader);
-				//#elseif MC >= 1.16.5
+				//#elseif MC >= 1.15.2
 				//$$ JsonElement root = new JsonParser().parse(reader);
 				//#else
 				//$$ // TODO: Port JSON parsing against the target Gson version.
