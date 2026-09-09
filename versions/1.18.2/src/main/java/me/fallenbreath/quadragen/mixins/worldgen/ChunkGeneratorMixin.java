@@ -35,10 +35,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//#if MC < 1.18.2
+//$$ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+//$$ import net.minecraft.server.level.WorldGenRegion;
+//#endif
+
 /**
- * mc >= 1.19.4: subproject 26.2 (main project)       <--------
- * 1.16.5 <= mc <= 1.18.2: subproject 1.18.2
+ * mc >= 1.19.4: subproject 26.2 (main project)
+ * 1.16.5 <= mc <= 1.18.2: subproject 1.18.2       <--------
  * mc <= 1.15.2: subproject 1.15.2
+ * <p>
+ * This interval spans the dynamic-registry biome containers, height-aware chunks, and the 1.18 Holder/retrogen transition.
  */
 @Mixin(ChunkGenerator.class)
 public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
@@ -72,6 +79,7 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 		}
 	}
 
+	//#if MC >= 1.18.2
 	@Inject(method = "applyBiomeDecoration", at = @At("HEAD"), cancellable = true)
 	private void applyBiomeDecoration(
 			CallbackInfo ci,
@@ -93,10 +101,48 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 			ci.cancel();
 		}
 	}
+	//#else
+	//$$ @Inject(
+	//$$ 		method = "applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureFeatureManager;)V",
+	//$$ 		at = @At("HEAD"),
+	//$$ 		cancellable = true
+	//$$ )
+	//$$ private void applyBiomeDecoration(CallbackInfo ci, @Local(argsOnly = true) WorldGenRegion level)
+	//$$ {
+	//$$ 	LevelContext context = this.levelContext$quadragen;
+	//$$ 	if (context == null)
+	//$$ 	{
+	//$$ 		return;
+	//$$ 	}
+	//$$ //#if MC >= 1.17.1
+	//$$ 	ChunkAccess chunk = level.getChunk(ChunkPosCompat.x(level.getCenter()), ChunkPosCompat.z(level.getCenter()));
+	//$$ //#else
+	//$$ //$$ 	ChunkAccess chunk = level.getChunk(level.getCenterX(), level.getCenterZ());
+	//$$ //#endif
+	//$$ 	QuadrantPlan plan = context.getPlanAt(chunk.getPos());
+	//$$ 	if (!plan.isOrdinaryNoise())
+	//$$ 	{
+	//$$ 		if (
+	//$$ //#if MC >= 1.17.1
+	//$$ 				!SharedConstants.DEBUG_DISABLE_FEATURES &&
+	//$$ //#endif
+	//$$ 				plan.isFlat() && !plan.isClearGeneratedContent()
+	//$$ 		)
+	//$$ 		{
+	//$$ 			FlatLayerPlacement.placeDelayedLayers(level, chunk, plan.getFlat());
+	//$$ 		}
+	//$$ 		ci.cancel();
+	//$$ 	}
+	//$$ }
+	//#endif
 
 	@Unique
 	private boolean isUpgrading$quadragen(ChunkAccess chunk)
 	{
+		//#if MC >= 1.18.2
 		return chunk.isUpgrading();
+		//#else
+		//$$ return false;
+		//#endif
 	}
 }

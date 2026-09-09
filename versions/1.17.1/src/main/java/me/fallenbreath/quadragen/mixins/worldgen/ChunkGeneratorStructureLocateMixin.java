@@ -21,55 +21,46 @@
 package me.fallenbreath.quadragen.mixins.worldgen;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.feature.StrongholdFeature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * mc >= 1.16.5: main project
- * mc <= 1.15.2: subproject 1.15.2                    <--------
- * <p>
- * The legacy stronghold locate path uses precomputed positions without validating structure starts.
+ * mc >= 1.19.4: subproject 26.2 (main project)
+ * mc == 1.18.2: subproject 1.18.2
+ * 1.16.5 <= mc <= 1.17.1: subproject 1.17.1       <--------
+ * mc <= 1.15.2: subproject 1.15.2
  */
-@Mixin(StrongholdFeature.class)
-public abstract class StrongholdFeatureMixin
+@Mixin(ChunkGenerator.class)
+public abstract class ChunkGeneratorStructureLocateMixin
 {
 	/**
-	 * Filters the positions consumed by
-	 * {@link net.minecraft.world.level.levelgen.feature.StrongholdFeature#getNearestGeneratedFeature} so Flat quadrants
-	 * cannot be reported as stronghold sources.
+	 * Filters the precomputed positions read by {@link net.minecraft.world.level.chunk.ChunkGenerator#findNearestMapFeature}
+	 * because its stronghold branch does not validate structure starts.
 	 */
 	@ModifyExpressionValue(
-			method = "getNearestGeneratedFeature",
-			at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/levelgen/feature/StrongholdFeature;strongholdPos:[Lnet/minecraft/world/level/ChunkPos;")
+			method = "findNearestMapFeature",
+			at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/chunk/ChunkGenerator;strongholdPositions:Ljava/util/List;")
 	)
-	private ChunkPos[] filterFlatCandidates(ChunkPos[] original, @Local(argsOnly = true) ChunkGenerator<?> generator)
+	private List<ChunkPos> filterStrongholdCandidates(List<ChunkPos> original)
 	{
-		LevelContext context = ((GeneratorContextAccess)generator).getLevelContext$quadragen();
+		LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
 		if (context == null)
 		{
 			return original;
 		}
-		int count = 0;
+		List<ChunkPos> filtered = new ArrayList<ChunkPos>();
 		for (ChunkPos candidate : original)
 		{
 			if (context.getPlanAt(candidate).isNoise())
 			{
-				count++;
-			}
-		}
-		ChunkPos[] filtered = new ChunkPos[count];
-		int index = 0;
-		for (ChunkPos candidate : original)
-		{
-			if (context.getPlanAt(candidate).isNoise())
-			{
-				filtered[index++] = candidate;
+				filtered.add(candidate);
 			}
 		}
 		return filtered;

@@ -25,8 +25,7 @@ import me.fallenbreath.quadragen.core.FlatLayerPlacement;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import net.minecraft.SharedConstants;
-import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,9 +35,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * mc >= 1.19.4: subproject 26.2 (main project)       <--------
+ * mc >= 1.19.4: subproject 26.2 (main project)
  * 1.16.5 <= mc <= 1.18.2: subproject 1.18.2
- * mc <= 1.15.2: subproject 1.15.2
+ * mc <= 1.15.2: subproject 1.15.2                    <--------
+ * <p>
+ * These versions use dimension-owned generators, legacy biome storage, and the coordinate-based carver API.
  */
 @Mixin(ChunkGenerator.class)
 public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
@@ -62,31 +63,29 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	private void createStructures(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess centerChunk)
 	{
 		LevelContext context = this.levelContext$quadragen;
-		if (context != null && !this.isUpgrading$quadragen(centerChunk))
+		if (context != null && context.getPlanAt(centerChunk.getPos()).isFlat())
 		{
-			QuadrantPlan plan = context.getPlanAt(centerChunk.getPos());
-			if (plan.isFlat())
-			{
-				ci.cancel();
-			}
+			ci.cancel();
 		}
 	}
 
-	@Inject(method = "applyBiomeDecoration", at = @At("HEAD"), cancellable = true)
-	private void applyBiomeDecoration(
-			CallbackInfo ci,
-			@Local(argsOnly = true) WorldGenLevel level,
-			@Local(argsOnly = true) ChunkAccess chunk)
+	@Inject(
+			method = "applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;)V",
+			at = @At("HEAD"),
+			cancellable = true
+	)
+	private void applyBiomeDecoration(CallbackInfo ci, @Local(argsOnly = true) WorldGenRegion level)
 	{
 		LevelContext context = this.levelContext$quadragen;
-		if (context == null || this.isUpgrading$quadragen(chunk))
+		if (context == null)
 		{
 			return;
 		}
+		ChunkAccess chunk = level.getChunk(level.getCenterX(), level.getCenterZ());
 		QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 		if (!plan.isOrdinaryNoise())
 		{
-			if (!SharedConstants.DEBUG_DISABLE_FEATURES && plan.isFlat() && !plan.isClearGeneratedContent())
+			if (plan.isFlat() && !plan.isClearGeneratedContent())
 			{
 				FlatLayerPlacement.placeDelayedLayers(level, chunk, plan.getFlat());
 			}
@@ -94,9 +93,4 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 		}
 	}
 
-	@Unique
-	private boolean isUpgrading$quadragen(ChunkAccess chunk)
-	{
-		return chunk.isUpgrading();
-	}
 }

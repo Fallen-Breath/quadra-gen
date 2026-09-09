@@ -27,9 +27,11 @@
     "spawning.OverworldLevelSourceMixin",
     "spawning.PatrolSpawnerMixin",
     "spawning.VillageSiegeMixin",
+    "worldgen.ChunkGeneratorBiomeMixin",
+    "worldgen.ChunkGeneratorCarverMixin",
     "worldgen.ChunkGeneratorMixin",
-    "worldgen.NoiseBasedChunkGeneratorMixin",
-    "worldgen.StrongholdFeatureMixin"
+    "worldgen.ChunkGeneratorStructureLocateMixin",
+    "worldgen.NoiseBasedChunkGeneratorMixin"
   ],
   "client": [
   ],
