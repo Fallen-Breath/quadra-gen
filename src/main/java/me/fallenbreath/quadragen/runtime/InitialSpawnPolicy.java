@@ -20,7 +20,6 @@
 
 package me.fallenbreath.quadragen.runtime;
 
-import me.fallenbreath.quadragen.QuadraGen;
 import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 import me.fallenbreath.quadragen.core.DimensionKind;
 import me.fallenbreath.quadragen.core.Quadrant;
@@ -35,7 +34,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public final class InitialSpawnPolicy
 {
+	//#if MC >= 1.18.2
+	// Vanilla {@link net.minecraft.server.MinecraftServer#setInitialSpawn} searches a centered 11x11 chunk square.
 	private static final int AXIS_CLEARANCE_CHUNKS = 5;
+	//#elseif MC >= 1.16.5
+	//$$ // Vanilla {@link net.minecraft.server.MinecraftServer#setInitialSpawn} searches up to 16 chunks from its anchor.
+	//$$ private static final int AXIS_CLEARANCE_CHUNKS = 16;
+	//#else
+	//$$ // Vanilla {@link net.minecraft.server.level.ServerLevel#setInitialSpawn} searches up to 16 chunks from its anchor.
+	//$$ private static final int AXIS_CLEARANCE_CHUNKS = 16;
+	//#endif
 
 	private InitialSpawnPolicy()
 	{
@@ -63,18 +71,8 @@ public final class InitialSpawnPolicy
 
 	private static ChunkPos selectAnchor(LevelContext context, ChunkPos vanillaAnchor)
 	{
-		ChunkPos noise = nearestEligible(context, vanillaAnchor, true);
-		if (noise != null)
-		{
-			return noise;
-		}
-		ChunkPos flat = nearestEligible(context, vanillaAnchor, false);
-		if (flat != null)
-		{
-			return flat;
-		}
-		QuadraGen.LOGGER.warn("No ordinary Noise or non-empty safe Flat quadrant is available for initial spawn; keeping vanilla anchor {}", vanillaAnchor);
-		return vanillaAnchor;
+		ChunkPos noise = nearestOrdinaryNoise(context, vanillaAnchor);
+		return noise != null ? noise : vanillaAnchor;
 	}
 
 	/**
@@ -93,7 +91,7 @@ public final class InitialSpawnPolicy
 		return groundState.getFluidState().isEmpty() && Block.isFaceFull(groundState.getCollisionShape(level, groundPos), Direction.UP);
 	}
 
-	private static ChunkPos nearestEligible(LevelContext context, ChunkPos origin, boolean requireNoise)
+	private static ChunkPos nearestOrdinaryNoise(LevelContext context, ChunkPos origin)
 	{
 		int originX = ChunkPosCompat.x(origin);
 		int originZ = ChunkPosCompat.z(origin);
@@ -102,8 +100,7 @@ public final class InitialSpawnPolicy
 		for (Quadrant quadrant : Quadrant.values())
 		{
 			QuadrantPlan plan = context.getPlan(quadrant);
-			boolean eligible = requireNoise ? plan.isOrdinaryNoise() : plan.hasSafeFlatSurface();
-			if (!eligible)
+			if (!plan.isOrdinaryNoise())
 			{
 				continue;
 			}

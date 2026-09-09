@@ -61,9 +61,4 @@ public final class QuadrantPlan
 	{
 		return this.isNoise() && !this.clearGeneratedContent;
 	}
-
-	public boolean hasSafeFlatSurface()
-	{
-		return this.isFlat() && !this.clearGeneratedContent && this.getFlat().hasSafeSurface();
-	}
 }

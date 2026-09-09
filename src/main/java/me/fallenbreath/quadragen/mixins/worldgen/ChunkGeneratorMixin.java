@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import java.util.List;
 //#endif
 
-//#if MC < 1.18.2
+//#if MC < 1.19.4
 //$$ import net.minecraft.world.level.ChunkPos;
 //#endif
 

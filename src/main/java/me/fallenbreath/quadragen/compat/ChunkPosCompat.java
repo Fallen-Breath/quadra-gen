@@ -20,7 +20,6 @@
 
 package me.fallenbreath.quadragen.compat;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 
 public final class ChunkPosCompat
@@ -47,55 +46,8 @@ public final class ChunkPosCompat
 		//#endif
 	}
 
-	public static ChunkPos fromBlockPos(BlockPos pos)
-	{
-		//#if MC >= 26.1
-		return ChunkPos.containing(pos);
-		//#else
-		//$$ return new ChunkPos(pos);
-		//#endif
-	}
-
 	public static ChunkPos of(int x, int z)
 	{
 		return new ChunkPos(x, z);
-	}
-
-	public static long pack(ChunkPos pos)
-	{
-		//#if MC >= 26.1
-		return pos.pack();
-		//#else
-		//$$ return pos.toLong();
-		//#endif
-	}
-
-	public static long pack(int x, int z)
-	{
-		//#if MC >= 26.1
-		return ChunkPos.pack(x, z);
-		//#else
-		//$$ return ChunkPos.asLong(x, z);
-		//#endif
-	}
-
-	public static long pack(BlockPos pos)
-	{
-		//#if MC >= 26.1
-		return ChunkPos.pack(pos);
-		//#elseif MC >= 1.17.1
-		//$$ return ChunkPos.asLong(pos);
-		//#else
-		//$$ return ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
-		//#endif
-	}
-
-	public static ChunkPos unpack(long packed)
-	{
-		//#if MC >= 26.1
-		return ChunkPos.unpack(packed);
-		//#else
-		//$$ return new ChunkPos(packed);
-		//#endif
 	}
 }

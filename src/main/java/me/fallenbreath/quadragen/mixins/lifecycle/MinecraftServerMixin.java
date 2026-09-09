@@ -53,6 +53,8 @@ public abstract class MinecraftServerMixin
 		}
 		//#if MC >= 1.21.10
 		return InitialSpawnPolicy.allowsBonusChest(level, levelData.getRespawnData().pos());
+		//#elseif MC >= 1.20.6
+		//$$ return InitialSpawnPolicy.allowsBonusChest(level, levelData.getSpawnPos());
 		//#else
 		//$$ return InitialSpawnPolicy.allowsBonusChest(level, new BlockPos(levelData.getXSpawn(), levelData.getYSpawn(), levelData.getZSpawn()));
 		//#endif
