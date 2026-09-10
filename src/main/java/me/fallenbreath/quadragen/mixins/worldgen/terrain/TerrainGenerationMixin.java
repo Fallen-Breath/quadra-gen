@@ -18,18 +18,13 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.terrain;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -40,29 +35,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.concurrent.CompletableFuture;
 
-//#if MC >= 1.17.1
-import net.minecraft.world.level.LevelHeightAccessor;
-//#else
-//$$ import net.minecraft.world.level.LevelAccessor;
-//#endif
-
-//#if MC >= 1.16.5
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.NoiseColumn;
-//#endif
-
 //#if MC >= 1.18.2
-import net.minecraft.world.level.levelgen.BelowZeroRetrogen;
 import net.minecraft.world.level.levelgen.blending.Blender;
+//#endif
+
+//#if MC < 1.17.1
+//$$ import net.minecraft.world.level.LevelAccessor;
 //#endif
 
 //#if MC >= 1.19.4
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.levelgen.RandomState;
-//#elseif MC >= 1.18.2
-//$$ import net.minecraft.core.Registry;
-//$$ import net.minecraft.world.level.StructureFeatureManager;
-//$$ import net.minecraft.world.level.biome.Biome;
 //#elseif MC >= 1.16.5
 //$$ import net.minecraft.world.level.StructureFeatureManager;
 //#endif
@@ -74,59 +57,12 @@ import net.minecraft.world.level.levelgen.RandomState;
 /**
  * mc >= 26.3: subproject 26.3
  * mc <= 26.2: subproject 26.2 (main project)       <--------
+ * <p>
+ * Noise fill and surface remain separate generator stages through 26.2.
  */
 @Mixin(NoiseBasedChunkGenerator.class)
-public abstract class NoiseBasedChunkGeneratorMixin
+public abstract class TerrainGenerationMixin
 {
-	//#if MC >= 1.18.2
-	@Inject(
-			//#if MC >= 1.21.1
-			method = "createBiomes(Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
-			//#elseif MC >= 1.19.4
-			//$$ method = "createBiomes(Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
-			//#else
-			//$$ method = "createBiomes(Lnet/minecraft/core/Registry;Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureFeatureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
-			//#endif
-			at = @At("HEAD"),
-			cancellable = true
-	)
-	private void createBiomes(
-			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
-			//#if 1.18.2 <= MC && MC < 1.19.4
-			//$$ @Local(argsOnly = true) Registry<Biome> biomeRegistry,
-			//#endif
-			//#if 1.18.2 <= MC && MC < 1.21.1
-			//$$ @Local(argsOnly = true) Executor executor,
-			//#endif
-			//#if MC >= 1.19.4
-			@Local(argsOnly = true) RandomState randomState,
-			//#endif
-			@Local(argsOnly = true) Blender blender,
-			//#if MC >= 1.19.4
-			@Local(argsOnly = true) StructureManager structureManager,
-			//#elseif MC >= 1.18.2
-			//$$ @Local(argsOnly = true) StructureFeatureManager structureManager,
-			//#endif
-			@Local(argsOnly = true) ChunkAccess chunk)
-	{
-		LevelContext context = this.getContext$quadragen();
-		if (context != null && !chunk.isUpgrading())
-		{
-			QuadrantPlan plan = context.getPlanAt(chunk.getPos());
-			if (plan.isFlat())
-			{
-				//#if MC >= 1.21.1
-				cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(randomState, blender, structureManager, chunk));
-				//#elseif MC >= 1.19.4
-				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(executor, randomState, blender, structureManager, chunk));
-				//#else
-				//$$ cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(biomeRegistry, executor, blender, structureManager, chunk));
-				//#endif
-			}
-		}
-	}
-	//#endif
-
 	//#if MC >= 1.17.1
 	@Inject(
 			//#if MC >= 1.21.1
@@ -154,9 +90,7 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			//#endif
 			//#if MC >= 1.19.4
 			@Local(argsOnly = true) StructureManager structureManager,
-			//#elseif MC >= 1.18.2
-			//$$ @Local(argsOnly = true) StructureFeatureManager structureManager,
-			//#elseif MC >= 1.17.1
+			//#else
 			//$$ @Local(argsOnly = true) StructureFeatureManager structureManager,
 			//#endif
 			@Local(argsOnly = true) ChunkAccess chunk)
@@ -248,154 +182,6 @@ public abstract class NoiseBasedChunkGeneratorMixin
 			ci.cancel();
 		}
 	}
-
-	//#if MC >= 1.18.2
-	@Inject(
-			method = "applyCarvers",
-			at = @At("HEAD"),
-			cancellable = true
-	)
-	private void applyCarvers(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess chunk)
-	{
-		LevelContext context = this.getContext$quadragen();
-		if (context == null || this.isUpgrading$quadragen(chunk))
-		{
-			return;
-		}
-		if (!context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
-		{
-			ci.cancel();
-		}
-	}
-
-	@ModifyExpressionValue(
-			method = "applyCarvers",
-			//#if MC >= 1.19.4
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Lnet/minecraft/util/RandomSource;)Z")
-			//#elseif MC >= 1.18.2
-			//$$ at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Ljava/util/Random;)Z")
-			//#endif
-	)
-	private boolean filterCarverSource(
-			boolean isStartChunk,
-			@Local(argsOnly = true) ChunkAccess chunk,
-			@Local(ordinal = 1) ChunkPos sourcePos)
-	{
-		if (!isStartChunk || this.isUpgrading$quadragen(chunk))
-		{
-			return isStartChunk;
-		}
-		LevelContext context = this.getContext$quadragen();
-		return context == null || context.getPlanAt(sourcePos).isOrdinaryNoise();
-	}
-	//#endif
-
-	//#if MC >= 1.16.5
-	@Inject(method = "spawnOriginalMobs", at = @At("HEAD"), cancellable = true)
-	private void spawnOriginalMobs(WorldGenRegion region, CallbackInfo ci)
-	{
-		LevelContext context = this.getContext$quadragen();
-		if (context == null)
-		{
-			return;
-		}
-		ChunkAccess chunk = region.getChunk(
-				//#if MC >= 1.17.1
-				ChunkPosCompat.x(region.getCenter()), ChunkPosCompat.z(region.getCenter())
-				//#elseif MC >= 1.16.5
-				//$$ region.getCenterX(), region.getCenterZ()
-				//#endif
-		);
-		if (!this.isUpgrading$quadragen(chunk) && !context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
-		{
-			ci.cancel();
-		}
-	}
-	//#endif
-
-	@Inject(method = "getBaseHeight", at = @At("HEAD"), cancellable = true)
-	private void getBaseHeight(
-			int x,
-			int z,
-			Heightmap.Types type,
-			//#if MC >= 1.17.1
-			LevelHeightAccessor heightAccessor,
-			//#endif
-			//#if MC >= 1.19.4
-			RandomState randomState,
-			//#endif
-			CallbackInfoReturnable<Integer> cir)
-	{
-		LevelContext context = this.getContext$quadragen();
-		if (context != null
-				//#if MC >= 1.17.1
-				&& !this.isUpgradingHeightAccessor$quadragen(heightAccessor)
-				//#endif
-		)
-		{
-			QuadrantPlan plan = context.getPlanAt(x, z);
-			if (plan.isFlat())
-			{
-				cir.setReturnValue(plan.getFlat().getBaseHeightFromConfiguredLayers(
-						type
-						//#if MC >= 1.17.1
-						, heightAccessor
-						//#endif
-				));
-			}
-		}
-	}
-
-	//#if MC >= 1.16.5
-	@Inject(method = "getBaseColumn", at = @At("HEAD"), cancellable = true)
-	private void getBaseColumn(
-			int x,
-			int z,
-			//#if MC >= 1.17.1
-			LevelHeightAccessor heightAccessor,
-			//#endif
-			//#if MC >= 1.19.4
-			RandomState randomState,
-			//#endif
-			CallbackInfoReturnable<
-					//#if MC >= 1.17.1
-					NoiseColumn
-					//#elseif MC >= 1.16.5
-					//$$ BlockGetter
-					//#endif
-			> cir)
-	{
-		LevelContext context = this.getContext$quadragen();
-		if (context != null
-				//#if MC >= 1.17.1
-				&& !this.isUpgradingHeightAccessor$quadragen(heightAccessor)
-				//#endif
-		)
-		{
-			QuadrantPlan plan = context.getPlanAt(x, z);
-			if (plan.isFlat())
-			{
-				cir.setReturnValue(plan.getFlat().getBaseColumnFromConfiguredLayers(
-						//#if MC >= 1.17.1
-						heightAccessor
-						//#endif
-				));
-			}
-		}
-	}
-	//#endif
-
-	//#if MC >= 1.17.1
-	@Unique
-	private boolean isUpgradingHeightAccessor$quadragen(LevelHeightAccessor heightAccessor)
-	{
-		//#if MC >= 1.18.2
-		return heightAccessor == BelowZeroRetrogen.UPGRADE_HEIGHT_ACCESSOR || heightAccessor instanceof ChunkAccess && ((ChunkAccess)heightAccessor).isUpgrading();
-		//#elseif MC >= 1.17.1
-		//$$ return false;
-		//#endif
-	}
-	//#endif
 
 	@Unique
 	private boolean isUpgrading$quadragen(ChunkAccess chunk)

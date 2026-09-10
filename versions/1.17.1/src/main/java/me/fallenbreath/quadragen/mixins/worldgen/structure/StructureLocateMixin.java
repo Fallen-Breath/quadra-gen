@@ -18,7 +18,7 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.structure;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.fallenbreath.quadragen.runtime.LevelContext;
@@ -38,7 +38,7 @@ import java.util.List;
  * mc <= 1.15.2: subproject 1.15.2
  */
 @Mixin(ChunkGenerator.class)
-public abstract class ChunkGeneratorStructureLocateMixin
+public abstract class StructureLocateMixin
 {
 	/**
 	 * Filters the precomputed positions read by {@link net.minecraft.world.level.chunk.ChunkGenerator#findNearestMapFeature}

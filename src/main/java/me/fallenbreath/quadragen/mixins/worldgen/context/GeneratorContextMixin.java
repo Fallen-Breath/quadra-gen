@@ -18,20 +18,29 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.context;
 
-import me.fallenbreath.quadragen.compat.DummyClass;
+import me.fallenbreath.quadragen.runtime.LevelContext;
+import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
-/**
- * mc >= 1.19.4: subproject 26.2 (main project)       <--------
- * mc == 1.18.2: subproject 1.18.2
- * 1.16.5 <= mc <= 1.17.1: subproject 1.17.1
- * mc <= 1.15.2: subproject 1.15.2
- * <p>
- * Structure locate validates actual starts without a Quadra Gen patch since 1.19.4.
- */
-@Mixin(DummyClass.class)
-public abstract class ChunkGeneratorStructureLocateMixin
+@Mixin(ChunkGenerator.class)
+public abstract class GeneratorContextMixin implements GeneratorContextAccess
 {
+	@Unique
+	private volatile LevelContext levelContext$quadragen;
+
+	@Override
+	public LevelContext getLevelContext$quadragen()
+	{
+		return this.levelContext$quadragen;
+	}
+
+	@Override
+	public void setLevelContext$quadragen(LevelContext context)
+	{
+		this.levelContext$quadragen = context;
+	}
 }

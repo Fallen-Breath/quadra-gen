@@ -18,7 +18,7 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.biome;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
@@ -47,9 +47,11 @@ import net.minecraft.world.level.chunk.ProtoChunk;
  * mc >= 26.3: subproject 26.3
  * 1.18.2 <= mc <= 26.2: subproject 26.2 (main project)
  * mc <= 1.17.1: subproject 1.17.1                    <--------
+ * <p>
+ * Biome generation is implemented by ChunkGenerator in this interval.
  */
 @Mixin(ChunkGenerator.class)
-public abstract class ChunkGeneratorBiomeMixin
+public abstract class BiomeGenerationMixin
 {
 	/**
 	 * Mirrors {@link net.minecraft.world.level.chunk.ChunkGenerator#createBiomes} with constant biome storage

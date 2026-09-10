@@ -18,15 +18,19 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.terrain;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,38 +38,56 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * mc >= 26.3: subproject 26.3                    <--------
- * 1.18.2 <= mc <= 26.2: subproject 26.2 (main project)
- * mc <= 1.17.1: subproject 1.17.1
+ * mc <= 26.2: subproject 26.2 (main project)
  * <p>
- * 26.3 moves the biome-generation implementation from
- * {@link net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator} to {@link ChunkGenerator}.
+ * 26.3 combines Noise fill, surface, and carvers into
+ * {@link NoiseBasedChunkGenerator#buildTerrain}.
  */
-@Mixin(ChunkGenerator.class)
-public abstract class ChunkGeneratorBiomeMixin
+@Mixin(NoiseBasedChunkGenerator.class)
+public abstract class TerrainGenerationMixin
 {
 	@Inject(
-			method = "createBiomes(Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
+			method = "buildTerrain(Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/biome/BiomeManager;Lnet/minecraft/server/level/WorldGenRegion;Ljava/util/Set;)Ljava/util/concurrent/CompletableFuture;",
 			at = @At("HEAD"),
 			cancellable = true
 	)
-	private void createBiomes(
+	private void buildTerrain(
 			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
-			@Local(argsOnly = true) RandomState randomState,
+			@Local(argsOnly = true) ChunkAccess chunk,
 			@Local(argsOnly = true) Blender blender,
+			@Local(argsOnly = true) RandomState randomState,
 			@Local(argsOnly = true) StructureManager structureManager,
-			@Local(argsOnly = true) ChunkAccess chunk)
+			@Local(argsOnly = true) BiomeManager biomeManager,
+			@Local(argsOnly = true) WorldGenRegion carverBiomeRegion,
+			@Local(argsOnly = true) Set<Holder<Biome>> possibleBiomes)
 	{
 		LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
 		if (context != null && !chunk.isUpgrading())
 		{
 			QuadrantPlan plan = context.getPlanAt(chunk.getPos());
-			if (plan.isFlat())
+			if (!plan.isOrdinaryNoise())
 			{
-				cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(randomState, blender, structureManager, chunk));
+				if (plan.isFlat() && !plan.isClearGeneratedContent())
+				{
+					cir.setReturnValue(plan.getFlat().getFlatGenerator().buildTerrain(
+							chunk,
+							blender,
+							randomState,
+							structureManager,
+							biomeManager,
+							carverBiomeRegion,
+							possibleBiomes
+					));
+				}
+				else
+				{
+					cir.setReturnValue(CompletableFuture.completedFuture(chunk));
+				}
 			}
 		}
 	}

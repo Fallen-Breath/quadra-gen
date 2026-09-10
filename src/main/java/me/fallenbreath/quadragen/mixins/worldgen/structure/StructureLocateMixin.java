@@ -18,18 +18,20 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.structure;
 
 import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * mc >= 1.18.2: subproject 26.2 (main project)       <--------
- * mc <= 1.17.1: subproject 1.17.1
+ * mc >= 1.19.4: subproject 26.2 (main project)       <--------
+ * mc == 1.18.2: subproject 1.18.2
+ * 1.16.5 <= mc <= 1.17.1: subproject 1.17.1
+ * mc <= 1.15.2: subproject 1.15.2
  * <p>
- * Carver routing moved to NoiseBasedChunkGenerator in 1.18.2.
+ * Structure locate validates actual starts without a Quadra Gen patch since 1.19.4.
  */
 @Mixin(DummyClass.class)
-public abstract class ChunkGeneratorCarverMixin
+public abstract class StructureLocateMixin
 {
 }

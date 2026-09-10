@@ -18,7 +18,7 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.structure;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.At;
  * mc <= 1.15.2: subproject 1.15.2                    <--------
  */
 @Mixin(StrongholdFeature.class)
-public abstract class ChunkGeneratorStructureLocateMixin
+public abstract class StructureLocateMixin
 {
 	/**
 	 * Filters the positions consumed by

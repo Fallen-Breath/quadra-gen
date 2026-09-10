@@ -18,7 +18,7 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.spawning;
+package me.fallenbreath.quadragen.mixins.worldgen.mob;
 
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
@@ -31,13 +31,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * mc >= 1.16.5: main project
- * mc <= 1.15.2: subproject 1.15.2  <--------
+ * mc >= 1.16.5: subproject 26.2 (main project)
+ * mc <= 1.15.2: subproject 1.15.2                    <--------
  * <p>
- * Worldgen mob spawning is overridden only by OverworldLevelSource in this version; Nether inherits the no-op base method.
+ * Worldgen mob spawning is overridden only by OverworldLevelSource in this interval; Nether inherits the no-op base method.
  */
 @Mixin(OverworldLevelSource.class)
-public abstract class OverworldLevelSourceMixin
+public abstract class WorldgenMobGenerationMixin
 {
 	@Inject(method = "spawnOriginalMobs", at = @At("HEAD"), cancellable = true)
 	private void spawnOriginalMobs(WorldGenRegion region, CallbackInfo ci)

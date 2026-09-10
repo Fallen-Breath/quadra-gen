@@ -18,67 +18,35 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.decoration;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.core.FlatLayerPlacement;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import net.minecraft.SharedConstants;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//#if MC < 1.18.2
-//$$ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+//#if MC >= 1.18.2
+import net.minecraft.SharedConstants;
+import net.minecraft.world.level.WorldGenLevel;
+//#else
 //$$ import net.minecraft.server.level.WorldGenRegion;
 //#endif
 
-/**
- * mc >= 1.19.4: subproject 26.2 (main project)
- * 1.16.5 <= mc <= 1.18.2: subproject 1.18.2       <--------
- * mc <= 1.15.2: subproject 1.15.2
- * <p>
- * This interval spans the dynamic-registry biome containers, height-aware chunks, and the 1.18 Holder/retrogen transition.
- */
+//#if 1.17.1 <= MC && MC < 1.18.2
+//$$ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+//$$ import net.minecraft.SharedConstants;
+//#endif
+
 @Mixin(ChunkGenerator.class)
-public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
+public abstract class BiomeDecorationMixin
 {
-	@Unique
-	private volatile LevelContext levelContext$quadragen;
-
-	@Override
-	public LevelContext getLevelContext$quadragen()
-	{
-		return this.levelContext$quadragen;
-	}
-
-	@Override
-	public void setLevelContext$quadragen(LevelContext context)
-	{
-		this.levelContext$quadragen = context;
-	}
-
-	@Inject(method = "createStructures", at = @At("HEAD"), cancellable = true)
-	private void createStructures(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess centerChunk)
-	{
-		LevelContext context = this.levelContext$quadragen;
-		if (context != null && !this.isUpgrading$quadragen(centerChunk))
-		{
-			QuadrantPlan plan = context.getPlanAt(centerChunk.getPos());
-			if (plan.isFlat())
-			{
-				ci.cancel();
-			}
-		}
-	}
-
 	//#if MC >= 1.18.2
 	@Inject(method = "applyBiomeDecoration", at = @At("HEAD"), cancellable = true)
 	private void applyBiomeDecoration(
@@ -86,8 +54,8 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 			@Local(argsOnly = true) WorldGenLevel level,
 			@Local(argsOnly = true) ChunkAccess chunk)
 	{
-		LevelContext context = this.levelContext$quadragen;
-		if (context == null || this.isUpgrading$quadragen(chunk))
+		LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
+		if (context == null || chunk.isUpgrading())
 		{
 			return;
 		}
@@ -103,13 +71,18 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	}
 	//#else
 	//$$ @Inject(
-	//$$ 		method = "applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureFeatureManager;)V",
+	//$$ 		method =
+	//$$ //#if MC >= 1.16.5
+	//$$ 		"applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;Lnet/minecraft/world/level/StructureFeatureManager;)V",
+	//$$ //#else
+	//$$ //$$ 		"applyBiomeDecoration(Lnet/minecraft/server/level/WorldGenRegion;)V",
+	//$$ //#endif
 	//$$ 		at = @At("HEAD"),
 	//$$ 		cancellable = true
 	//$$ )
 	//$$ private void applyBiomeDecoration(CallbackInfo ci, @Local(argsOnly = true) WorldGenRegion level)
 	//$$ {
-	//$$ 	LevelContext context = this.levelContext$quadragen;
+	//$$ 	LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
 	//$$ 	if (context == null)
 	//$$ 	{
 	//$$ 		return;
@@ -135,14 +108,4 @@ public abstract class ChunkGeneratorMixin implements GeneratorContextAccess
 	//$$ 	}
 	//$$ }
 	//#endif
-
-	@Unique
-	private boolean isUpgrading$quadragen(ChunkAccess chunk)
-	{
-		//#if MC >= 1.18.2
-		return chunk.isUpgrading();
-		//#else
-		//$$ return false;
-		//#endif
-	}
 }

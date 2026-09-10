@@ -24,14 +24,17 @@
     "sealevel.TurtleMixin",
     "sealevel.TurtleTravelGoalMixin",
     "sealevel.WaterAnimalMixin",
-    "spawning.OverworldLevelSourceMixin",
     "spawning.PatrolSpawnerMixin",
     "spawning.VillageSiegeMixin",
-    "worldgen.ChunkGeneratorBiomeMixin",
-    "worldgen.ChunkGeneratorCarverMixin",
-    "worldgen.ChunkGeneratorMixin",
-    "worldgen.ChunkGeneratorStructureLocateMixin",
-    "worldgen.NoiseBasedChunkGeneratorMixin"
+    "worldgen.biome.BiomeGenerationMixin",
+    "worldgen.context.GeneratorContextMixin",
+    "worldgen.decoration.BiomeDecorationMixin",
+    "worldgen.mob.WorldgenMobGenerationMixin",
+    "worldgen.structure.StructureGenerationMixin",
+    "worldgen.structure.StructureLocateMixin",
+    "worldgen.terrain.CarverGenerationMixin",
+    "worldgen.terrain.TerrainGenerationMixin",
+    "worldgen.terrain.TerrainQueryMixin"
   ],
   "client": [
   ],

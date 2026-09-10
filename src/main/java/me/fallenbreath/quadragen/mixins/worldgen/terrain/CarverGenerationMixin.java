@@ -18,76 +18,58 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen;
+package me.fallenbreath.quadragen.mixins.worldgen.terrain;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//#if MC < 1.17.1
-//$$ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-//$$ import java.util.Random;
-//#endif
-
 /**
- * mc >= 1.18.2: subproject 26.2 (main project)
- * mc <= 1.17.1: subproject 1.17.1                    <--------
+ * mc >= 26.3: subproject 26.3
+ * 1.18.2 <= mc <= 26.2: subproject 26.2 (main project)       <--------
+ * mc <= 1.17.1: subproject 1.17.1
+ * <p>
+ * Carver routing is implemented by NoiseBasedChunkGenerator in this interval.
  */
-@Mixin(ChunkGenerator.class)
-public abstract class ChunkGeneratorCarverMixin
+@Mixin(NoiseBasedChunkGenerator.class)
+public abstract class CarverGenerationMixin
 {
 	@Inject(method = "applyCarvers", at = @At("HEAD"), cancellable = true)
 	private void applyCarvers(CallbackInfo ci, @Local(argsOnly = true) ChunkAccess chunk)
 	{
 		LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
-		if (context != null && !context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
+		if (context != null && !chunk.isUpgrading() && !context.getPlanAt(chunk.getPos()).isOrdinaryNoise())
 		{
 			ci.cancel();
 		}
 	}
 
-	//#if MC >= 1.17.1
 	@ModifyExpressionValue(
 			method = "applyCarvers",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Ljava/util/Random;)Z")
+			//#if MC >= 1.19.4
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Lnet/minecraft/util/RandomSource;)Z")
+			//#else
+			//$$ at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Ljava/util/Random;)Z")
+			//#endif
 	)
-	private boolean filterCarverSource(boolean isStartChunk, @Local(ordinal = 1) ChunkPos sourcePos)
+	private boolean filterCarverSource(
+			boolean isStartChunk,
+			@Local(argsOnly = true) ChunkAccess chunk,
+			@Local(ordinal = 1) ChunkPos sourcePos)
 	{
-		if (!isStartChunk)
+		if (!isStartChunk || chunk.isUpgrading())
 		{
-			return false;
+			return isStartChunk;
 		}
 		LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
 		return context == null || context.getPlanAt(sourcePos).isOrdinaryNoise();
 	}
-	//#else
-	//$$ @WrapOperation(
-	//$$ 		method = "applyCarvers",
-	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/carver/ConfiguredWorldCarver;isStartChunk(Ljava/util/Random;II)Z")
-	//$$ )
-	//$$ private boolean filterCarverSource(
-	//$$ 		ConfiguredWorldCarver<?> carver,
-	//$$ 		Random random,
-	//$$ 		int sourceX,
-	//$$ 		int sourceZ,
-	//$$ 		Operation<Boolean> original)
-	//$$ {
-	//$$ 	if (!original.call(carver, random, sourceX, sourceZ))
-	//$$ 	{
-	//$$ 		return false;
-	//$$ 	}
-	//$$ 	LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
-	//$$ 	return context == null || context.getPlanAt(new ChunkPos(sourceX, sourceZ)).isOrdinaryNoise();
-	//$$ }
-	//#endif
 }
