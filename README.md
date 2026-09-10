@@ -5,6 +5,8 @@
 
 English | [中文](README.zh.md)
 
+Four independently configurable terrain quadrants in one dimension
+
 ## Feature
 
 Quadra Gen is a mod for creative servers that gives each of the four quadrants of a single dimension its own terrain-generation logic.
