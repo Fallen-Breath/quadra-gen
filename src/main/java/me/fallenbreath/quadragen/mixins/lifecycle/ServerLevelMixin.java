@@ -20,33 +20,15 @@
 
 package me.fallenbreath.quadragen.mixins.lifecycle;
 
-import com.mojang.datafixers.util.Pair;
 import me.fallenbreath.quadragen.runtime.LevelBootstrap;
 import me.fallenbreath.quadragen.runtime.LevelContext;
-import me.fallenbreath.quadragen.runtime.InitialSpawnPolicy;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
-import me.fallenbreath.quadragen.runtime.BiomeQuery;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.function.Predicate;
-
-//#if MC < 1.16.5
-//$$ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-//#endif
-
-//#if MC >= 1.18.2
-import net.minecraft.core.Holder;
-//#endif
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin implements ServerLevelContextAccess
@@ -71,86 +53,4 @@ public abstract class ServerLevelMixin implements ServerLevelContextAccess
 	{
 		LevelBootstrap.install((ServerLevel)(Object)this);
 	}
-
-	//#if MC < 1.16.5
-	//$$ @ModifyVariable(method = "setInitialSpawn", at = @At("STORE"), ordinal = 0)
-	//$$ private ChunkPos selectInitialSpawnAnchor(ChunkPos vanillaAnchor)
-	//$$ {
-	//$$ 	return InitialSpawnPolicy.selectAnchor((ServerLevel)(Object)this, vanillaAnchor);
-	//$$ }
-
-	//$$ @ModifyExpressionValue(
-	//$$ 		method = "setInitialSpawn",
-	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelSettings;hasStartingBonusItems()Z")
-	//$$ )
-	//$$ private boolean disableUnsafeBonusChest(boolean spawnBonusChest)
-	//$$ {
-	//$$ 	if (!spawnBonusChest)
-	//$$ 	{
-	//$$ 		return false;
-	//$$ 	}
-	//$$ 	ServerLevel level = (ServerLevel)(Object)this;
-	//$$ 	return InitialSpawnPolicy.allowsBonusChest(
-	//$$ 			level,
-	//$$ 			new BlockPos(level.getLevelData().getXSpawn(), level.getLevelData().getYSpawn(), level.getLevelData().getZSpawn())
-	//$$ 	);
-	//$$ }
-	//#endif
-
-	//#if MC >= 1.18.2
-	@Inject(
-			//#if MC >= 1.19.4
-			method = "findClosestBiome3d",
-			//#else
-			//$$ method = "findNearestBiome",
-			//#endif
-			at = @At("HEAD"),
-			cancellable = true
-	)
-	private void findClosestBiome3d(
-			Predicate<Holder<Biome>> biomeTest,
-			BlockPos origin,
-			int maxSearchRadius,
-			int sampleResolutionHorizontal,
-			//#if MC >= 1.19.4
-			int sampleResolutionVertical,
-			//#endif
-			CallbackInfoReturnable<Pair<BlockPos, Holder<Biome>>> cir)
-	{
-		LevelContext context = this.levelContext$quadragen;
-		if (context != null)
-		{
-			//#if MC >= 1.19.4
-			cir.setReturnValue(BiomeQuery.findClosestBiome3d(
-					context,
-					(ServerLevel)(Object)this,
-					biomeTest,
-					origin,
-					maxSearchRadius,
-					sampleResolutionHorizontal,
-					sampleResolutionVertical
-			));
-			//#else
-			//$$ cir.setReturnValue(BiomeQuery.findNearestBiome(context, biomeTest, origin, maxSearchRadius, sampleResolutionHorizontal));
-			//#endif
-		}
-	}
-	//#elseif MC >= 1.16.5
-	//$$ @Inject(method = "findNearestBiome", at = @At("HEAD"), cancellable = true)
-	//$$ private void findNearestBiome(
-	//$$ 		Biome biome,
-	//$$ 		BlockPos origin,
-	//$$ 		int maxSearchRadius,
-	//$$ 		int sampleResolution,
-	//$$ 		CallbackInfoReturnable<BlockPos> cir)
-	//$$ {
-	//$$ 	LevelContext context = this.levelContext$quadragen;
-	//$$ 	if (context != null)
-	//$$ 	{
-	//$$ 		cir.setReturnValue(BiomeQuery.findNearestBiome(context, biome, origin, maxSearchRadius, sampleResolution));
-	//$$ 	}
-	//$$ }
-	//#else
-	//$$ // This version has no server biome-locate entry point.
-	//#endif
 }

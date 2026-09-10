@@ -18,7 +18,7 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.lifecycle;
+package me.fallenbreath.quadragen.mixins.worldgen.spawnpoint;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -33,13 +33,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 /**
- * mc >= 1.16.5: main project  <--------
+ * mc >= 1.16.5: subproject 26.2 (main project)       <--------
  * mc <= 1.15.2: subproject 1.15.2
  * <p>
- * Initial-spawn selection moved from ServerLevel to MinecraftServer in 1.16.5.
+ * Initial-spawn selection is owned by MinecraftServer in this interval.
  */
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin
+public abstract class InitialSpawnMixin
 {
 	@ModifyVariable(method = "setInitialSpawn", at = @At("LOAD"), argsOnly = true, ordinal = 0)
 	private static boolean disableUnsafeBonusChest(

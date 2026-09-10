@@ -18,18 +18,18 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.lifecycle;
+package me.fallenbreath.quadragen.mixins.worldgen.biome;
 
 import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * mc >= 1.16.5: main project
- * mc <= 1.15.2: subproject 1.15.2  <--------
+ * mc >= 1.16.5: subproject 26.2 (main project)
+ * mc <= 1.15.2: subproject 1.15.2                    <--------
  * <p>
- * Initial-spawn selection still belongs to ServerLevel in 1.15.2.
+ * These versions have no server biome-locate entry point.
  */
 @Mixin(DummyClass.class)
-public abstract class MinecraftServerMixin
+public abstract class BiomeLocateMixin
 {
 }
