@@ -35,7 +35,7 @@ preprocess {
 	def mc2601 = createNode('26.1.2', 26_01_02, '')
 	def mc2602 = createNode('26.2', 26_02_00, '')
 
-	mc115 .link(mc114 , null)
+	mc114 .link(mc115 , null)
 	mc115 .link(mc116 , null)
 	mc116 .link(mc117 , null)
 	mc117 .link(mc118 , null)
