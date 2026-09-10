@@ -24,6 +24,7 @@
     "sealevel.TurtleTravelGoalMixin",
     "sealevel.WaterAnimalMixin",
     "spawning.PatrolSpawnerMixin",
+    "spawning.SlimeMixin",
     "spawning.VillageSiegeMixin",
     "worldgen.biome.BiomeGenerationMixin",
     "worldgen.biome.BiomeLocateMixin",
