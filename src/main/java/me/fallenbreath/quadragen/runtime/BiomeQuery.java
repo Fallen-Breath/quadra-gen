@@ -31,11 +31,16 @@ import net.minecraft.core.QuartPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Climate;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
+
+//#if MC >= 26.3
+//$$ import net.minecraft.world.level.biome.BiomeResolver;
+//#else
+import net.minecraft.world.level.biome.Climate;
+//#endif
 
 /**
  * mc >= 1.19: subproject 26.2 (main project)        <--------
@@ -82,7 +87,11 @@ public final class BiomeQuery
 				LevelHeightCompat.maxYInclusive(level) + 1,
 				verticalResolution
 		).toArray();
+		//#if MC >= 26.3
+		//$$ BiomeResolver resolver = context.getNoiseGenerator().getBiomeSource().createCachingResolver(level.getChunkSource().randomState());
+		//#else
 		Climate.Sampler sampler = level.getChunkSource().randomState().sampler();
+		//#endif
 		for (BlockPos.MutableBlockPos sampleColumn : BlockPos.spiralAround(BlockPos.ZERO, sampleRadius, Direction.EAST, Direction.SOUTH))
 		{
 			int blockX = origin.getX() + sampleColumn.getX() * horizontalResolution;
@@ -90,9 +99,19 @@ public final class BiomeQuery
 			for (int blockY : sampleYs)
 			{
 				QuadrantPlan plan = context.getPlanAt(blockX, blockZ);
-				Holder<Biome> biome = plan.isFlat()
-						? plan.getFlat().getBiome()
-						: context.getNoiseGenerator().getBiomeSource().getNoiseBiome(QuartPos.fromBlock(blockX), QuartPos.fromBlock(blockY), QuartPos.fromBlock(blockZ), sampler);
+				Holder<Biome> biome;
+				if (plan.isFlat())
+				{
+					biome = plan.getFlat().getBiome();
+				}
+				else
+				{
+					//#if MC >= 26.3
+					//$$ biome = resolver.getNoiseBiome(QuartPos.fromBlock(blockX), QuartPos.fromBlock(blockY), QuartPos.fromBlock(blockZ));
+					//#else
+					biome = context.getNoiseGenerator().getBiomeSource().getNoiseBiome(QuartPos.fromBlock(blockX), QuartPos.fromBlock(blockY), QuartPos.fromBlock(blockZ), sampler);
+					//#endif
+				}
 				if (candidates.contains(biome))
 				{
 					return Pair.of(new BlockPos(blockX, blockY, blockZ), biome);

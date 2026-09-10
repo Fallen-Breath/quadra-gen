@@ -22,33 +22,20 @@ package me.fallenbreath.quadragen.core;
 
 import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FillLayerFeature;
 
 import java.util.List;
 
-//#if MC < 1.15.2
-//$$ import net.minecraft.world.level.levelgen.feature.LayerConfiguration;
-//#else
-import net.minecraft.world.level.levelgen.feature.configurations.LayerConfiguration;
-//#endif
-
-//#if MC >= 1.19.4
-import net.minecraft.util.RandomSource;
-//#else
-//$$ import java.util.Random;
-//#endif
-
-//#if MC >= 1.16.5
-import net.minecraft.world.level.WorldGenLevel;
-//#else
-//$$ import net.minecraft.server.level.WorldGenRegion;
-//#endif
-
 /**
- * mc >= 26.3: subproject 26.3
- * mc <= 26.2: subproject 26.2 (main project)       <--------
+ * mc >= 26.3: subproject 26.3                    <--------
+ * mc <= 26.2: subproject 26.2 (main project)
+ * <p>
+ * 26.3 represents configured features as data-carrying {@link net.minecraft.world.level.levelgen.feature.Feature}
+ * implementations, so delayed Flat layers invoke {@link FillLayerFeature} directly.
  */
 public final class FlatLayerPlacement
 {
@@ -56,34 +43,18 @@ public final class FlatLayerPlacement
 	{
 	}
 
-	public static void placeDelayedLayers(
-			//#if MC >= 1.16.5
-			WorldGenLevel level,
-			//#else
-			//$$ WorldGenRegion level,
-			//#endif
-			ChunkAccess chunk, FlatGenerationPlan plan)
+	public static void placeDelayedLayers(WorldGenLevel level, ChunkAccess chunk, FlatGenerationPlan plan)
 	{
 		BlockPos origin = new BlockPos(chunk.getPos().getMinBlockX(), LevelHeightCompat.minY(level) + 1, chunk.getPos().getMinBlockZ());
-		// NOTE: {@link net.minecraft.world.level.levelgen.feature.FillLayerFeature#place} does not consume random in supported versions;
+		// NOTE: {@link net.minecraft.world.level.levelgen.feature.FillLayerFeature#place} does not consume random in 26.3;
 		// re-audit before relying on this unseeded source.
-		//#if MC >= 1.19.4
 		RandomSource random = RandomSource.create();
-		//#else
-		//$$ Random random = new Random();
-		//#endif
 		List<BlockState> layers = plan.getLayers();
 		for (int index = 0; index < layers.size(); index++)
 		{
 			if (plan.isDelayedLayer(index))
 			{
-				//#if MC >= 1.18.2
-				Feature.FILL_LAYER.place(new LayerConfiguration(index, layers.get(index)), level, plan.getFlatGenerator(), random, origin);
-				//#elseif MC >= 1.15.2
-				//$$ Feature.FILL_LAYER.configured(new LayerConfiguration(index, layers.get(index))).place(level, plan.getFlatGenerator(), random, origin);
-				//#else
-				//$$ Feature.FILL_LAYER.place(level, plan.getFlatGenerator(), random, origin, new LayerConfiguration(index, layers.get(index)));
-				//#endif
+				new FillLayerFeature(index, layers.get(index)).place(level, plan.getFlatGenerator(), random, origin);
 			}
 		}
 	}

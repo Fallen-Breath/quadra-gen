@@ -60,7 +60,12 @@ public abstract class MinecraftServerMixin
 		//#endif
 	}
 
-	//#if MC >= 26.1
+	//#if MC >= 26.3
+	//$$ @ModifyExpressionValue(
+	//$$ 		method = "setInitialSpawn",
+	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkGenerator;getOrigin(Lnet/minecraft/world/level/levelgen/RandomState;)Lnet/minecraft/world/level/ChunkPos;")
+	//$$ )
+	//#elseif MC >= 26.1
 	@ModifyExpressionValue(
 			method = "setInitialSpawn",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ChunkPos;containing(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/ChunkPos;")

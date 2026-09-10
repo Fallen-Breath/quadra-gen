@@ -76,7 +76,10 @@ public final class FlatGenerationPlan
 		for (int index = 0; index < this.layers.size(); index++)
 		{
 			BlockState state = this.layers.get(index);
-			//#if MC >= 1.18.2
+			//#if MC >= 26.3
+			//$$ // See {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#adjustGenerationSettings}:
+			//$$ // non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.FillLayerFeature}.
+			//#elseif MC >= 1.18.2
 			// See {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#adjustGenerationSettings}:
 			// non-motion-blocking layers are deferred to {@link net.minecraft.world.level.levelgen.feature.Feature#FILL_LAYER}.
 			//#elseif MC >= 1.16.5

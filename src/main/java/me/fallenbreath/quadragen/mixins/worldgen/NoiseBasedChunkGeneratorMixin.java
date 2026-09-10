@@ -71,6 +71,10 @@ import net.minecraft.world.level.levelgen.RandomState;
 //$$ import java.util.concurrent.Executor;
 //#endif
 
+/**
+ * mc >= 26.3: subproject 26.3
+ * mc <= 26.2: subproject 26.2 (main project)       <--------
+ */
 @Mixin(NoiseBasedChunkGenerator.class)
 public abstract class NoiseBasedChunkGeneratorMixin
 {

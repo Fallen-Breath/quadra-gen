@@ -24,78 +24,48 @@ import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Arrays;
-
-//#if MC >= 1.16.5
-import net.minecraft.core.Registry;
-//#endif
-
-//#if MC >= 1.15.2
-import net.minecraft.world.level.chunk.ChunkBiomeContainer;
-import net.minecraft.world.level.chunk.ProtoChunk;
-//#endif
+import java.util.concurrent.CompletableFuture;
 
 /**
- * mc >= 26.3: subproject 26.3
+ * mc >= 26.3: subproject 26.3                    <--------
  * 1.18.2 <= mc <= 26.2: subproject 26.2 (main project)
- * mc <= 1.17.1: subproject 1.17.1                    <--------
+ * mc <= 1.17.1: subproject 1.17.1
+ * <p>
+ * 26.3 moves the biome-generation implementation from
+ * {@link net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator} to {@link ChunkGenerator}.
  */
 @Mixin(ChunkGenerator.class)
 public abstract class ChunkGeneratorBiomeMixin
 {
-	/**
-	 * Mirrors {@link net.minecraft.world.level.chunk.ChunkGenerator#createBiomes} with constant biome storage
-	 * for Flat quadrants.
-	 */
 	@Inject(
-			method =
-			//#if MC >= 1.16.5
-			"createBiomes(Lnet/minecraft/core/Registry;Lnet/minecraft/world/level/chunk/ChunkAccess;)V",
-			//#else
-			//$$ "createBiomes(Lnet/minecraft/world/level/chunk/ChunkAccess;)V",
-			//#endif
+			method = "createBiomes(Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;",
 			at = @At("HEAD"),
 			cancellable = true
 	)
 	private void createBiomes(
-			CallbackInfo ci,
-			//#if MC >= 1.16.5
-			@Local(argsOnly = true) Registry<Biome> biomeRegistry,
-			//#endif
+			CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir,
+			@Local(argsOnly = true) RandomState randomState,
+			@Local(argsOnly = true) Blender blender,
+			@Local(argsOnly = true) StructureManager structureManager,
 			@Local(argsOnly = true) ChunkAccess chunk)
 	{
 		LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
-		if (context != null)
+		if (context != null && !chunk.isUpgrading())
 		{
 			QuadrantPlan plan = context.getPlanAt(chunk.getPos());
 			if (plan.isFlat())
 			{
-				//#if MC >= 1.17.1
-				int[] biomeIds = new int[16 * ((chunk.getHeight() + 3) / 4)];
-				Arrays.fill(biomeIds, biomeRegistry.getId(plan.getFlat().getBiome()));
-				((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, chunk, biomeIds));
-				//#elseif MC >= 1.15.2
-				//$$ Biome[] biomes = new Biome[ChunkBiomeContainer.BIOMES_SIZE];
-				//$$ Arrays.fill(biomes, plan.getFlat().getBiome());
-				//$$ //#if MC >= 1.16.5
-				//$$ ((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, biomes));
-				//$$ //#else
-				//$$ //$$ ((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomes));
-				//$$ //#endif
-				//#else
-				//$$ Biome[] biomes = new Biome[256];
-				//$$ Arrays.fill(biomes, plan.getFlat().getBiome());
-				//$$ chunk.setBiomes(biomes);
-				//#endif
-				ci.cancel();
+				cir.setReturnValue(plan.getFlat().getFlatGenerator().createBiomes(randomState, blender, structureManager, chunk));
 			}
 		}
 	}

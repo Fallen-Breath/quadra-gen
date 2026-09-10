@@ -110,7 +110,11 @@ public final class FlatGeneratorFactory
 		FlatLevelSource generator = new FlatLevelSource(settings);
 		// Initialize {@link net.minecraft.world.level.levelgen.ChunkGenerator#getBiomeGenerationSettings} so the layer split
 		// performed by {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings#adjustGenerationSettings} is ready before
+		//#if MC >= 26.3
+		//$$ // {@link net.minecraft.world.level.levelgen.FlatLevelSource#buildTerrain} reads the settings.
+		//#else
 		// {@link net.minecraft.world.level.levelgen.FlatLevelSource#fillFromNoise} reads the settings.
+		//#endif
 		generator.getBiomeGenerationSettings(biome);
 		return generator;
 		//#elseif MC >= 1.18.2
