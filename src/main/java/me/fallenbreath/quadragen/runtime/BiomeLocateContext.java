@@ -18,18 +18,36 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.worldgen.biome;
+package me.fallenbreath.quadragen.runtime;
 
-import me.fallenbreath.quadragen.compat.DummyClass;
-import org.spongepowered.asm.mixin.Mixin;
-
-/**
- * mc >= 1.16.5: subproject 26.2 (main project)
- * mc <= 1.15.2: subproject 1.15.2                    <--------
- * <p>
- * These versions have no server biome-locate entry point.
- */
-@Mixin(DummyClass.class)
-public abstract class BiomeLocateMixin
+public final class BiomeLocateContext
 {
+	private static final ThreadLocal<BiomeLocateContext> CURRENT = new ThreadLocal<BiomeLocateContext>();
+
+	private final LevelContext levelContext;
+
+	private BiomeLocateContext(LevelContext levelContext)
+	{
+		this.levelContext = levelContext;
+	}
+
+	public static BiomeLocateContext current()
+	{
+		return CURRENT.get();
+	}
+
+	public static void install(LevelContext levelContext)
+	{
+		CURRENT.set(new BiomeLocateContext(levelContext));
+	}
+
+	public static void clear()
+	{
+		CURRENT.remove();
+	}
+
+	public LevelContext getLevelContext()
+	{
+		return this.levelContext;
+	}
 }

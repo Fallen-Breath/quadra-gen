@@ -1,0 +1,87 @@
+/*
+ * This file is part of the Quadra Gen project, licensed under the
+ * GNU Lesser General Public License v3.0
+ *
+ * Copyright (C) 2026  Fallen_Breath and contributors
+ *
+ * Quadra Gen is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License v3.0
+ * as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Quadra Gen is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package me.fallenbreath.quadragen.mixins.worldgen.biome;
+
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.datafixers.util.Pair;
+import me.fallenbreath.quadragen.runtime.BiomeLocateContext;
+import me.fallenbreath.quadragen.runtime.LevelContext;
+import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
+import java.util.Random;
+import java.util.function.Predicate;
+
+/**
+ * mc >= 1.19.4: subproject 26.2
+ * 1.18.2: subproject 1.18.2                    <--------
+ * mc <= 1.17.1: subproject 1.17.1
+ * <p>
+ * 1.18.2 keeps biome locate as a horizontal search and passes a climate sampler.
+ */
+@Mixin(ServerLevel.class)
+public abstract class ServerLevelMixin
+{
+	@WrapOperation(
+			method = "findNearestBiome(Ljava/util/function/Predicate;Lnet/minecraft/core/BlockPos;II)Lcom/mojang/datafixers/util/Pair;",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/world/level/biome/BiomeSource;findBiomeHorizontal(IIIIILjava/util/function/Predicate;Ljava/util/Random;ZLnet/minecraft/world/level/biome/Climate$Sampler;)Lcom/mojang/datafixers/util/Pair;"
+			)
+	)
+	private Pair<BlockPos, Holder<Biome>> scopeLocateBiome(
+			BiomeSource source,
+			int x,
+			int y,
+			int z,
+			int maxSearchRadius,
+			int sampleResolution,
+			Predicate<Holder<Biome>> biomeTest,
+			Random random,
+			boolean findClosest,
+			Climate.Sampler sampler,
+			Operation<Pair<BlockPos, Holder<Biome>>> original
+	)
+	{
+		LevelContext context = ((ServerLevelContextAccess)this).getLevelContext$quadragen();
+		if (context == null)
+		{
+			return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest, sampler);
+		}
+		BiomeLocateContext.install(context);
+		try
+		{
+			return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest, sampler);
+		}
+		finally
+		{
+			BiomeLocateContext.clear();
+		}
+	}
+}
