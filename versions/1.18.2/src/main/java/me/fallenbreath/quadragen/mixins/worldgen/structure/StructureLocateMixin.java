@@ -57,7 +57,7 @@ public abstract class StructureLocateMixin
 	private List<ChunkPos> filterConcentricRingCandidates(List<ChunkPos> original)
 	{
 		LevelContext context = ((GeneratorContextAccess)this).getLevelContext$quadragen();
-		if (context == null)
+		if (context == null || original == null)
 		{
 			return original;
 		}

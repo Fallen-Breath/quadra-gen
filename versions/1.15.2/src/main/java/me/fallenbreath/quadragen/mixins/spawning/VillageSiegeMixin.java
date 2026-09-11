@@ -21,21 +21,13 @@
 package me.fallenbreath.quadragen.mixins.spawning;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.CustomSpawnerPolicy;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.village.VillageSiege;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.level.LevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-
-import java.util.Random;
 
 /**
  * mc >= 1.16.5: main project
@@ -59,19 +51,15 @@ public abstract class VillageSiegeMixin
 	}
 
 	// Re-check the actual candidate because the vanilla search may cross a quadrant boundary.
-	@WrapOperation(
+	@ModifyExpressionValue(
 			method = "findRandomSpawnPos",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Monster;checkMonsterSpawnRules(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/world/entity/MobSpawnType;Lnet/minecraft/core/BlockPos;Ljava/util/Random;)Z")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;isVillage(Lnet/minecraft/core/BlockPos;)Z")
 	)
 	private boolean rejectFlatCandidate(
-			EntityType<? extends Monster> entityType,
-			LevelAccessor level,
-			MobSpawnType spawnType,
-			BlockPos candidate,
-			Random random,
-			Operation<Boolean> original)
+			boolean isVillage,
+			@Local(argsOnly = true) ServerLevel level,
+			@Local(ordinal = 1) BlockPos candidate)
 	{
-		return CustomSpawnerPolicy.usesNoiseGeneratorAt((ServerLevel)level, candidate)
-				&& original.call(entityType, level, spawnType, candidate, random);
+		return isVillage && CustomSpawnerPolicy.usesNoiseGeneratorAt(level, candidate);
 	}
 }

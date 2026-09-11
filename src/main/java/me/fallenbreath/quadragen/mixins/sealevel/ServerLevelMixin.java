@@ -37,13 +37,7 @@ public abstract class ServerLevelMixin
 	)
 	private int useSeaLevelAtPrecipitation(
 			int original,
-			//#if MC >= 1.21.11
 			@Local(argsOnly = true) BlockPos pos
-			//#elseif MC >= 1.21.8
-			//$$ @Local(ordinal = 2) BlockPos pos
-			//#else
-			//$$ @Local(argsOnly = true) BlockPos pos
-			//#endif
 	)
 	{
 		return SeaLevelQuery.getSeaLevelAt((ServerLevel)(Object)this, pos, original);
