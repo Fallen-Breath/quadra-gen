@@ -55,6 +55,8 @@ dependencies {
 	autoRuntimeOnly "me.fallenbreath:mixin-auditor:0.2.0-${unobfuscated ? 'u' : 'o'}"
 
 	// dependencies
+	def fanetlibMcVer = mcVersion >= 260000 ? '26.1.1' : mcVersion >= 12111 ? '1.21.11' : mcVersion >= 12100 ? '1.21.1' : mcVersion >= 12006 ? '1.20.6' : mcVersion >= 12002 ? '1.20.2' : '1.15.2'
+	include(autoImplementation("me.fallenbreath:fanetlib:${project.fanetlib_version}-mc${fanetlibMcVer}"))
 //	def fabricApiModules = []
 //	if (mcVersion >= 12105) {  // "fabric-resource-loader-v0" dependency since fabric api 0.117.0 (25w07a, mc1.21.5 snapshot)
 //		fabricApiModules.add("fabric-api-base")

@@ -5,6 +5,7 @@
   "compatibilityLevel": "{{COMPATIBILITY_LEVEL}}",
   "mixins": [
     "lifecycle.ServerLevelMixin",
+    "network.FanetlibPacketRegistrationCenterMixin",
     "sealevel.AbstractNautilusMixin",
     "sealevel.AgeableWaterCreatureMixin",
     "sealevel.AmphibiousNodeEvaluatorMixin",

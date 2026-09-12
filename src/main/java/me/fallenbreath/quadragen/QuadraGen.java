@@ -22,6 +22,7 @@ package me.fallenbreath.quadragen;
 
 import me.fallenbreath.quadragen.config.ConfigLoader;
 import me.fallenbreath.quadragen.config.QuadraGenConfig;
+import me.fallenbreath.quadragen.network.ClientNetworkHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -65,6 +66,12 @@ public class QuadraGen implements ModInitializer
 		MOD_NAME = metadata.getName();
 		MOD_VERSION = metadata.getVersion().getFriendlyString();
 		config = ConfigLoader.loadOrCreate();
+
+		if (FabricLoader.getInstance().getEnvironmentType() == net.fabricmc.api.EnvType.CLIENT)
+		{
+			ClientNetworkHandler.initEvents();
+		}
+
 		LOGGER.info(
 				"Loaded {} {} (enabled: {}, enabled in singleplayer: {}, Overworld: {}, Nether: {})",
 				MOD_NAME,
