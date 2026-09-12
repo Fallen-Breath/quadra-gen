@@ -21,6 +21,7 @@
 package me.fallenbreath.quadragen.network;
 
 import me.fallenbreath.quadragen.compat.NbtCompat;
+import me.fallenbreath.quadragen.core.Quadrant;
 import net.minecraft.nbt.CompoundTag;
 
 public final class ClientSyncState
@@ -86,6 +87,11 @@ public final class ClientSyncState
 		public int[] getFlatSeaLevels()
 		{
 			return this.flatSeaLevels.clone();
+		}
+
+		public int getFlatSeaLevel(Quadrant quadrant)
+		{
+			return this.flatSeaLevels[quadrant.ordinal()];
 		}
 	}
 }

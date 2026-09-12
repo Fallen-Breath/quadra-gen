@@ -41,6 +41,10 @@
     "worldgen.terrain.TerrainQueryMixin"
   ],
   "client": [
+    "client.fog.FogRendererMixin",
+    "client.level.ClientLevelMixin",
+    "client.level.LevelMixin",
+    "client.sky.SkyRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
