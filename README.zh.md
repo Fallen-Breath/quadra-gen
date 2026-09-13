@@ -2,6 +2,9 @@
 
 [![License](https://img.shields.io/github/license/Fallen-Breath/quadra-gen.svg)](http://www.gnu.org/licenses/lgpl-3.0.html)
 [![workflow](https://github.com/Fallen-Breath/quadra-gen/actions/workflows/gradle.yml/badge.svg)](https://github.com/Fallen-Breath/quadra-gen/actions/workflows/gradle.yml)
+[![MC Versions](https://cf.way2muchnoise.eu/versions/For%20MC_1694935_all.svg)](https://legacy.curseforge.com/minecraft/mc-mods/quadra-gen)
+[![CurseForge](https://cf.way2muchnoise.eu/full_1694935_downloads.svg)](https://legacy.curseforge.com/minecraft/mc-mods/quadra-gen)
+[![Modrinth](https://img.shields.io/modrinth/dt/FYg0zGyC?label=Modrinth%20Downloads)](https://modrinth.com/mod/quadra-gen)
 
 [English](README.md) | 中文
 
