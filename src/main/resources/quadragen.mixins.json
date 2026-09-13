@@ -44,7 +44,8 @@
     "client.fog.FogRendererMixin",
     "client.level.ClientLevelMixin",
     "client.level.LevelMixin",
-    "client.sky.SkyRendererMixin"
+    "client.sky.SkyRendererMixin",
+    "client.weather.WeatherEffectRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -20,30 +20,17 @@
 
 package me.fallenbreath.quadragen.mixins.client.level;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
+import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * mc >= 26.2: subproject 26.2 (main project)       <--------
- * mc <= 26.1.2: subproject 26.1.2
+ * mc >= 26.2: subproject 26.2 (main project)
+ * mc <= 26.1.2: subproject 26.1.2                    <--------
  * <p>
  * 26.1.2 has no {@code net.minecraft.client.multiplayer.ClientLevel#getPrecipitationAt(BlockPos)};
- * its weather renderer is adapted separately by WeatherEffectRendererMixin.
+ * weather queries in this version are handled by WeatherEffectRendererMixin instead.
  */
-@Mixin(ClientLevel.class)
+@Mixin(DummyClass.class)
 public abstract class ClientLevelMixin
 {
-	@ModifyExpressionValue(
-			method = "getPrecipitationAt(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/biome/Biome$Precipitation;",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getSeaLevel()I")
-	)
-	private int useQuadrantSeaLevel(int original, @Local(argsOnly = true) BlockPos pos)
-	{
-		return ClientSyncQuery.getSeaLevelAt(pos, original);
-	}
 }
