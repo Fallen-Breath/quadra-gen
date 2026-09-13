@@ -40,8 +40,12 @@ public abstract class SkyRendererMixin
 	@ModifyExpressionValue(
 			//#if MC >= 1.20.6
 			method = "renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
-			//#else
+			//#elseif MC >= 1.19.4
 			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+			//#elseif MC >= 1.18.2
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+			//#else
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLjava/lang/Runnable;)V",
 			//#endif
 			at = @At(
 					value = "INVOKE",

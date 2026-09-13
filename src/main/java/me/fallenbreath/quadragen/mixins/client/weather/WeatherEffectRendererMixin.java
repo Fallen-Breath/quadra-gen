@@ -28,7 +28,8 @@ import org.spongepowered.asm.mixin.Mixin;
  * mc in [26.1.2, 26.2): subproject 26.1.2
  * mc in [1.21.8, 26.1.2): subproject 1.21.8
  * mc in [1.21.3, 1.21.8): subproject 1.21.3
- * mc < 1.21.3: subproject 1.21.1
+ * mc in [1.21.1, 1.21.3): subproject 1.21.1
+ * mc < 1.21.1: subproject 1.20.6
  */
 @Mixin(WeatherEffectRenderer.class)
 public abstract class WeatherEffectRendererMixin

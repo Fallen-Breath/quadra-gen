@@ -32,7 +32,8 @@ import org.spongepowered.asm.mixin.injection.At;
  * mc >= 26.2: subproject 26.2 (main project)       <--------
  * mc in [26.1.2, 26.2): subproject 26.1.2
  * mc in [1.21.4, 26.1.2): subproject 1.21.4
- * mc < 1.21.4: subproject 1.21.1
+ * mc in [1.21.1, 1.21.4): subproject 1.21.1
+ * mc < 1.21.1: subproject 1.20.6
  * <p>
  * 26.1.2 has no {@code net.minecraft.client.multiplayer.ClientLevel#getPrecipitationAt(BlockPos)};
  * its weather renderer is adapted separately by WeatherEffectRendererMixin.

@@ -74,14 +74,22 @@ public final class ClientSyncQuery
 	//#else
 	/** Selects the vanilla Flat/Noise clear-color scale for one position; corresponding vanilla source: {@link net.minecraft.client.multiplayer.ClientLevel.ClientLevelData#voidDarknessOnsetRange()}. */
 	//#endif
+	//#if MC >= 1.18.2
 	public static float getClearColorScale(float original, double x, double z)
+	//#else
+	//$$ public static double getClearColorScale(double original, double x, double z)
+	//#endif
 	{
 		ClientSyncState.State state = ClientSyncState.getState();
 		if (!state.isActive())
 		{
 			return original;
 		}
+		//#if MC >= 1.18.2
 		return isFlat(state, x, z) ? 1.0F : original;
+		//#else
+		//$$ return isFlat(state, x, z) ? 1.0D : original;
+		//#endif
 	}
 
 	/**

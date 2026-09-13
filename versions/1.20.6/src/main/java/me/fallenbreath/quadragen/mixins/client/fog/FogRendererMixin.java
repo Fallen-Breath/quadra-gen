@@ -43,10 +43,18 @@ public abstract class FogRendererMixin
 			method = "setupColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)V",
 			at = @At(
 					value = "INVOKE",
+					//#if MC >= 1.18.2
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()F"
+					//#else
+					//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()D"
+					//#endif
 			)
 	)
+	//#if MC >= 1.18.2
 	private static float useQuadrantClearColorScale(float original, @Local(argsOnly = true) Camera camera)
+	//#else
+	//$$ private static double useQuadrantClearColorScale(double original, @Local(argsOnly = true) Camera camera)
+	//#endif
 	{
 		return ClientSyncQuery.getClearColorScale(original, camera.getPosition().x, camera.getPosition().z);
 	}
