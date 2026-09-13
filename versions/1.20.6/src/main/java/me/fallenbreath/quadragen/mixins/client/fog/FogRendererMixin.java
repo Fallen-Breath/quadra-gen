@@ -45,7 +45,7 @@ public abstract class FogRendererMixin
 					value = "INVOKE",
 					//#if MC >= 1.18.2
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()F"
-					//#else
+					//#elseif MC >= 1.16.5
 					//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()D"
 					//#endif
 			)
@@ -56,6 +56,10 @@ public abstract class FogRendererMixin
 	//$$ private static double useQuadrantClearColorScale(double original, @Local(argsOnly = true) Camera camera)
 	//#endif
 	{
+		//#if MC >= 1.18.2
 		return ClientSyncQuery.getClearColorScale(original, camera.getPosition().x, camera.getPosition().z);
+		//#else
+		//$$ return ClientSyncQuery.getClearColorScale((float) original, camera.getPosition().x, camera.getPosition().z);
+		//#endif
 	}
 }

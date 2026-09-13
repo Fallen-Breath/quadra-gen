@@ -20,8 +20,13 @@
 
 package me.fallenbreath.quadragen.mixins.client.fog;
 
-import me.fallenbreath.quadragen.compat.DummyClass;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.FogRenderer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 
 /**
  * mc >= 1.21.8: subproject 26.2 (main project)
@@ -29,10 +34,20 @@ import org.spongepowered.asm.mixin.Mixin;
  * mc in [1.21.1, 1.21.5): subproject 1.21.4
  * mc < 1.21.1: subproject 1.20.6
  * <p>
- * 1.21.5 has no {@code ClientLevel.ClientLevelData#voidDarknessOnsetRange()};
- * the fog renderer does not query a position-dependent void darkness range in this version.
+ * 1.21.5 still uses {@code ClientLevel.ClientLevelData#getClearColorScale()} for void fog.
  */
-@Mixin(DummyClass.class)
+@Mixin(FogRenderer.class)
 public abstract class FogRendererMixin
 {
+	@ModifyExpressionValue(
+			method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()F"
+			)
+	)
+	private static float useQuadrantClearColorScale(float original, @Local(argsOnly = true) Camera camera)
+	{
+		return ClientSyncQuery.getClearColorScale(original, camera.getPosition().x, camera.getPosition().z);
+	}
 }

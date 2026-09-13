@@ -25,6 +25,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -44,17 +45,31 @@ public abstract class SkyRendererMixin
 			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
 			//#elseif MC >= 1.18.2
 			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
-			//#else
+			//#elseif MC >= 1.17.1
 			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLjava/lang/Runnable;)V",
+			//#elseif MC >= 1.16.5
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+			//#elseif MC >= 1.15.2
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+			//#else
+			//$$ method = "renderSky(F)V",
 			//#endif
 			at = @At(
 					value = "INVOKE",
+					//#if MC >= 1.17.1
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"
+					//#elseif MC >= 1.16.5
+					//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight()D"
+					//#elseif MC >= 1.15.2
+					//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel;getHorizonHeight()D"
+					//#else
+					//$$ target = "Lnet/minecraft/client/multiplayer/MultiPlayerLevel;getHorizonHeight()D"
+					//#endif
 			)
 	)
 	private double useQuadrantHorizonHeight(double original, @Local(argsOnly = true) float deltaPartialTick)
 	{
-		var eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
+		Vec3 eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
 		return ClientSyncQuery.getHorizonHeight(Minecraft.getInstance().level, original, eyePosition.x, eyePosition.z);
 	}
 }

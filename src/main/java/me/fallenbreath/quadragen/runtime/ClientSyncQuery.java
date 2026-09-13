@@ -47,7 +47,11 @@ public final class ClientSyncQuery
 		{
 			return original;
 		}
+		//#if MC >= 1.17.1
 		return isFlat(state, x, z) ? level.getMinY() : 63.0D;
+		//#else
+		//$$ return isFlat(state, x, z) ? 0.0D : 63.0D;
+		//#endif
 	}
 
 	/**
@@ -74,7 +78,7 @@ public final class ClientSyncQuery
 	//#else
 	/** Selects the vanilla Flat/Noise clear-color scale for one position; corresponding vanilla source: {@link net.minecraft.client.multiplayer.ClientLevel.ClientLevelData#voidDarknessOnsetRange()}. */
 	//#endif
-	//#if MC >= 1.18.2
+	//#if MC >= 1.16.5
 	public static float getClearColorScale(float original, double x, double z)
 	//#else
 	//$$ public static double getClearColorScale(double original, double x, double z)
@@ -85,7 +89,7 @@ public final class ClientSyncQuery
 		{
 			return original;
 		}
-		//#if MC >= 1.18.2
+		//#if MC >= 1.16.5
 		return isFlat(state, x, z) ? 1.0F : original;
 		//#else
 		//$$ return isFlat(state, x, z) ? 1.0D : original;

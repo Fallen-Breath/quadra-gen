@@ -39,10 +39,14 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class FogRendererMixin
 {
 	@ModifyExpressionValue(
-			//#if MC >= 1.21.11
-			method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
-			//#else
+			//#if MC >= 26.1.2
+			method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IFLorg/joml/Vector4f;)V",
+			//#elseif MC >= 1.21.11
+			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
+			//#elseif MC >= 1.21.8
 			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IFZ)Lorg/joml/Vector4f;",
+			//#else
+			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
 			//#endif
 			at = @At(
 					value = "INVOKE",
