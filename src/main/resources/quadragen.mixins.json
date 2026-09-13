@@ -5,6 +5,8 @@
   "compatibilityLevel": "{{COMPATIBILITY_LEVEL}}",
   "mixins": [
     "lifecycle.ServerLevelMixin",
+    "network.advertise.ServerPlayerMixin",
+    "network.advertise.PlayerListMixin",
     "network.FanetlibPacketRegistrationCenterMixin",
     "sealevel.AbstractNautilusMixin",
     "sealevel.AgeableWaterCreatureMixin",
@@ -54,3 +56,4 @@
     "requireAnnotations": true
   }
 }
+

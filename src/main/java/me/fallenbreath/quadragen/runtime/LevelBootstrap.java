@@ -132,7 +132,7 @@ public final class LevelBootstrap
 			}
 		}
 
-		LevelContext context = new LevelContext(resolved, (NoiseBasedChunkGenerator)generator);
+		LevelContext context = new LevelContext(resolved, (NoiseBasedChunkGenerator)generator, dimensionConfig.getAdvertisedWorldType());
 		((ServerLevelContextAccess)level).setLevelContext$quadragen(context);
 		((GeneratorContextAccess)generator).setLevelContext$quadragen(context);
 		QuadraGen.LOGGER.info("Quadra Gen world-generation routing installed for {}", dimensionId);

@@ -57,7 +57,7 @@ public final class ConfigDefaults
 		quadrants.put(Quadrant.X_NEGATIVE_Z_POSITIVE, noise(true));
 		quadrants.put(Quadrant.X_NEGATIVE_Z_NEGATIVE, flat("minecraft:the_void", Collections.<FlatLayerConfig>emptyList()));
 		quadrants.put(Quadrant.X_POSITIVE_Z_NEGATIVE, flat(flatBiome, Collections.singletonList(new FlatLayerConfig("minecraft:white_stained_glass", 1))));
-		return new DimensionConfig(true, quadrants);
+		return new DimensionConfig(true, AdvertisedWorldType.AUTO, quadrants);
 	}
 
 	private static QuadrantConfig noise(boolean clear)

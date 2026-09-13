@@ -29,12 +29,19 @@ import java.util.Map;
 public final class DimensionConfig
 {
 	private final boolean enabled;
+	private final AdvertisedWorldType advertisedWorldType;
 	private final Map<Quadrant, QuadrantConfig> quadrants;
 
-	public DimensionConfig(boolean enabled, Map<Quadrant, QuadrantConfig> quadrants)
+	public DimensionConfig(boolean enabled, AdvertisedWorldType advertisedWorldType, Map<Quadrant, QuadrantConfig> quadrants)
 	{
 		this.enabled = enabled;
+		this.advertisedWorldType = advertisedWorldType;
 		this.quadrants = Collections.unmodifiableMap(new EnumMap<Quadrant, QuadrantConfig>(quadrants));
+	}
+
+	public AdvertisedWorldType getAdvertisedWorldType()
+	{
+		return this.advertisedWorldType;
 	}
 
 	public QuadrantConfig getQuadrant(Quadrant quadrant)

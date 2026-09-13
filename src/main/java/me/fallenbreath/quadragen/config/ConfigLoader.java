@@ -38,7 +38,7 @@ public final class ConfigLoader
 {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 	private static final Set<String> ROOT_FIELDS = setOf("schema_version", "enabled", "enabled_in_singleplayer", "overworld", "nether");
-	private static final Set<String> DIMENSION_FIELDS = setOf("enabled", "quadrants");
+	private static final Set<String> DIMENSION_FIELDS = setOf("enabled", "advertised_world_type", "quadrants");
 	private static final Set<String> QUADRANT_FIELDS = setOf("generator", "clear_generated_content", "flat");
 	private static final Set<String> FLAT_FIELDS = setOf("biome", "layers");
 	private static final Set<String> LAYER_FIELDS = setOf("block", "count");
@@ -110,6 +110,12 @@ public final class ConfigLoader
 	{
 		checkFields(object, DIMENSION_FIELDS, path);
 		boolean enabled = requireBoolean(object, "enabled", path);
+		JsonElement advertisedWorldTypeElement = object.get("advertised_world_type");
+		AdvertisedWorldType advertisedWorldType = advertisedWorldTypeElement == null ? AdvertisedWorldType.AUTO : AdvertisedWorldType.fromConfigValue(requireString(object, "advertised_world_type", path));
+		if (advertisedWorldType == null)
+		{
+			throw error(path + ".advertised_world_type", "expected 'auto', 'flat' or 'noise'");
+		}
 		JsonObject quadrantsObject = requireObject(require(object, "quadrants", path), path + ".quadrants");
 		Set<String> quadrantKeys = new HashSet<String>();
 		for (Quadrant quadrant : Quadrant.values())
@@ -129,7 +135,7 @@ public final class ConfigLoader
 			}
 			quadrants.put(quadrant, parseQuadrant(requireObject(value, quadrantPath), quadrantPath));
 		}
-		return new DimensionConfig(enabled, quadrants);
+		return new DimensionConfig(enabled, advertisedWorldType, quadrants);
 	}
 
 	private static QuadrantConfig parseQuadrant(JsonObject object, String path)
@@ -196,6 +202,7 @@ public final class ConfigLoader
 	{
 		JsonObject dimension = new JsonObject();
 		dimension.addProperty("enabled", config.isEnabled());
+		dimension.addProperty("advertised_world_type", config.getAdvertisedWorldType().getConfigValue());
 		JsonObject quadrants = new JsonObject();
 		for (Quadrant quadrant : Quadrant.values())
 		{

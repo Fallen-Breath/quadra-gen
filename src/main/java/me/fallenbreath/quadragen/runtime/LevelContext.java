@@ -23,6 +23,7 @@ package me.fallenbreath.quadragen.runtime;
 import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
+import me.fallenbreath.quadragen.config.AdvertisedWorldType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 
@@ -34,11 +35,18 @@ public final class LevelContext
 {
 	private final Map<Quadrant, QuadrantPlan> plans;
 	private final NoiseBasedChunkGenerator noiseGenerator;
+	private final AdvertisedWorldType advertisedWorldType;
 
-	public LevelContext(Map<Quadrant, QuadrantPlan> plans, NoiseBasedChunkGenerator noiseGenerator)
+	public LevelContext(Map<Quadrant, QuadrantPlan> plans, NoiseBasedChunkGenerator noiseGenerator, AdvertisedWorldType advertisedWorldType)
 	{
 		this.plans = Collections.unmodifiableMap(new EnumMap<Quadrant, QuadrantPlan>(plans));
 		this.noiseGenerator = noiseGenerator;
+		this.advertisedWorldType = advertisedWorldType;
+	}
+
+	public AdvertisedWorldType getAdvertisedWorldType()
+	{
+		return this.advertisedWorldType;
 	}
 
 	public QuadrantPlan getPlan(Quadrant quadrant)
