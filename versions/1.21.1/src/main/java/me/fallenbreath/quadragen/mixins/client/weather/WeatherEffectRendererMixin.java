@@ -25,10 +25,10 @@ import org.spongepowered.asm.mixin.Mixin;
 
 /**
  * mc >= 26.2: subproject 26.2 (main project)
- * mc <= 26.1.2: subproject 26.1.2
- * mc <= 1.21.8: subproject 1.21.8
- * mc <= 1.21.3: subproject 1.21.3
- * mc <= 1.21.1: subproject 1.21.1                    <--------
+ * mc in [26.1.2, 26.2): subproject 26.1.2
+ * mc in [1.21.8, 26.1.2): subproject 1.21.8
+ * mc in [1.21.3, 1.21.8): subproject 1.21.3
+ * mc < 1.21.3: subproject 1.21.1                    <--------
  * <p>
  * 1.21.1 does not have the sea-level precipitation API used by the 1.21.3 implementation.
  */

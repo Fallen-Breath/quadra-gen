@@ -38,8 +38,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * mc >= 26.3: subproject 26.3                    <--------
- * 1.18.2 <= mc <= 26.2: subproject 26.2 (main project)
- * mc <= 1.17.1: subproject 1.17.1
+ * mc in [1.18.2, 26.3): subproject 26.2 (main project)
+ * mc < 1.18.2: subproject 1.17.1
  * <p>
  * 26.3 moves biome generation from
  * {@link net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator} to {@link ChunkGenerator}.

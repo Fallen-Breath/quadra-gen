@@ -23,7 +23,10 @@ package me.fallenbreath.quadragen.mixins.sealevel;
 import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
-// Runtime sea-level routing is not used in MC <= 1.21.1.
+/**
+ * mc >= 1.21.3: subproject 26.2 (main project)
+ * mc < 1.21.3: subproject 1.21.1                    <--------
+ */
 @Mixin(DummyClass.class)
 public interface LevelReaderMixin
 {

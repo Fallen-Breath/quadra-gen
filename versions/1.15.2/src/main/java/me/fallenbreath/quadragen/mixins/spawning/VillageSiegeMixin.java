@@ -30,8 +30,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * mc >= 1.16.5: main project
- * mc <= 1.15.2: subproject 1.15.2  <--------
+ * mc >= 1.16.5: subproject 26.2 (main project)
+ * mc < 1.16.5: subproject 1.15.2                    <--------
  * <p>
  * The original Flat generator omits VillageSiege, so Flat players and resolved Flat candidates must be rejected.
  */

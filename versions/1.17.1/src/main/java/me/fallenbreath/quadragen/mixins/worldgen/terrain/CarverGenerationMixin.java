@@ -41,8 +41,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * mc >= 26.3: subproject 26.3
- * 1.18.2 <= mc <= 26.2: subproject 26.2 (main project)
- * mc <= 1.17.1: subproject 1.17.1                    <--------
+ * mc in [1.18.2, 26.3): subproject 26.2 (main project)
+ * mc < 1.18.2: subproject 1.17.1                    <--------
  * <p>
  * Carver routing is implemented by ChunkGenerator in this interval.
  */

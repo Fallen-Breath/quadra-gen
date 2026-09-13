@@ -56,7 +56,7 @@ import net.minecraft.world.level.levelgen.RandomState;
 
 /**
  * mc >= 26.3: subproject 26.3
- * mc <= 26.2: subproject 26.2 (main project)       <--------
+ * mc < 26.3: subproject 26.2 (main project)       <--------
  * <p>
  * Noise fill and surface remain separate generator stages through 26.2.
  */

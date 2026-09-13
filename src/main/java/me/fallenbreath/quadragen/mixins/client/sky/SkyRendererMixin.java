@@ -30,8 +30,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * mc >= 1.21.10: subproject 26.2 (main project)
- * mc <= 1.21.8: subproject 1.21.8
+ * mc >= 1.21.10: subproject 26.2 (main project)       <--------
+ * mc in [1.21.8, 1.21.10): subproject 1.21.8
+ * mc < 1.21.8: subproject 1.21.4
  */
 @Mixin(SkyRenderer.class)
 public abstract class SkyRendererMixin

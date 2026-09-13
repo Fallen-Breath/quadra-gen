@@ -24,8 +24,11 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * mc >= 1.16.5: subproject 26.2 (main project)
- * mc <= 1.15.2: subproject 1.15.2                    <--------
+ * mc >= 26.3: subproject 26.3
+ * mc in [1.19.4, 26.3): subproject 26.2 (main project)
+ * mc in [1.18.2, 1.19.4): subproject 1.18.2
+ * mc in [1.16.5, 1.18.2): subproject 1.17.1
+ * mc < 1.16.5: subproject 1.15.2                    <--------
  * <p>
  * These versions have no server biome-locate entry point.
  */
