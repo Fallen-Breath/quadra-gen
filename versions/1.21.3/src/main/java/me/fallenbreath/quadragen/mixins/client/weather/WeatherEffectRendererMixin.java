@@ -30,14 +30,13 @@ import org.spongepowered.asm.mixin.injection.At;
 
 /**
  * mc >= 26.2: subproject 26.2 (main project)
- * mc <= 26.1.2: subproject 26.1.2                    <--------
+ * mc <= 26.1.2: subproject 26.1.2
  * mc <= 1.21.8: subproject 1.21.8
- * mc <= 1.21.3: subproject 1.21.3
+ * mc <= 1.21.3: subproject 1.21.3                    <--------
  * mc <= 1.21.1: subproject 1.21.1
  * <p>
- * 26.1.2 keeps the precipitation lookup in the private
- * {@link net.minecraft.client.renderer.WeatherEffectRenderer#getPrecipitationAt(net.minecraft.world.level.Level, net.minecraft.core.BlockPos)}
- * helper instead of delegating it to ClientLevel.
+ * 1.21.3 performs the client weather precipitation lookup in
+ * {@link WeatherEffectRenderer#getPrecipitationAt(net.minecraft.world.level.Level, BlockPos)}.
  */
 @Mixin(WeatherEffectRenderer.class)
 public abstract class WeatherEffectRendererMixin
