@@ -67,6 +67,23 @@ public final class ClientSyncQuery
 		return isFlat(state, x, z) ? 1.0F : original;
 	}
 
+	//#if MC < 1.16.5
+	/** Selects the vanilla Flat/Noise clear-color scale for one position; vanilla source: {@link net.minecraft.world.level.dimension.Dimension#getClearColorScale()}. */
+	//#elseif MC < 1.21.8
+	/** Selects the vanilla Flat/Noise clear-color scale for one position; vanilla source: {@link net.minecraft.client.multiplayer.ClientLevel.ClientLevelData#getClearColorScale()}. */
+	//#else
+	/** Selects the vanilla Flat/Noise clear-color scale for one position; corresponding vanilla source: {@link net.minecraft.client.multiplayer.ClientLevel.ClientLevelData#voidDarknessOnsetRange()}. */
+	//#endif
+	public static float getClearColorScale(float original, double x, double z)
+	{
+		ClientSyncState.State state = ClientSyncState.getState();
+		if (!state.isActive())
+		{
+			return original;
+		}
+		return isFlat(state, x, z) ? 1.0F : original;
+	}
+
 	/**
 	 * Selects the Flat sea level for a client precipitation query. Noise and inactive states retain the vanilla value.
 	 */
