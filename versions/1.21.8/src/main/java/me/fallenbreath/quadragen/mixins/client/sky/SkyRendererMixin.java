@@ -24,20 +24,19 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.SkyRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
  * mc >= 1.21.10: subproject 26.2 (main project)
- * mc <= 1.21.8: subproject 1.21.8
+ * mc <= 1.21.8: subproject 1.21.8                    <--------
  */
-@Mixin(SkyRenderer.class)
+@Mixin(LevelRenderer.class)
 public abstract class SkyRendererMixin
 {
 	@ModifyExpressionValue(
-			method = "shouldRenderDarkDisc(FLnet/minecraft/client/multiplayer/ClientLevel;)Z",
+			method = "shouldRenderDarkDisc(F)Z",
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"
@@ -45,11 +44,10 @@ public abstract class SkyRendererMixin
 	)
 	private double useQuadrantHorizonHeight(
 			double original,
-			@Local(argsOnly = true) float deltaPartialTick,
-			@Local(argsOnly = true) ClientLevel level
+			@Local(argsOnly = true) float deltaPartialTick
 	)
 	{
 		var eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
-		return ClientSyncQuery.getHorizonHeight(level, original, eyePosition.x, eyePosition.z);
+		return ClientSyncQuery.getHorizonHeight(Minecraft.getInstance().level, original, eyePosition.x, eyePosition.z);
 	}
 }

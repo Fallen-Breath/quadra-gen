@@ -18,38 +18,29 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.client.sky;
+package me.fallenbreath.quadragen.mixins.client.weather;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.SkyRenderer;
+import net.minecraft.client.renderer.WeatherEffectRenderer;
+import net.minecraft.core.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
  * mc >= 1.21.10: subproject 26.2 (main project)
- * mc <= 1.21.8: subproject 1.21.8
+ * mc <= 1.21.8: subproject 1.21.8                    <--------
  */
-@Mixin(SkyRenderer.class)
-public abstract class SkyRendererMixin
+@Mixin(WeatherEffectRenderer.class)
+public abstract class WeatherEffectRendererMixin
 {
 	@ModifyExpressionValue(
-			method = "shouldRenderDarkDisc(FLnet/minecraft/client/multiplayer/ClientLevel;)Z",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"
-			)
+			method = "getPrecipitationAt(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/biome/Biome$Precipitation;",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
 	)
-	private double useQuadrantHorizonHeight(
-			double original,
-			@Local(argsOnly = true) float deltaPartialTick,
-			@Local(argsOnly = true) ClientLevel level
-	)
+	private int useQuadrantSeaLevel(int original, @Local(argsOnly = true) BlockPos pos)
 	{
-		var eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
-		return ClientSyncQuery.getHorizonHeight(level, original, eyePosition.x, eyePosition.z);
+		return ClientSyncQuery.getSeaLevelAt(pos, original);
 	}
 }

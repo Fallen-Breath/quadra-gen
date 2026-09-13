@@ -24,8 +24,8 @@ import net.minecraft.client.renderer.WeatherEffectRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * No-op on the 26.2 baseline; 26.1.2 overrides this class because its weather
- * renderer still owns a private precipitation helper.
+ * mc >= 1.21.10: subproject 26.2 (main project)
+ * mc <= 1.21.8: subproject 1.21.8
  */
 @Mixin(WeatherEffectRenderer.class)
 public abstract class WeatherEffectRendererMixin
