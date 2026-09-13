@@ -24,6 +24,9 @@ import net.minecraft.client.renderer.WeatherEffectRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
+ *          mc >  26.1.2: subproject 26.2 (main project)  <--------
+ * 1.21.1 < mc <= 26.1.2: subproject 26.1.2
+ *          mc <= 1.21.1: subproject 1.21.1
  */
 @Mixin(WeatherEffectRenderer.class)
 public abstract class WeatherEffectRendererMixin

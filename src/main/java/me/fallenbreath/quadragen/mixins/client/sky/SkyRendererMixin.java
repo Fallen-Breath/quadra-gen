@@ -35,6 +35,9 @@ import net.minecraft.client.renderer.SkyRenderer;
 //#endif
 
 /**
+ *          mc >  1.21.4: subproject 26.2 (main project)  <--------
+ * 1.21.1 < mc <= 1.21.4: subproject 1.21.4
+ *          mc <= 1.21.1: subproject 1.21.1
  */
 //#if MC >= 1.21.10
 @Mixin(SkyRenderer.class)

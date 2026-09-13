@@ -24,6 +24,9 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
+ *          mc >  26.1.2: subproject 26.2 (main project)
+ * 1.21.1 < mc <= 26.1.2: subproject 26.1.2
+ *          mc <= 1.21.1: subproject 1.21.1  <--------
  * <p>
  * 1.21.1 does not have the sea-level precipitation API used by the 1.21.3 implementation.
  */

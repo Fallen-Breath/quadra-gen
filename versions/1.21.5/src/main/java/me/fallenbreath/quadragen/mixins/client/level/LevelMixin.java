@@ -29,6 +29,12 @@ import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+/**
+ *          mc >  26.1.2: subproject 26.2 (main project)
+ * 1.21.5 < mc <= 26.1.2: subproject 26.1.2
+ * 1.21.1 < mc <= 1.21.5: subproject 1.21.5  <--------
+ *          mc <= 1.21.1: subproject 1.21.1
+ */
 @Mixin(Level.class)
 public abstract class LevelMixin
 {

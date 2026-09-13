@@ -23,6 +23,12 @@ package me.fallenbreath.quadragen.mixins.client.fog;
 import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
+/**
+ *          mc >  1.21.5: subproject 26.2 (main project)
+ * 1.15.2 < mc <= 1.21.5: subproject 1.21.5
+ *          mc <= 1.15.2: subproject 1.15.2  <--------
+ */
+
 @Mixin(DummyClass.class)
 public abstract class FogRendererMixin
 {

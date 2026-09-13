@@ -29,6 +29,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
+ *          mc >  1.21.5: subproject 26.2 (main project)
+ * 1.15.2 < mc <= 1.21.5: subproject 1.21.5  <--------
+ *          mc <= 1.15.2: subproject 1.15.2
  * <p>
  * 1.21.5 still uses {@code ClientLevel.ClientLevelData#getClearColorScale()} for void fog.
  */

@@ -29,6 +29,11 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+/**
+ *          mc >  1.21.4: subproject 26.2 (main project)
+ * 1.21.1 < mc <= 1.21.4: subproject 1.21.4  <--------
+ *          mc <= 1.21.1: subproject 1.21.1
+ */
 @Mixin(LevelRenderer.class)
 public abstract class SkyRendererMixin
 {
