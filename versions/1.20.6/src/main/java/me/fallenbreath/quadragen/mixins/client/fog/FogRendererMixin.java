@@ -40,13 +40,13 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class FogRendererMixin
 {
 	@ModifyExpressionValue(
-			method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
+			method = "setupColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)V",
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()F"
 			)
 	)
-	private float useQuadrantClearColorScale(float original, @Local(argsOnly = true) Camera camera)
+	private static float useQuadrantClearColorScale(float original, @Local(argsOnly = true) Camera camera)
 	{
 		return ClientSyncQuery.getClearColorScale(original, camera.getPosition().x, camera.getPosition().z);
 	}
