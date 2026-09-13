@@ -11,8 +11,12 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * mc >= 1.21.5: subproject 1.21.5
+ * mc >= 26.2: subproject 26.2 (main project)
+ * mc <= 26.1.2: subproject 26.1.2
+ * mc <= 1.21.8: subproject 1.21.8
+ * mc <= 1.21.5: subproject 1.21.5
  * mc <= 1.21.4: subproject 1.21.4                    <--------
+ * mc <= 1.21.1: subproject 1.21.1
  * <p>
  * 1.21.4 has no {@code ClientLevel#getPrecipitationAt(BlockPos)}; precipitation uses {@code Level#isRainingAt}.
  */
