@@ -24,6 +24,10 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
+ *          mc >  1.18.2: subproject 26.2 (main project)  <--------
+ * 1.17.1 < mc <= 1.18.2: subproject 1.18.2
+ * 1.15.2 < mc <= 1.17.1: subproject 1.17.1
+ *          mc <= 1.15.2: subproject 1.15.2
  * <p>
  * Structure locate validates actual starts without a Quadra Gen patch since 1.19.4.
  */

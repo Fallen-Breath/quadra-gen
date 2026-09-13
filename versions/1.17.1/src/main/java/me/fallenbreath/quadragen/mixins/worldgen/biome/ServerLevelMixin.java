@@ -36,6 +36,11 @@ import java.util.Random;
 import java.util.function.Predicate;
 
 /**
+ *          mc >  26.2  : subproject 26.3
+ * 1.18.2 < mc <= 26.2  : subproject 26.2 (main project)
+ * 1.17.1 < mc <= 1.18.2: subproject 1.18.2
+ * 1.15.2 < mc <= 1.17.1: subproject 1.17.1  <--------
+ *          mc <= 1.15.2: subproject 1.15.2
  * <p>
  * 1.16.5 and 1.17.1 locate a raw Biome through BiomeSource.findBiomeHorizontal.
  */

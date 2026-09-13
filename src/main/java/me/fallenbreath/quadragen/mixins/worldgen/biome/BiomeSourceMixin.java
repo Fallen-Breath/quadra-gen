@@ -49,6 +49,9 @@ import java.util.Set;
 //#endif
 
 /**
+ *          mc >  26.2  : subproject 26.3
+ * 1.15.2 < mc <= 26.2  : subproject 26.2 (main project)  <--------
+ *          mc <= 1.15.2: subproject 1.15.2
  * <p>
  * Adjusts only the biome values consumed by vanilla locate searches.
  */

@@ -42,6 +42,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ *          mc >  26.2: subproject 26.3  <--------
+ *          mc <= 26.2: subproject 26.2 (main project)
  * <p>
  * 26.3 combines Noise fill, surface, and carvers into
  * {@link NoiseBasedChunkGenerator#buildTerrain}.

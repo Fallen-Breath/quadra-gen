@@ -37,6 +37,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ *          mc >  26.2  : subproject 26.3  <--------
+ * 1.17.1 < mc <= 26.2  : subproject 26.2 (main project)
+ *          mc <= 1.17.1: subproject 1.17.1
  * <p>
  * 26.3 moves biome generation from
  * {@link net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator} to {@link ChunkGenerator}.
