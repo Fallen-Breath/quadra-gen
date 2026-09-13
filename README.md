@@ -23,7 +23,7 @@ With the default configuration, the four quadrants behave as follows:
 
 The Overworld and Nether have independent settings. The End and custom dimensions are not affected.
 
-Supported Mod Platform: Fabric. No extra dependency is needed. Quadra Gen is server-side only; clients can join without installing it.
+Supported Mod Platform: Fabric. No extra dependency is needed. The server must install Quadra Gen; client installation is optional. Clients without it can join, while installing it improves client-side details such as horizon height.
 
 Supported Minecraft versions:
 
