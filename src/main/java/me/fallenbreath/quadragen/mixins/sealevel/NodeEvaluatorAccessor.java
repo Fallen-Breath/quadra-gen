@@ -26,6 +26,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
+ * mc >  1.21.1: subproject 26.2 (main project)
+ * mc <= 1.21.1: subproject 1.21.1
  */
 @Mixin(NodeEvaluator.class)
 public interface NodeEvaluatorAccessor

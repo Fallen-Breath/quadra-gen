@@ -30,6 +30,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
+ * mc >  1.21.1: subproject 26.2 (main project)
+ * mc <= 1.21.1: subproject 1.21.1
  */
 @Mixin(targets = "net.minecraft.world.entity.monster.Phantom$PhantomAttackStrategyGoal")
 public abstract class PhantomAttackStrategyGoalMixin

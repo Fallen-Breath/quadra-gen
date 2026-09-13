@@ -30,6 +30,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
+ * mc >  1.21.1: subproject 26.2 (main project)
+ * mc <= 1.21.1: subproject 1.21.1
  */
 @Mixin(AmphibiousNodeEvaluator.class)
 public abstract class AmphibiousNodeEvaluatorMixin
@@ -38,6 +40,7 @@ public abstract class AmphibiousNodeEvaluatorMixin
 			method = "getNeighbors",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
 	)
+	// At this instruction, the compiler frame keeps only the method argument and loop node; ordinal 1 is the loop neighbor.
 	private int useSeaLevelAtNode(int original, @Local(ordinal = 1) Node neighbor)
 	{
 		Mob mob = ((NodeEvaluatorAccessor)(Object)this).getMob$quadragen();

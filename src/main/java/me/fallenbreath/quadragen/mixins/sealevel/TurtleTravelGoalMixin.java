@@ -30,6 +30,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
+ * mc >  1.21.1: subproject 26.2 (main project)
+ * mc <= 1.21.1: subproject 1.21.1
  */
 //#if MC >= 1.21.11
 @Mixin(targets = "net.minecraft.world.entity.animal.turtle.Turtle$TurtleTravelGoal")

@@ -29,6 +29,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
+ * mc >  1.21.1: subproject 26.2 (main project)
+ * mc <= 1.21.1: subproject 1.21.1
  */
 @Mixin(LevelReader.class)
 public interface LevelReaderMixin
