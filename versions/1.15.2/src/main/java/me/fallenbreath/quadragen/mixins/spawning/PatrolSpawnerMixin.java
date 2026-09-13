@@ -30,6 +30,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
+ * mc >  1.15.2: subproject 26.2 (main project)
+ * mc <= 1.15.2: subproject 1.15.2  <--------
  * <p>
  * The original Flat generator omits PatrolSpawner, so the shared Noise generator must reject resolved Flat targets.
  */

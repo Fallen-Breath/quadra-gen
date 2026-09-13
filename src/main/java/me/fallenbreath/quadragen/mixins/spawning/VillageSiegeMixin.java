@@ -24,6 +24,8 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
+ * mc >  1.15.2: subproject 26.2 (main project)
+ * mc <= 1.15.2: subproject 1.15.2
  * <p>
  * Generator-owned custom spawners no longer require quadrant compensation after 1.15.2.
  */
