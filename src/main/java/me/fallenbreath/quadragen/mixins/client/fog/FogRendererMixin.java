@@ -33,7 +33,11 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class FogRendererMixin
 {
 	@ModifyExpressionValue(
+			//#if MC >= 1.21.11
 			method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IFLorg/joml/Vector4f;)V",
+			//#else
+			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IFZ)Lorg/joml/Vector4f;",
+			//#endif
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;voidDarknessOnsetRange()F"
