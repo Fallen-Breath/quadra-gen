@@ -33,8 +33,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 /**
- * mc >= 1.16.5: subproject 26.2 (main project)       <--------
- * mc < 1.16.5: subproject 1.15.2
  * <p>
  * Initial-spawn selection is owned by MinecraftServer in this interval.
  */

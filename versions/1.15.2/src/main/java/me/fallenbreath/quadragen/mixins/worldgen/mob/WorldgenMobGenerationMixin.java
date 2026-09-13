@@ -31,8 +31,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * mc >= 1.16.5: subproject 26.2 (main project)
- * mc < 1.16.5: subproject 1.15.2                    <--------
  * <p>
  * Worldgen mob spawning is overridden only by OverworldLevelSource in this interval; Nether inherits the no-op base method.
  */

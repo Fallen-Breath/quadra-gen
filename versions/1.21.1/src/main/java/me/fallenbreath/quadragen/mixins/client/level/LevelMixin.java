@@ -24,11 +24,6 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * mc >= 1.21.8: subproject 26.2 (main project)
- * mc in [1.21.5, 1.21.8): subproject 1.21.5
- * mc in [1.21.4, 1.21.5): subproject 1.21.4
- * mc in [1.21.1, 1.21.4): subproject 1.21.1                    <--------
- * mc < 1.21.1: subproject 1.20.6
  * <p>
  * 1.21.1 has no {@code net.minecraft.world.level.Level#precipitationAt(BlockPos)};
  * precipitation uses {@code Level#isRainingAt} without a sea-level parameter.

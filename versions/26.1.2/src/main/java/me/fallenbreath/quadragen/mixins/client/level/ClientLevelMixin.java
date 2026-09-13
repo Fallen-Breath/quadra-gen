@@ -24,10 +24,6 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * mc >= 26.2: subproject 26.2 (main project)
- * mc in [26.1.2, 26.2): subproject 26.1.2                    <--------
- * mc in [1.21.4, 26.1.2): subproject 1.21.4
- * mc < 1.21.4: subproject 1.21.1
  * <p>
  * 26.1.2 has no {@code net.minecraft.client.multiplayer.ClientLevel#getPrecipitationAt(BlockPos)};
  * weather queries in this version are handled by WeatherEffectRendererMixin instead.

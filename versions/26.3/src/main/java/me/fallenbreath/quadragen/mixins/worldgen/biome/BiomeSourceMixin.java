@@ -43,9 +43,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * mc >= 26.3: subproject 26.3                    <--------
- * mc in [1.16.5, 26.3): subproject 26.2 (main project)
- * mc < 1.16.5: subproject 1.15.2
  * <p>
  * 26.3 creates a caching BiomeResolver from RandomState before sampling.
  */

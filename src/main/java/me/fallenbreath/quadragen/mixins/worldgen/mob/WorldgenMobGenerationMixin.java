@@ -35,8 +35,6 @@ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 //#endif
 
 /**
- * mc >= 1.16.5: subproject 26.2 (main project)       <--------
- * mc < 1.16.5: subproject 1.15.2
  * <p>
  * Worldgen mob spawning is implemented by NoiseBasedChunkGenerator in this interval.
  */

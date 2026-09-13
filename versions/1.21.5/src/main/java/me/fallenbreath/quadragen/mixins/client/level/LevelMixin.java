@@ -30,10 +30,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * mc >= 1.21.8: subproject 26.2 (main project)
- * mc in [1.21.5, 1.21.8): subproject 1.21.5                    <--------
- * mc in [1.21.4, 1.21.5): subproject 1.21.4
- * mc < 1.21.4: subproject 1.21.1
  * <p>
  * 1.21.5 performs the block-level precipitation check directly in {@code isRainingAt}.
  */

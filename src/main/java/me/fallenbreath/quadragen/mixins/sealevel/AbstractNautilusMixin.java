@@ -30,8 +30,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * mc >= 1.21.11: subproject 26.2 (main project)       <--------
- * mc < 1.21.11: subproject 1.21.10
  */
 @Mixin(AbstractNautilus.class)
 public abstract class AbstractNautilusMixin

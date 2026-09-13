@@ -16,10 +16,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * mc >= 1.21.8: subproject 26.2 (main project)
- * mc in [1.21.5, 1.21.8): subproject 1.21.5
- * mc in [1.21.1, 1.21.5): subproject 1.21.4                    <--------
- * mc < 1.21.1: subproject 1.20.6
  * <p>
  * 1.21.4 names the vanilla void-fog value {@code getClearColorScale}.
  */

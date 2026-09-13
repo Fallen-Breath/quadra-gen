@@ -31,10 +31,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * mc >= 1.19.4: subproject 26.2 (main project)
- * mc in [1.18.2, 1.19.4): subproject 1.18.2
- * mc in [1.16.5, 1.18.2): subproject 1.17.1
- * mc < 1.16.5: subproject 1.15.2                    <--------
  */
 @Mixin(StrongholdFeature.class)
 public abstract class StructureLocateMixin

@@ -31,8 +31,6 @@ import net.minecraft.world.level.levelgen.feature.FillLayerFeature;
 import java.util.List;
 
 /**
- * mc >= 26.3: subproject 26.3                    <--------
- * mc < 26.3: subproject 26.2 (main project)
  * <p>
  * 26.3 represents configured features as data-carrying {@link net.minecraft.world.level.levelgen.feature.Feature}
  * implementations, so delayed Flat layers invoke {@link FillLayerFeature} directly.

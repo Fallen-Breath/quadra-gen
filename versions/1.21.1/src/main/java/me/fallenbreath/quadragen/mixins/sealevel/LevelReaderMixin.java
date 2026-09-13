@@ -24,8 +24,6 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * mc >= 1.21.3: subproject 26.2 (main project)
- * mc < 1.21.3: subproject 1.21.1                    <--------
  */
 @Mixin(DummyClass.class)
 public interface LevelReaderMixin

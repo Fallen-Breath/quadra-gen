@@ -33,9 +33,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * mc >= 26.3: subproject 26.3
- * mc in [1.18.2, 26.3): subproject 26.2 (main project)       <--------
- * mc < 1.18.2: subproject 1.17.1
  * <p>
  * Carver routing is implemented by NoiseBasedChunkGenerator in this interval.
  */

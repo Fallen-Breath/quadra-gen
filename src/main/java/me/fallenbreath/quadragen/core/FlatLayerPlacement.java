@@ -47,8 +47,6 @@ import net.minecraft.world.level.WorldGenLevel;
 //#endif
 
 /**
- * mc >= 26.3: subproject 26.3
- * mc < 26.3: subproject 26.2 (main project)       <--------
  */
 public final class FlatLayerPlacement
 {

@@ -30,8 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 
 //#if MC >= 1.21.11
 /**
- * mc >= 1.21.3: subproject 26.2 (main project)       <--------
- * mc < 1.21.3: subproject 1.21.1
  */
 @Mixin(targets = "net.minecraft.world.entity.monster.zombie.Drowned$DrownedSwimUpGoal")
 //#else
