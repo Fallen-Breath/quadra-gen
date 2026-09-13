@@ -20,33 +20,16 @@
 
 package me.fallenbreath.quadragen.config;
 
+import com.google.gson.annotations.SerializedName;
+
 public enum AdvertisedWorldType
 {
-	AUTO("auto"),
-	FLAT("flat"),
-	NOISE("noise");
+	@SerializedName("auto")
+	AUTO,
 
-	private final String configValue;
+	@SerializedName("flat")
+	FLAT,
 
-	AdvertisedWorldType(String configValue)
-	{
-		this.configValue = configValue;
-	}
-
-	public String getConfigValue()
-	{
-		return this.configValue;
-	}
-
-	public static AdvertisedWorldType fromConfigValue(String value)
-	{
-		for (AdvertisedWorldType type : values())
-		{
-			if (type.configValue.equals(value))
-			{
-				return type;
-			}
-		}
-		return null;
-	}
+	@SerializedName("noise")
+	NOISE
 }

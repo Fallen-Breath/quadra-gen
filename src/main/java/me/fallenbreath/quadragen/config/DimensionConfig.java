@@ -20,23 +20,32 @@
 
 package me.fallenbreath.quadragen.config;
 
+import com.google.gson.annotations.SerializedName;
 import me.fallenbreath.quadragen.core.Quadrant;
 
 import java.util.Collections;
-import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class DimensionConfig
 {
-	private final boolean enabled;
-	private final AdvertisedWorldType advertisedWorldType;
-	private final Map<Quadrant, QuadrantConfig> quadrants;
+	@SerializedName("enabled")
+	Boolean enabled;
+	@SerializedName("advertised_world_type")
+	AdvertisedWorldType advertisedWorldType;
+	@SerializedName("quadrants")
+	Map<String, QuadrantConfig> quadrants;
 
 	public DimensionConfig(boolean enabled, AdvertisedWorldType advertisedWorldType, Map<Quadrant, QuadrantConfig> quadrants)
 	{
 		this.enabled = enabled;
 		this.advertisedWorldType = advertisedWorldType;
-		this.quadrants = Collections.unmodifiableMap(new EnumMap<Quadrant, QuadrantConfig>(quadrants));
+		Map<String, QuadrantConfig> values = new LinkedHashMap<String, QuadrantConfig>();
+		for (Map.Entry<Quadrant, QuadrantConfig> entry : quadrants.entrySet())
+		{
+			values.put(entry.getKey().getConfigKey(), entry.getValue());
+		}
+		this.quadrants = Collections.unmodifiableMap(values);
 	}
 
 	public AdvertisedWorldType getAdvertisedWorldType()
@@ -46,7 +55,7 @@ public final class DimensionConfig
 
 	public QuadrantConfig getQuadrant(Quadrant quadrant)
 	{
-		QuadrantConfig config = this.quadrants.get(quadrant);
+		QuadrantConfig config = this.quadrants.get(quadrant.getConfigKey());
 		if (config == null)
 		{
 			throw new IllegalArgumentException("Missing quadrant " + quadrant.getConfigKey());

@@ -20,13 +20,17 @@
 
 package me.fallenbreath.quadragen.config;
 
+import com.google.gson.annotations.SerializedName;
 import me.fallenbreath.quadragen.core.GeneratorKind;
 
 public final class QuadrantConfig
 {
-	private final GeneratorKind generator;
-	private final boolean clearGeneratedContent;
-	private final FlatConfig flat;
+	@SerializedName("generator")
+	GeneratorKind generator;
+	@SerializedName("clear_generated_content")
+	Boolean clearGeneratedContent;
+	@SerializedName("flat")
+	FlatConfig flat;
 
 	public QuadrantConfig(GeneratorKind generator, boolean clearGeneratedContent, FlatConfig flat)
 	{

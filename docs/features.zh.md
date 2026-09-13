@@ -228,7 +228,7 @@ Mod 不为全空配置创建出生平台，也不输出专门的全空警告。�
 
 ## 12. 配置功能
 
-配置文件位于 `config/quadragen/config.json`，当前 schema 版本为 `1`。配置文件不存在时，Mod 会创建默认配置。各字段的取值与默认值见[配置文档](config.zh.md)。
+配置文件位于 `config/quadragen/config.json`，当前 schema 版本为 `1`。配置文件不存在时，Mod 会将随包提供的 `src/main/resources/default_config.json` 复制到该位置。各字段的取值与默认值见[配置文档](config.zh.md)。
 
 配置层次：
 
@@ -239,17 +239,19 @@ Mod 不为全空配置创建出生平台，也不输出专门的全空警告。�
 ├── enabled_in_singleplayer
 ├── overworld
 │   ├── enabled
+│   ├── advertised_world_type
 │   └── 四个象限
 └── nether
     ├── enabled
+    ├── advertised_world_type
     └── 四个象限
 ```
 
-每个象限必须声明 `generator` 与 `clear_generated_content`；选择 `flat` 时必须同时提供固定群系及完整层列表，选择 `noise` 时不得携带 Flat 配置。
+每个维度声明 `enabled`、`advertised_world_type` 和四个象限。每个象限必须声明 `generator` 与 `clear_generated_content`；选择 `flat` 时必须同时提供固定群系及完整层列表，选择 `noise` 时不得携带 Flat 配置。
 
-配置采用严格校验：
+配置只严格校验 Quadra Gen 自己理解的字段：
 
-- 拒绝未知字段、缺失字段与错误的数据类型；
+- 忽略未知字段；缺失字段与错误值仍会报错；
 - `schema_version` 必须等于当前版本；
 - 四个象限缺一不可；
 - `generator` 只能是 `noise` 或 `flat`；

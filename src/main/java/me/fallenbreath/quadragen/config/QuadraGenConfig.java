@@ -20,17 +20,26 @@
 
 package me.fallenbreath.quadragen.config;
 
+import com.google.gson.annotations.SerializedName;
+
 public final class QuadraGenConfig
 {
 	public static final int SCHEMA_VERSION = 1;
 
-	private final boolean enabled;
-	private final boolean enabledInSingleplayer;
-	private final DimensionConfig nether;
-	private final DimensionConfig overworld;
+	@SerializedName("schema_version")
+	Integer schemaVersion;
+	@SerializedName("enabled")
+	Boolean enabled;
+	@SerializedName("enabled_in_singleplayer")
+	Boolean enabledInSingleplayer;
+	@SerializedName("nether")
+	DimensionConfig nether;
+	@SerializedName("overworld")
+	DimensionConfig overworld;
 
 	public QuadraGenConfig(boolean enabled, boolean enabledInSingleplayer, DimensionConfig overworld, DimensionConfig nether)
 	{
+		this.schemaVersion = SCHEMA_VERSION;
 		this.enabled = enabled;
 		this.enabledInSingleplayer = enabledInSingleplayer;
 		this.nether = nether;

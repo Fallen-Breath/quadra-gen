@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "enabled_in_singleplayer": false,
+  "overworld": {
+    "enabled": true,
+    "advertised_world_type": "auto",
+    "quadrants": {
+      "x_positive_z_positive": {
+        "generator": "noise",
+        "clear_generated_content": false
+      },
+      "x_negative_z_positive": {
+        "generator": "noise",
+        "clear_generated_content": true
+      },
+      "x_negative_z_negative": {
+        "generator": "flat",
+        "clear_generated_content": false,
+        "flat": {
+          "biome": "minecraft:the_void",
+          "layers": []
+        }
+      },
+      "x_positive_z_negative": {
+        "generator": "flat",
+        "clear_generated_content": false,
+        "flat": {
+          "biome": "minecraft:plains",
+          "layers": [
+            {
+              "block": "minecraft:white_stained_glass",
+              "count": 1
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nether": {
+    "enabled": true,
+    "advertised_world_type": "auto",
+    "quadrants": {
+      "x_positive_z_positive": {
+        "generator": "noise",
+        "clear_generated_content": false
+      },
+      "x_negative_z_positive": {
+        "generator": "noise",
+        "clear_generated_content": true
+      },
+      "x_negative_z_negative": {
+        "generator": "flat",
+        "clear_generated_content": false,
+        "flat": {
+          "biome": "minecraft:the_void",
+          "layers": []
+        }
+      },
+      "x_positive_z_negative": {
+        "generator": "flat",
+        "clear_generated_content": false,
+        "flat": {
+          "biome": "minecraft:nether_wastes",
+          "layers": [
+            {
+              "block": "minecraft:white_stained_glass",
+              "count": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}

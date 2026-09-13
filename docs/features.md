@@ -228,7 +228,7 @@ The mod does not create a spawn platform for an all-empty configuration, and doe
 
 ## 12. Configuration
 
-The configuration file is located at `config/quadragen/config.json`, and the current schema version is `1`. When the file does not exist, the mod creates the default configuration. See the [configuration reference](config.md) for the values and defaults of every field.
+The configuration file is located at `config/quadragen/config.json`, and the current schema version is `1`. When the file does not exist, the mod copies the bundled `src/main/resources/default_config.json` into place. See the [configuration reference](config.md) for the values and defaults of every field.
 
 Configuration hierarchy:
 
@@ -239,17 +239,19 @@ Global configuration
 ├── enabled_in_singleplayer
 ├── overworld
 │   ├── enabled
+│   ├── advertised_world_type
 │   └── four quadrants
 └── nether
     ├── enabled
+    ├── advertised_world_type
     └── four quadrants
 ```
 
-Each quadrant must declare `generator` and `clear_generated_content`. When `flat` is chosen, the fixed biome and the complete layer list must also be provided; when `noise` is chosen, no Flat configuration may be carried.
+Each dimension declares `enabled`, `advertised_world_type`, and four quadrants. Each quadrant must declare `generator` and `clear_generated_content`. When `flat` is chosen, the fixed biome and the complete layer list must also be provided; when `noise` is chosen, no Flat configuration may be carried.
 
-The configuration is validated strictly:
+The configuration is validated for fields understood by Quadra Gen:
 
-- Unknown fields, missing fields, and wrong data types are rejected;
+- Unknown fields are ignored; missing fields and invalid values are rejected;
 - `schema_version` must equal the current version;
 - All four quadrants are required;
 - `generator` can only be `noise` or `flat`;

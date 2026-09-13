@@ -5,8 +5,9 @@ English | [中文](config.zh.md)
 ## Configuration File Reference
 
 Quadra Gen's configuration file is located at `config/quadragen/config.json`. If the file does not exist, the mod creates a default configuration automatically at startup.
+The bundled default is available as [`src/main/resources/default_config.json`](../src/main/resources/default_config.json).
 
-The configuration is read once at server startup. Changes take effect after restarting the server; hot reload is not supported. The configuration is validated strictly: unknown fields, missing fields, wrong types, or invalid values all cause the mod to report an error and refuse to load.
+The configuration is read once at server startup. Changes take effect after restarting the server; hot reload is not supported. Unknown fields are ignored. Missing fields, wrong types, or invalid values for fields understood by Quadra Gen cause the mod to report an error and refuse to load.
 
 ### Activation conditions
 
@@ -73,6 +74,7 @@ The End and custom dimensions are not supported, and Quadra Gen does not read or
 ```json
 {
     "enabled": true,
+    "advertised_world_type": "auto",
     "quadrants": {
         // the configuration of all four quadrants, all required. See the sections below
         "x_positive_z_positive": {/* Quadrant configuration */},
@@ -89,6 +91,13 @@ The switch of this dimension. When set to `false`, the dimension keeps vanilla w
 
 - Type: `bool`
 - Default: `true`
+
+#### advertised_world_type
+
+The world type advertised to clients for this dimension. Available values are `auto`, `flat`, and `noise`.
+
+- Type: `str`
+- Default: `auto`
 
 #### quadrants
 
@@ -114,7 +123,7 @@ The default quadrant layout is as follows (the `flat` column corresponds to the 
 | `(-X,-Z)` | `flat` | `false` | `minecraft:the_void`, empty layers |
 | `(+X,-Z)` | `flat` | `false` | Overworld: `minecraft:plains`, one layer of white stained glass; Nether: `minecraft:nether_wastes`, one layer of white stained glass |
 
-In Minecraft 1.14.4–1.15.2, the default Nether biome is `minecraft:nether`.
+The bundled resource uses `minecraft:nether_wastes`; on Minecraft 1.14.4–1.15.2, the loader translates this default ID to the historical `minecraft:nether` ID before validation.
 
 - Type: `Map[str, Quadrant configuration]`
 
@@ -199,4 +208,3 @@ The thickness of this layer, i.e. how many times this block is repeated consecut
 The total thickness of all layers must not exceed the dimension's buildable height, otherwise the mod reports an error
 
 - Type: `int`
-

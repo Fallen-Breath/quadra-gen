@@ -20,32 +20,13 @@
 
 package me.fallenbreath.quadragen.core;
 
+import com.google.gson.annotations.SerializedName;
+
 public enum GeneratorKind
 {
-	NOISE("noise"),
-	FLAT("flat");
+	@SerializedName("noise")
+	NOISE,
 
-	private final String configValue;
-
-	GeneratorKind(String configValue)
-	{
-		this.configValue = configValue;
-	}
-
-	public String getConfigValue()
-	{
-		return this.configValue;
-	}
-
-	public static GeneratorKind fromConfigValue(String value)
-	{
-		for (GeneratorKind kind : values())
-		{
-			if (kind.configValue.equals(value))
-			{
-				return kind;
-			}
-		}
-		return null;
-	}
+	@SerializedName("flat")
+	FLAT
 }

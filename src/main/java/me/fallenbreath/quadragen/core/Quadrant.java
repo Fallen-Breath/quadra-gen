@@ -20,11 +20,20 @@
 
 package me.fallenbreath.quadragen.core;
 
+import com.google.gson.annotations.SerializedName;
+
 public enum Quadrant
 {
+	@SerializedName("x_positive_z_positive")
 	X_POSITIVE_Z_POSITIVE("x_positive_z_positive", 1, 1),
+
+	@SerializedName("x_negative_z_positive")
 	X_NEGATIVE_Z_POSITIVE("x_negative_z_positive", -1, 1),
+
+	@SerializedName("x_negative_z_negative")
 	X_NEGATIVE_Z_NEGATIVE("x_negative_z_negative", -1, -1),
+
+	@SerializedName("x_positive_z_negative")
 	X_POSITIVE_Z_NEGATIVE("x_positive_z_negative", 1, -1);
 
 	private final String configKey;

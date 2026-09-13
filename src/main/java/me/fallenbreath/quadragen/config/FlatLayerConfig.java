@@ -20,10 +20,14 @@
 
 package me.fallenbreath.quadragen.config;
 
+import com.google.gson.annotations.SerializedName;
+
 public final class FlatLayerConfig
 {
-	private final String block;
-	private final int count;
+	@SerializedName("block")
+	String block;
+	@SerializedName("count")
+	Integer count;
 
 	public FlatLayerConfig(String block, int count)
 	{

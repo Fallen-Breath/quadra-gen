@@ -20,14 +20,18 @@
 
 package me.fallenbreath.quadragen.config;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class FlatConfig
 {
-	private final String biome;
-	private final List<FlatLayerConfig> layers;
+	@SerializedName("biome")
+	String biome;
+	@SerializedName("layers")
+	List<FlatLayerConfig> layers;
 
 	public FlatConfig(String biome, List<FlatLayerConfig> layers)
 	{

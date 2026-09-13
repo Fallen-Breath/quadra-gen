@@ -4,9 +4,10 @@
 
 ## 配置文件详解
 
-Quadra Gen 的配置文件位于 `config/quadragen/config.json`。若文件不存在，Mod 会在启动时自动创建一份默认配置。
+Quadra Gen 的配置文件位于 `config/quadragen/config.json`。若文件不存在，Mod 会将随包提供的默认配置复制到该位置。
+随 Mod 打包的默认配置位于 [`src/main/resources/default_config.json`](../src/main/resources/default_config.json)。
 
-配置仅在服务器启动时读取一次，修改后需要重启服务器才会生效，不支持热重载。配置会经过严格校验：未知字段、缺失字段、错误类型或非法值都会导致 Mod 报错并拒绝加载。
+配置仅在服务器启动时读取一次，修改后需要重启服务器才会生效，不支持热重载。未知字段会被忽略；Mod 自己理解的字段如果缺失、类型错误或取值非法，仍会导致报错并拒绝加载。
 
 ### 生效条件
 
@@ -73,6 +74,7 @@ Quadra Gen 面向多人服务器设计，因此单人游戏默认不启用。若
 ```json
 {
     "enabled": true,
+    "advertised_world_type": "auto",
     "quadrants": {
         // 四个象限的配置，缺一不可。详见以下各节
         "x_positive_z_positive": {/* 象限配置 */},
@@ -89,6 +91,13 @@ Quadra Gen 面向多人服务器设计，因此单人游戏默认不启用。若
 
 - 类型：`bool`
 - 默认值：`true`
+
+#### advertised_world_type
+
+客户端看到的该维度世界类型。可用值为 `auto`、`flat` 和 `noise`。
+
+- 类型：`str`
+- 默认值：`auto`
 
 #### quadrants
 
@@ -114,7 +123,7 @@ X/Z 坐标轴与区块边界重合，因此每个区块只会属于一个象限
 | `(-X,-Z)` | `flat` | `false` | `minecraft:the_void`，空层 |
 | `(+X,-Z)` | `flat` | `false` | 主世界 `minecraft:plains`，一层白色染色玻璃；下界 `minecraft:nether_wastes`，一层白色染色玻璃 |
 
-Minecraft 1.14.4–1.15.2 的下界默认群系为 `minecraft:nether`。
+随包资源使用 `minecraft:nether_wastes`；在 Minecraft 1.14.4–1.15.2 中，加载器会在校验前将这个默认 ID 转换为当时使用的 `minecraft:nether`。
 
 - 类型：`Map[str, 象限配置]`
 
@@ -199,4 +208,3 @@ Minecraft 1.14.4–1.15.2 的下界默认群系为 `minecraft:nether`。
 所有层厚度之和不能超过该维度的可建造高度，否则 Mod 会报错
 
 - 类型：`int`
-
