@@ -20,7 +20,7 @@
 
 package me.fallenbreath.quadragen.runtime;
 
-import me.fallenbreath.quadragen.QuadraGen;
+import me.fallenbreath.quadragen.QuadraGenMod;
 import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import me.fallenbreath.quadragen.config.ConfigValidationException;
 import me.fallenbreath.quadragen.config.ConfigValueResolver;
@@ -66,7 +66,7 @@ public final class LevelBootstrap
 
 	public static void install(ServerLevel level)
 	{
-		QuadraGenConfig config = QuadraGen.getConfig();
+		QuadraGenConfig config = QuadraGenMod.getConfig();
 		String dimensionId =
 				//#if MC >= 1.16.5
 				ResourceKeyCompat.identifier(level.dimension());
@@ -75,12 +75,12 @@ public final class LevelBootstrap
 				//#endif
 		if (!config.isEnabled())
 		{
-			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: globally disabled", dimensionId);
+			QuadraGenMod.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: globally disabled", dimensionId);
 			return;
 		}
 		if (level.getServer().isSingleplayer() && !config.isEnabledInSingleplayer())
 		{
-			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: disabled in singleplayer", dimensionId);
+			QuadraGenMod.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: disabled in singleplayer", dimensionId);
 			return;
 		}
 
@@ -99,19 +99,19 @@ public final class LevelBootstrap
 		}
 		else
 		{
-			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: unsupported dimension", dimensionId);
+			QuadraGenMod.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: unsupported dimension", dimensionId);
 			return;
 		}
 		if (!dimensionConfig.isEnabled())
 		{
-			QuadraGen.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: disabled by dimension config", dimensionId);
+			QuadraGenMod.LOGGER.info("Quadra Gen world-generation routing is not installed for {}: disabled by dimension config", dimensionId);
 			return;
 		}
 
 		ChunkGenerator generator = level.getChunkSource().getGenerator();
 		if (!isSupportedNoiseGenerator(dimensionKind, generator))
 		{
-			QuadraGen.LOGGER.info(
+			QuadraGenMod.LOGGER.info(
 					"Quadra Gen world-generation routing is not installed for {}: unsupported generator {}",
 					dimensionId,
 					generator.getClass().getName()
@@ -135,7 +135,7 @@ public final class LevelBootstrap
 		LevelContext context = new LevelContext(resolved, (NoiseBasedChunkGenerator)generator, dimensionConfig.getAdvertisedWorldType());
 		((ServerLevelContextAccess)level).setLevelContext$quadragen(context);
 		((GeneratorContextAccess)generator).setLevelContext$quadragen(context);
-		QuadraGen.LOGGER.info("Quadra Gen world-generation routing installed for {}", dimensionId);
+		QuadraGenMod.LOGGER.info("Quadra Gen world-generation routing installed for {}", dimensionId);
 	}
 
 	private static FlatGenerationPlan resolveFlat(ServerLevel level, String dimensionPath, Quadrant quadrant, FlatConfig raw)

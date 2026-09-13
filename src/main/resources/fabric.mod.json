@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.fallenbreath.quadragen.QuadraGen"
+      "me.fallenbreath.quadragen.QuadraGenMod"
     ]
   },
   "mixins": [

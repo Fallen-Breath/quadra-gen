@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 //$$ import org.apache.logging.log4j.Logger;
 //#endif
 
-public class QuadraGen implements ModInitializer
+public class QuadraGenMod implements ModInitializer
 {
 	public static final Logger LOGGER =
 			//#if MC >= 11802

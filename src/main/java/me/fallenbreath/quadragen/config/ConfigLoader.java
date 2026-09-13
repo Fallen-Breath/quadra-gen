@@ -22,7 +22,7 @@ package me.fallenbreath.quadragen.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.fallenbreath.quadragen.QuadraGen;
+import me.fallenbreath.quadragen.QuadraGenMod;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -43,14 +43,14 @@ public final class ConfigLoader
 
 	public static QuadraGenConfig loadOrCreate()
 	{
-		Path configPath = FabricLoader.getInstance().getConfigDir().resolve(QuadraGen.MOD_ID).resolve("config.json");
+		Path configPath = FabricLoader.getInstance().getConfigDir().resolve(QuadraGenMod.MOD_ID).resolve("config.json");
 		try
 		{
 			if (Files.notExists(configPath))
 			{
 				Files.createDirectories(configPath.getParent());
 				copyDefault(configPath);
-				QuadraGen.LOGGER.info("Created default config at {}", configPath.toAbsolutePath());
+				QuadraGenMod.LOGGER.info("Created default config at {}", configPath.toAbsolutePath());
 			}
 			try (Reader reader = Files.newBufferedReader(configPath, StandardCharsets.UTF_8))
 			{
