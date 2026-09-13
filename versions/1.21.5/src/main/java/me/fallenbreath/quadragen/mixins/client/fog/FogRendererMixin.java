@@ -26,7 +26,8 @@ import org.spongepowered.asm.mixin.Mixin;
 /**
  * mc >= 1.21.8: subproject 26.2 (main project)
  * mc in [1.21.5, 1.21.8): subproject 1.21.5                    <--------
- * mc < 1.21.5: subproject 1.21.4
+ * mc in [1.21.1, 1.21.5): subproject 1.21.4
+ * mc < 1.21.1: subproject 1.20.6
  * <p>
  * 1.21.5 has no {@code ClientLevel.ClientLevelData#voidDarknessOnsetRange()};
  * the fog renderer does not query a position-dependent void darkness range in this version.
