@@ -18,27 +18,13 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.mixins.client.weather;
+package me.fallenbreath.quadragen.mixins.client.level;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
-import net.minecraft.client.renderer.WeatherEffectRenderer;
-import net.minecraft.core.BlockPos;
+import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
 
-/**
- */
-@Mixin(WeatherEffectRenderer.class)
-public abstract class WeatherEffectRendererMixin
+/** No client precipitation sea-level hook exists in this version range. */
+@Mixin(DummyClass.class)
+public abstract class LevelMixin
 {
-	@ModifyExpressionValue(
-			method = "getPrecipitationAt(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/biome/Biome$Precipitation;",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
-	)
-	private int useQuadrantSeaLevel(int original, @Local(argsOnly = true) BlockPos pos)
-	{
-		return ClientSyncQuery.getSeaLevelAt(pos, original);
-	}
 }

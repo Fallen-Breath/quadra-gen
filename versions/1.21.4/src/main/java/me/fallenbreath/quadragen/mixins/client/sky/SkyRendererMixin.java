@@ -5,9 +5,17 @@
  * Copyright (C) 2026  Fallen_Breath and contributors
  *
  * Quadra Gen is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License v3.0
- * as published by the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * Quadra Gen is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package me.fallenbreath.quadragen.mixins.client.sky;
@@ -17,26 +25,17 @@ import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/**
- * <p>
- * 1.21.4 keeps the dark-disc decision in {@link LevelRenderer}, rather than in {@code SkyRenderer}.
- */
 @Mixin(LevelRenderer.class)
 public abstract class SkyRendererMixin
 {
-	@ModifyExpressionValue(
-			method = "shouldRenderDarkDisc(F)Z",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"
-			)
-	)
+	@ModifyExpressionValue(method = "shouldRenderDarkDisc(F)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"))
 	private double useQuadrantHorizonHeight(double original, @Local(argsOnly = true) float deltaPartialTick)
 	{
-		var eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
+		Vec3 eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
 		return ClientSyncQuery.getHorizonHeight(Minecraft.getInstance().level, original, eyePosition.x, eyePosition.z);
 	}
 }

@@ -29,17 +29,10 @@ import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/**
- * <p>
- * 1.21.5 performs the block-level precipitation check directly in {@code isRainingAt}.
- */
 @Mixin(Level.class)
 public abstract class LevelMixin
 {
-	@ModifyExpressionValue(
-			method = "isRainingAt(Lnet/minecraft/core/BlockPos;)Z",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
-	)
+	@ModifyExpressionValue(method = "isRainingAt(Lnet/minecraft/core/BlockPos;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I"))
 	private int useQuadrantSeaLevel(int original, @Local(argsOnly = true) BlockPos pos)
 	{
 		Level level = (Level)(Object)this;

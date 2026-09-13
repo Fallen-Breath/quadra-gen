@@ -36,14 +36,32 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class FogRendererMixin
 {
 	@ModifyExpressionValue(
+			//#if MC >= 1.21.5
 			method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
+			//#elseif MC >= 1.21.3
+			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
+			//#else
+			//$$ method = "setupColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)V",
+			//#endif
 			at = @At(
 					value = "INVOKE",
+					//#if MC >= 1.18.2
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()F"
+					//#else
+					//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()D"
+					//#endif
 			)
 	)
+	//#if MC >= 1.18.2
 	private static float useQuadrantClearColorScale(float original, @Local(argsOnly = true) Camera camera)
+	//#else
+	//$$ private static double useQuadrantClearColorScale(double original, @Local(argsOnly = true) Camera camera)
+	//#endif
 	{
+		//#if MC >= 1.18.2
 		return ClientSyncQuery.getClearColorScale(original, camera.getPosition().x, camera.getPosition().z);
+		//#else
+		//$$ return ClientSyncQuery.getClearColorScale((float) original, camera.getPosition().x, camera.getPosition().z);
+		//#endif
 	}
 }

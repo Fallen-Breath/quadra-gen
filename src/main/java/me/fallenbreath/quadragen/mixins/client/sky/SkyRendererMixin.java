@@ -24,30 +24,62 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.ClientSyncQuery;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.SkyRenderer;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+//#if MC >= 1.21.10
+import net.minecraft.client.renderer.SkyRenderer;
+//#else
+//$$ import net.minecraft.client.renderer.LevelRenderer;
+//#endif
+
 /**
  */
+//#if MC >= 1.21.10
 @Mixin(SkyRenderer.class)
+//#else
+//$$ @Mixin(LevelRenderer.class)
+//#endif
 public abstract class SkyRendererMixin
 {
 	@ModifyExpressionValue(
+			//#if MC >= 1.21.10
 			method = "shouldRenderDarkDisc(FLnet/minecraft/client/multiplayer/ClientLevel;)Z",
+			//#elseif MC >= 1.21.4
+			//$$ method = "shouldRenderDarkDisc(F)Z",
+			//#elseif MC >= 1.20.6
+			//$$ method = "renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+			//#elseif MC >= 1.19.4
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+			//#elseif MC >= 1.18.2
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+			//#elseif MC >= 1.17.1
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLjava/lang/Runnable;)V",
+			//#elseif MC >= 1.15.2
+			//$$ method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+			//#else
+			//$$ method = "renderSky(F)V",
+			//#endif
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"
+				//#if MC >= 1.17.1
+				target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"
+				//#elseif MC >= 1.16.5
+				//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight()D"
+				//#elseif MC >= 1.15.2
+				//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel;getHorizonHeight()D"
+				//#else
+				//$$ target = "Lnet/minecraft/client/multiplayer/MultiPlayerLevel;getHorizonHeight()D"
+				//#endif
 			)
 	)
 	private double useQuadrantHorizonHeight(
 			double original,
-			@Local(argsOnly = true) float deltaPartialTick,
-			@Local(argsOnly = true) ClientLevel level
+			@Local(argsOnly = true) float deltaPartialTick
 	)
 	{
-		var eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
-		return ClientSyncQuery.getHorizonHeight(level, original, eyePosition.x, eyePosition.z);
+		Vec3 eyePosition = Minecraft.getInstance().player.getEyePosition(deltaPartialTick);
+		return ClientSyncQuery.getHorizonHeight(Minecraft.getInstance().level, original, eyePosition.x, eyePosition.z);
 	}
 }

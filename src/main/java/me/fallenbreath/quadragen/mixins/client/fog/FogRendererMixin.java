@@ -41,14 +41,19 @@ public abstract class FogRendererMixin
 			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
 			//#elseif MC >= 1.21.8
 			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IFZ)Lorg/joml/Vector4f;",
-			//#else
-			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
+			//#elseif MC >= 1.16.5
+			//$$ method = "setupColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)V",
 			//#endif
 			at = @At(
 					value = "INVOKE",
+					//#if MC >= 1.21.8
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;voidDarknessOnsetRange()F"
+					//#else
+					//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()F"
+					//#endif
 			)
 	)
+	//#if MC >= 1.21.8
 	private float useQuadrantVoidDarknessRange(
 			float original,
 			@Local(argsOnly = true) Camera camera
@@ -56,4 +61,15 @@ public abstract class FogRendererMixin
 	{
 		return ClientSyncQuery.getVoidDarknessOnsetRange(original, camera.position().x, camera.position().z);
 	}
+	//#elseif MC >= 1.18.2
+	//$$ private static float useQuadrantClearColorScale(float original, @Local(argsOnly = true) Camera camera)
+	//$$ {
+	//$$ 	return ClientSyncQuery.getClearColorScale(original, camera.getPosition().x, camera.getPosition().z);
+	//$$ }
+	//#elseif MC >= 1.16.5
+	//$$ private static double useQuadrantClearColorScale(double original, @Local(argsOnly = true) Camera camera)
+	//$$ {
+	//$$ 	return ClientSyncQuery.getClearColorScale((float) original, camera.getPosition().x, camera.getPosition().z);
+	//$$ }
+	//#endif
 }
