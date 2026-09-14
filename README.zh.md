@@ -40,55 +40,8 @@ Quadra Gen 是一个为创造服设计的 mod，能让单个维度的四个象�
 ## 使用
 
 1. 下载 Quadra Gen 的发布版 mod jar，放入服务器的 `mods` 文件夹中。
-2. 若要自定义各维度/象限的布局，请在创建世界前准备好或编辑 `config/quadragen/config.json`。若配置文件不存在，Quadra Gen 会自动创建一份默认的配置并启用。
+2. 若要自定义各维度/象限的布局，请在创建世界前准备好或编辑 `config/quadragen/config.json`。若配置文件不存在，Quadra Gen 会把随包提供的[默认配置](src/main/resources/default_config.json)复制到该位置并启用。
 3. 启动服务器并创建世界，即可享受 Quadra Gen 生成的，不同象限不同地形的世界。
-
-默认配置大致如下：
-
-```json5
-{
-  "schema_version": 1,
-  "enabled": true,
-  "enabled_in_singleplayer": false,
-  "overworld": {
-    "enabled": true,
-    "quadrants": {
-      "x_positive_z_positive": {
-        "generator": "noise",
-        "clear_generated_content": false
-      },
-      "x_negative_z_positive": {
-        "generator": "noise",
-        "clear_generated_content": true
-      },
-      "x_negative_z_negative": {
-        "generator": "flat",
-        "clear_generated_content": false,
-        "flat": {
-          "biome": "minecraft:the_void",
-          "layers": []
-        }
-      },
-      "x_positive_z_negative": {
-        "generator": "flat",
-        "clear_generated_content": false,
-        "flat": {
-          "biome": "minecraft:plains",
-          "layers": [
-            {
-              "block": "minecraft:white_stained_glass",
-              "count": 1
-            }
-          ]
-        }
-      }
-    }
-  },
-  "nether": {
-    /* 与 overworld 相同 */
-  }
-}
-```
 
 配置文件格式详情见 [docs/config.zh.md](docs/config.zh.md)
 
