@@ -16,7 +16,7 @@ The four quadrants still belong to the same vanilla dimension. They share time, 
 
 Installation requirements:
 
-- Multiplayer: only the server needs the mod; vanilla clients can connect directly and need no client-side content;
+- Multiplayer: the server must have the mod, and the client installation is optional. Clients without it can join directly, and installing it improves client-side details such as horizon height;
 - Singleplayer: the same functionality runs through the integrated server, but it is disabled by default and must be explicitly enabled in the configuration.
 
 ## 2. Scope
@@ -32,7 +32,7 @@ The feature takes effect only when all of the following hold. If any condition i
 3. The independent switch of that dimension is enabled;
 4. That dimension uses a supported vanilla natural terrain.
 
-The configuration is read only once at mod startup; hot reload is not supported.
+The configuration is read only once at mod startup; hot reload is not supported. See the [configuration reference](config.md) for its fields and defaults.
 
 A world created with the vanilla Flat world type is neither brought under management automatically nor converted automatically. See section 13.
 
@@ -162,7 +162,7 @@ Base terrain has a strict boundary: Flat or clear chunks do not generate Noise b
 
 Structures and decoration follow the vanilla neighbor-generation range without per-block hard clipping. Limited cross-boundary content such as tree edges or structure corners may appear near the axes; its range is decided by the vanilla generation behavior of the corresponding version, and it does not form a channel that continuously pollutes other quadrants from a distance.
 
-In Minecraft 26.2, vanilla surface generation consults the actual biomes of the target chunk and its surrounding chunks. Noise chunks next to the axes may therefore be locally affected by the biomes of an adjacent Flat quadrant (only when those biomes also belong to the current dimension's natural biome set). The other target versions do not have this behavior.
+In Minecraft 26.2 and above, vanilla surface generation consults the actual biomes of the target chunk and its surrounding chunks. Noise chunks next to the axes may therefore be locally affected by the biomes of an adjacent Flat quadrant (only when those biomes also belong to the current dimension's natural biome set). The other target versions do not have this behavior.
 
 The runtime world state has no quadrant walls: entities, player-placed blocks, fluids, explosions, redstone, POI, raids, and portals can all cross the axes.
 
@@ -174,27 +174,62 @@ The two Noise modes always use the vanilla natural sea level of the current dime
 
 ### 9.2 At Runtime
 
-Runtime sea levels within one dimension are distinguished per quadrant only when a check carries explicit X/Z coordinates. Coordinate-free dimension-level queries keep returning the underlying Noise value, and do not infer the quadrant from the nearest player, the current task, or other implicit state.
+The two terrain types have their own sea levels: a Flat quadrant uses the sea level of the vanilla Flat world of the corresponding version, and a Noise quadrant uses the natural sea level of the dimension. Which one a check gets depends on whether it has a position:
+
+- A check with explicit X/Z coordinates uses the sea level of the quadrant at that position, so a Flat quadrant behaves like a vanilla Flat world there, and a Noise quadrant like a vanilla natural world;
+- A check without coordinates keeps the dimension-level natural value, and never infers the quadrant from the nearest player, the current task, or other implicit state.
+
+The checks that use the sea level as a threshold include precipitation and weather, snow and freezing, and underwater and aquatic rules. `clear_generated_content` does not change the sea level semantics.
 
 | Minecraft version | Runtime behavior |
 | --- | --- |
-| 1.14.4–1.21.1 | The vanilla runtime world interfaces expose a fixed dimension-level sea level that does not distinguish Noise from Flat; the related checks keep that vanilla value |
-| 1.21.3 and above | Server-side precipitation and weather, freezing and snowing, aquatic mob spawning, part of aquatic mob AI, phantom spawning, and phantom AI with explicit coordinates use the Noise or Flat sea level according to the quadrant |
+| 1.14.4–1.21.1 | The two terrain types are not distinguished; every check keeps the dimension-level natural value |
+| 1.21.3 and above | Checks with explicit coordinates follow the quadrant |
 | 1.21.11 and above | On top of the previous row, the Nautilus spawn-height check also follows the quadrant |
 
 In the target versions of 1.21.3 and above, the vanilla Flat sea level is `-63`; the Overworld and Nether Noise values come from their respective natural generation settings, usually `63` and `32`.
 
 ### 9.3 Client Visibility
 
-Vanilla clients still receive only one dimension-level sea level, and Quadra Gen does not extend the network protocol. Server-side checks with explicit coordinates can therefore follow the quadrant, while client-side weather rendering and third-party logic that directly reads the dimension-level sea level may still see the Noise value.
+A client receives one dimension-level sea level, so the client-side checks that read it keep using the natural value, even inside a Flat quadrant. The client-side behavior of the two terrain types is described in section 10.
 
-## 10. Mob Spawning
+## 10. Client-side Behavior
 
-### 10.1 During World Generation
+### 10.1 Vanilla Clients
+
+A client without the mod receives one dimension-level world type, so it presents one client-side appearance for the whole dimension: Flat or Noise according to that world type, with no switching at the quadrant axes until the next login, respawn, or dimension change.
+
+The advertised world type decides the client-side Flat or Noise appearance, such as the horizon and the dark disc of the sky, and the void fog from 1.16.5. The sea level stays the natural one of the dimension: the save still records the vanilla Noise dimension, so a vanilla client inside a Flat quadrant keeps the natural sea level for its local precipitation and freezing checks (see 9.3).
+
+When the mod is absent on the server, or the dimension is disabled or unsupported, the advertised world type is the vanilla one, and clients behave as in an ordinary vanilla world.
+
+### 10.2 Advertised World Type
+
+Each dimension advertises a world type to its clients through `advertised_world_type`. `flat` always advertises Flat, `noise` always advertises Noise, and `auto` advertises according to the quadrant the player is in at that moment: the two Flat modes advertise Flat, and the two Noise modes advertise Noise. The value is computed at login, respawn, and dimension change, and stays unchanged afterwards.
+
+This advertisement affects clients only. Generation, mob spawning, and sea-level checks on the server do not depend on it.
+
+### 10.3 Clients with the Mod Installed
+
+Installing the mod on the client enables per-quadrant client-side behavior. The client requests the effective state of the current dimension at login and at respawn, and drops it on disconnect; the state is not re-sent per tick or per chunk.
+
+The synchronized state carries whether the dimension is actually managed, which quadrants are Flat, and the sea level of each Flat quadrant. `clear_generated_content` is not part of it: the two Flat modes share one client-side appearance, and the two Noise modes share the other. Client-side logic then picks the value by the coordinates it queries, instead of following the single advertised world type:
+
+| Client-side appearance | Versions |
+| --- | --- |
+| Horizon and dark disc of the sky | All supported versions |
+| Void fog | 1.16.5 and above |
+| Precipitation | 1.21.3 and above |
+
+This per-quadrant behavior applies only to a dimension that is actually managed. A client on a server without the mod, or on a disabled or unsupported dimension, falls back to the behavior described in 10.1.
+
+## 11. Mob Spawning
+
+### 11.1 During World Generation
 
 Noise quadrants keep the mob generation that happens during vanilla chunk generation; Noise clear, Flat, and Flat clear place no mobs while new chunks are generated.
 
-### 10.2 Runtime Natural Spawning
+### 11.2 Runtime Natural Spawning
 
 Runtime natural spawning is still managed by vanilla uniformly, and shares one cap within the same dimension. Candidate results depend on the biome stored in the chunk, valid structure ranges, actual blocks, fluids, light, and heightmaps:
 
@@ -203,7 +238,7 @@ Runtime natural spawning is still managed by vanilla uniformly, and shares one c
 - Flat: uses the configured biome and the surface that was actually placed;
 - Flat clear: uses the configured biome, but must still satisfy the vanilla spawning conditions in the real world.
 
-### 10.3 Special Events and Version Differences
+### 11.3 Special Events and Version Differences
 
 Phantoms, patrols, cats, village sieges, and wandering traders keep following the vanilla rules of the corresponding version. Empty layers, `minecraft:the_void`, or clear by themselves do not become extra phantom-disabling conditions; `minecraft:the_void` can still block ordinary biome mob spawning and wandering traders through vanilla biome rules.
 
@@ -214,7 +249,7 @@ Phantoms, patrols, cats, village sieges, and wandering traders keep following th
 
 Existing entities can cross quadrants freely. The mod does not delete, freeze, or reclassify an entity because it enters another terrain mode.
 
-## 11. Initial Spawn Point
+## 12. Initial Spawn Point
 
 Quadra Gen only adjusts the initial spawn selection of a brand-new Overworld. The spawn point of existing worlds is not recalculated, and the Nether does not take part in this feature.
 
@@ -225,52 +260,6 @@ Selection rules:
 - A safe non-clear Flat quadrant is currently not used as a fallback. If no ordinary Noise quadrant exists, the vanilla search center is kept.
 
 The mod does not create a spawn platform for an all-empty configuration, and does not log a special all-empty warning. If there is no fluid-free surface with a full top collision shape below the final spawn position, the bonus chest is disabled to avoid trying to generate it at an obviously unsafe position; the rest of the spawn search rules are still decided by the vanilla of the corresponding version.
-
-## 12. Configuration
-
-The configuration file is located at `config/quadragen/config.json`, and the current schema version is `1`. When the file does not exist, the mod copies the bundled `src/main/resources/default_config.json` into place. See the [configuration reference](config.md) for the values and defaults of every field.
-
-Configuration hierarchy:
-
-```text
-Global configuration
-├── schema_version
-├── enabled
-├── enabled_in_singleplayer
-├── overworld
-│   ├── enabled
-│   ├── advertised_world_type
-│   └── four quadrants
-└── nether
-    ├── enabled
-    ├── advertised_world_type
-    └── four quadrants
-```
-
-Each dimension declares `enabled`, `advertised_world_type`, and four quadrants. Each quadrant must declare `generator` and `clear_generated_content`. When `flat` is chosen, the fixed biome and the complete layer list must also be provided; when `noise` is chosen, no Flat configuration may be carried.
-
-The configuration is validated for fields understood by Quadra Gen:
-
-- Unknown fields are ignored; missing fields and invalid values are rejected;
-- `schema_version` must equal the current version;
-- All four quadrants are required;
-- `generator` can only be `noise` or `flat`;
-- Biomes and blocks must be valid and registered IDs;
-- Each layer thickness must be a positive integer;
-- The total layer height must not exceed the buildable range of the corresponding dimension.
-
-Biomes, blocks, and layer heights need to be validated against the actual dimension, so the validation only completes when the corresponding dimension is enabled and the world type is supported. Disabled or unsupported dimensions do not get their Flat content parsed.
-
-The default configuration enables the master switch and both dimensions, and disables singleplayer support. The two dimensions use the same mode layout:
-
-| Quadrant | Default mode | Overworld configuration | Nether configuration |
-| --- | --- | --- | --- |
-| `(+X,+Z)` | Noise | Vanilla Overworld natural terrain | Vanilla Nether natural terrain |
-| `(-X,+Z)` | Noise clear | An empty area keeping Overworld natural semantics | An empty area keeping Nether natural semantics |
-| `(-X,-Z)` | Flat | `minecraft:the_void`, empty layers | `minecraft:the_void`, empty layers |
-| `(+X,-Z)` | Flat | `minecraft:plains`, one layer of white stained glass | `minecraft:nether_wastes`, one layer of white stained glass |
-
-In Minecraft 1.14.4–1.15.2, the default Nether biome ID is `minecraft:nether`, the ID used at that time.
 
 ## 13. Save Files and Existing Worlds
 
@@ -304,14 +293,16 @@ The project currently covers the following Minecraft versions:
 - 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.8, 1.21.10, 1.21.11;
 - 26.1.2, 26.2, 26.3.
 
-Except for the version differences listed below, all versions provide the same four-quadrant configuration model and terrain semantics. World height, Nether biome names, biome-locating methods, runtime sea levels, and part of the vanilla special mob-spawning behaviors change with Minecraft itself, and Quadra Gen follows the vanilla Noise or Flat behavior of the corresponding version.
+Except for the version differences listed below, all versions provide the same four-quadrant configuration model and terrain semantics. World height, Nether biome names, biome-locating methods, runtime sea levels, client-side appearance, and part of the vanilla special mob-spawning behaviors change with Minecraft itself, and Quadra Gen follows the vanilla Noise or Flat behavior of the corresponding version.
 
 | Difference | Versions | Details |
 | --- | --- | --- |
 | World height and minimum buildable height | Varies with vanilla | Decides the starting Y and the layer height limit of Flat |
 | Default Nether biome ID | 1.14.4–1.15.2 | Uses the `minecraft:nether` ID of that time |
 | Biome locating | None in 1.14.4–1.15.2; 2D in 1.16.5–1.18.2; 3D in 1.19.4 and above | See 6.2 |
-| Reserved chunks at the axes for the initial spawn | 16 in 1.14.4–1.17.1; 5 in 1.18.2 and above | See section 11 |
+| Reserved chunks at the axes for the initial spawn | 16 in 1.14.4–1.17.1; 5 in 1.18.2 and above | See section 12 |
 | Runtime sea level | Per quadrant from 1.21.3; also covers the Nautilus from 1.21.11 | See 9.2 |
-| Neighbor biome reference in surface generation | 26.2 | See section 8 |
-| Special spawners and slime suppression | 1.14.4–1.15.2 | See 10.3 |
+| Client void fog | 1.16.5 and above | See 10.3 |
+| Client precipitation | 1.21.3 and above | See 10.3 |
+| Neighbor biome reference in surface generation | 26.2 and above | See section 8 |
+| Special spawners and slime suppression | 1.14.4–1.15.2 | See 11.3 |
