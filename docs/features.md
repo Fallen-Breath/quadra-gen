@@ -10,9 +10,9 @@ Core model:
 
 - The Overworld or the Nether is divided into four quadrants along the X/Z axes, with the origin fixed at `(0, 0)`;
 - Each quadrant picks one terrain type: the vanilla natural terrain of the current dimension, or flat terrain made of a fixed biome and fixed block layers;
-- Either terrain type can have its actual content generation turned off, which yields an empty area that keeps the terrain semantics.
+- Either terrain type can have its actual content generation turned off, which yields empty terrain that keeps the terrain semantics.
 
-The four quadrants still belong to the same vanilla dimension. They share time, weather, difficulty, game rules, the world border, the player list, and the entity cap; redstone, fluids, block events, POI, raids, entity AI, and portals are not isolated per quadrant either. Quadra Gen changes only how new chunks are generated and the query results directly related to the terrain type.
+The four quadrants still belong to the same vanilla dimension. They share time, weather, difficulty, game rules, the world border, the player list, and the mob cap; redstone, fluids, block events, POI, raids, entity AI, and portals are not isolated per quadrant either. Quadra Gen changes only how new chunks are generated and the query results directly related to the terrain type.
 
 Installation requirements:
 
@@ -25,7 +25,7 @@ The Overworld and the Nether are supported, and each can be enabled or disabled 
 
 A managed dimension must use the vanilla natural terrain of the corresponding version as its underlying world type: the Overworld uses the vanilla Overworld Noise terrain, and the Nether uses the vanilla Nether Noise terrain. Generators whose underlying type is not vanilla Noise do not enable this feature; compatibility with third-party generators that extend the vanilla Noise type is not guaranteed.
 
-The feature takes effect only when all of the following hold. If any condition is unmet, the mod does not touch that dimension at all:
+A dimension is managed only when all of the following hold. If any condition is unmet, the mod does not manage that dimension at all:
 
 1. The master switch is enabled;
 2. In singleplayer, the singleplayer switch is enabled;
@@ -34,7 +34,7 @@ The feature takes effect only when all of the following hold. If any condition i
 
 The configuration is read only once at mod startup; hot reload is not supported. See the [configuration reference](config.md) for its fields and defaults.
 
-A world created with the vanilla Flat world type is neither brought under management automatically nor converted automatically. See section 13.
+A save whose underlying world type is the vanilla Flat one is neither brought under management automatically nor converted automatically. See section 13.
 
 ## 3. Quadrant Division
 
@@ -77,7 +77,7 @@ The Overworld and the Nether each use their own natural-generation rules. The Ne
 
 ### 4.2 Noise clear
 
-Noise clear is an empty area that keeps natural world semantics: new chunks still store the vanilla natural biome and keep the theoretical heights, theoretical block columns, and structure data of the vanilla natural terrain, but generate no natural terrain blocks, structure content, decoration, or worldgen mobs.
+Noise clear is empty terrain that keeps natural world semantics: new chunks still store the vanilla natural biome and keep the theoretical heights, theoretical block columns, and structure data of the vanilla natural terrain, but generate no natural terrain blocks, structure content, decoration, or worldgen mobs.
 
 The kept structure data continues to take part in vanilla mechanics such as structure-range mob spawning, maps, and explored-structure counts, regardless of whether the chunk is currently empty.
 
@@ -197,9 +197,9 @@ A client receives one dimension-level sea level, so the client-side checks that 
 
 ### 10.1 Vanilla Clients
 
-A client without the mod receives one dimension-level world type, so it presents one client-side appearance for the whole dimension: Flat or Noise according to that world type, with no switching at the quadrant axes until the next login, respawn, or dimension change.
+A client without the mod receives a single advertised world type for the dimension, so it presents one client-side appearance for the whole dimension: Flat or Noise according to that type, with no switching at the quadrant axes until the next login, respawn, or dimension change.
 
-The advertised world type decides the client-side Flat or Noise appearance, such as the horizon and the dark disc of the sky, and the void fog from 1.16.5. The sea level stays the natural one of the dimension: the save still records the vanilla Noise dimension, so a vanilla client inside a Flat quadrant keeps the natural sea level for its local precipitation and freezing checks (see 9.3).
+The advertised world type decides the client-side Flat or Noise appearance, such as the horizon and the dark disc of the sky, and the void fog from 1.16.5. The sea level stays the natural one of the dimension: the save still records the underlying world type of the dimension as the vanilla Noise one, so a vanilla client inside a Flat quadrant keeps the natural sea level for its local precipitation and freezing checks (see 9.3).
 
 When the mod is absent on the server, or the dimension is disabled or unsupported, the advertised world type is the vanilla one, and clients behave as in an ordinary vanilla world.
 
@@ -231,7 +231,7 @@ Noise quadrants keep the mob generation that happens during vanilla chunk genera
 
 ### 11.2 Runtime Natural Spawning
 
-Runtime natural spawning is still managed by vanilla uniformly, and shares one cap within the same dimension. Candidate results depend on the biome stored in the chunk, valid structure ranges, actual blocks, fluids, light, and heightmaps:
+Runtime natural spawning is still managed by vanilla uniformly, and shares one mob cap within the same dimension. Candidate results depend on the biome stored in the chunk, valid structure ranges, actual blocks, fluids, light, and heightmaps:
 
 - Noise: identical to an ordinary vanilla natural world;
 - Noise clear: usually no valid spawning positions while completely empty; after players build an environment, mobs can spawn according to the natural biome and structure ranges;
@@ -265,7 +265,7 @@ The mod does not create a spawn platform for an all-empty configuration, and doe
 
 ### 13.1 Data Format
 
-Chunks generated by Quadra Gen keep using the vanilla chunk, biome, structure, and entity data formats. The save still records the vanilla Noise world type of the corresponding dimension, and no Quadra Gen-specific generator, biome, or chunk data is required.
+Chunks generated by Quadra Gen keep using the vanilla chunk, biome, structure, and entity data formats. The save still records the underlying world type of the corresponding dimension as the vanilla Noise one, and no Quadra Gen-specific generator, biome, or chunk data is required.
 
 Therefore:
 
@@ -282,7 +282,7 @@ In Minecraft 1.18.2 and above, when encountering old chunks that vanilla is upgr
 
 ### 13.3 Vanilla Flat Worlds
 
-Old worlds created with the vanilla Flat world type are not directly supported. To use Quadra Gen while keeping an existing flat design area, stop the server, make a full backup, and convert the world type of the target dimension to the same-version vanilla Noise while offline. The mod itself does not modify the dimension settings recorded in the save, nor does it perform this conversion.
+Old saves whose underlying world type is the vanilla Flat one are not directly supported. To use Quadra Gen while keeping an existing flat design area, stop the server, make a full backup, and convert the underlying world type of the target dimension to the same-version vanilla Noise while offline. The mod itself does not modify the dimension settings recorded in the save, nor does it perform this conversion.
 
 ## 14. Supported Versions
 

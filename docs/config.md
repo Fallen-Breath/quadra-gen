@@ -11,14 +11,14 @@ The configuration is read once at server startup. Changes take effect after rest
 
 ### Activation conditions
 
-Quadra Gen takes effect for a dimension only when all of the following hold:
+Quadra Gen manages a dimension only when all of the following hold:
 
 1. The root-level [`enabled`](#enabled) is `true`
 2. The world is not a singleplayer integrated server, or [`enabled_in_singleplayer`](#enabled_in_singleplayer) is `true`
 3. The dimension is the Overworld or the Nether, and the corresponding dimension's `enabled` is `true`
 4. The dimension uses the vanilla natural-terrain (Noise) generator of the corresponding version
 
-If any condition is not met, the dimension keeps vanilla behavior and Quadra Gen does not intervene.
+If any condition is not met, the dimension keeps vanilla behavior and is not managed.
 
 ### Root configuration
 
@@ -45,14 +45,14 @@ The format version of the configuration file. It must match the version required
 
 #### enabled
 
-The master switch of the mod. When set to `false`, Quadra Gen does not take effect in any dimension
+The master switch of the mod. When set to `false`, no dimension is managed
 
 - Type: `bool`
 - Default: `true`
 
 #### enabled_in_singleplayer
 
-Whether Quadra Gen takes effect in the singleplayer integrated server
+Whether Quadra Gen manages dimensions in the singleplayer integrated server
 
 Quadra Gen is designed for multiplayer servers, so it is disabled in singleplayer by default. Set it to `true` to use it in singleplayer worlds
 
@@ -144,14 +144,14 @@ The terrain generator used by this quadrant. Available values:
 
 | Value | Description |
 | --- | --- |
-| `noise` | The vanilla natural terrain of the current dimension (normal world) |
+| `noise` | The vanilla natural terrain of the current dimension |
 | `flat` | Flat terrain with a fixed biome and fixed block layers |
 
 - Type: `str`
 - Default: see the [default layout](#quadrants)
 #### clear_generated_content
 
-Whether to prevent this quadrant from placing new world-generation content (terrain blocks, structure content, decoration, worldgen entities, etc.)
+Whether to prevent this quadrant from placing new world-generation content (terrain blocks, structure content, decoration, worldgen mobs, etc.)
 
 When set to `true`, new chunks no longer generate the content of the corresponding terrain, but biomes, theoretical terrain, structure data, and terrain-related queries still follow the corresponding mode. It only affects the generation of new content and never clears or deletes anything that already exists
 
@@ -187,9 +187,9 @@ The fixed biome ID used by this quadrant. Must be a valid registered biome ID
 - Default: see the [default layout](#quadrants)
 #### layers
 
-The ordered list of block layers from bottom to top. The first layer starts at the dimension's minimum build height, and each following layer sits directly on top of the previous one
+The ordered list of block layers from bottom to top. The first layer starts at the dimension's minimum buildable height, and each following layer sits directly on top of the previous one
 
-An empty list is valid and produces a completely empty Flat area, without the initial platform of the vanilla Void preset
+An empty list is valid and produces completely empty Flat terrain, without the initial platform of the vanilla Void preset
 
 Layer placement follows the vanilla Flat generator of the corresponding version
 

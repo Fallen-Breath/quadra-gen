@@ -17,12 +17,12 @@ It lets one dimension contain natural terrain and flat terrain at the same time,
 
 With the default configuration, the four quadrants behave as follows:
 
-| Quadrant | Default mode  | Default result                                                                                    |
-|----------|---------------|---------------------------------------------------------------------------------------------------|
-| `+X, +Z` | Noise         | Normal vanilla terrain for the current dimension                                                  |
-| `-X, +Z` | Noise (clear) | Empty terrain that keeps vanilla biomes, theoretical terrain, and structure data                  |
-| `-X, -Z` | Flat          | Empty `minecraft:the_void` Flat terrain                                                           |
-| `+X, -Z` | Flat          | One layer of white stained glass; `minecraft:plains` in the Overworld, `minecraft:nether_wastes` in the Nether |
+| Quadrant | Default mode | Default result                                                                                                 |
+|----------|--------------|----------------------------------------------------------------------------------------------------------------|
+| `+X, +Z` | Noise        | Vanilla natural terrain of the current dimension                                                               |
+| `-X, +Z` | Noise clear  | Empty terrain that keeps vanilla biomes, theoretical terrain, and structure data                               |
+| `-X, -Z` | Flat         | Empty `minecraft:the_void` Flat terrain                                                                        |
+| `+X, -Z` | Flat         | One layer of white stained glass; `minecraft:plains` in the Overworld, `minecraft:nether_wastes` in the Nether |
 
 The Overworld and Nether have independent settings. The End and custom dimensions are not affected.
 
@@ -100,14 +100,14 @@ Enabling Quadra Gen on an existing world only affects newly generated chunks, wh
 
 The following table summarizes the expected behavior:
 
-| Situation                       | Quadra Gen action        | Existing chunks                    | New chunks / unfinished generation                          |
-|---------------------------------|--------------------------|------------------------------------|-------------------------------------------------------------|
-| Existing natural-terrain world  | Install the mod          | Kept as they are                   | Generated according to the current quadrant configuration   |
-| Existing vanilla Flat world     | Install the mod          | Kept as they are                   | Kept as they are. Quadra Gen does not support Flat worlds; convert the world to a vanilla Noise world type manually first if needed |
-| World generated with Quadra Gen | Remove the mod           | Kept as they are and remain readable | Generated with vanilla logic                                |
-| World generated with Quadra Gen | Change the configuration | Kept as they are                   | Generated according to the new configuration                |
+| Situation                      | Quadra Gen action        | Existing chunks                      | New chunks / unfinished generation                                                                                                            |
+|--------------------------------|--------------------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| Existing natural-terrain save  | Install the mod          | Kept as they are                     | Generated according to the current quadrant configuration                                                                                     |
+| Existing vanilla Flat save     | Install the mod          | Kept as they are                     | Kept as they are. Quadra Gen does not support Flat saves; convert its underlying world type to the vanilla Noise one manually first if needed |
+| Save generated with Quadra Gen | Remove the mod           | Kept as they are and remain readable | Generated with vanilla logic                                                                                                                  |
+| Save generated with Quadra Gen | Change the configuration | Kept as they are                     | Generated according to the new configuration                                                                                                  |
 
-Quadra Gen does not modify the save format, so worlds processed by Quadra Gen remain fully vanilla-compatible. Still, making a backup before changing anything is recommended.
+Quadra Gen does not modify the save format, so saves processed by Quadra Gen remain fully vanilla-compatible. Still, making a backup before changing anything is recommended.
 
 ### In-game behavior
 
