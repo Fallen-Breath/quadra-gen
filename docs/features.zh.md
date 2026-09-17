@@ -43,9 +43,9 @@ Quadra Gen 是一个 Fabric 世界生成 Mod，在同一个维度内提供四块
 | 配置键 | 坐标范围 |
 | --- | --- |
 | `x_positive_z_positive` | `x >= 0, z >= 0` |
+| `x_positive_z_negative` | `x >= 0, z < 0` |
 | `x_negative_z_positive` | `x < 0, z >= 0` |
 | `x_negative_z_negative` | `x < 0, z < 0` |
-| `x_positive_z_negative` | `x >= 0, z < 0` |
 
 两条坐标轴与区块边界重合，因此每个区块完整属于一个象限，单个区块内部不会拼接两种基础地形。
 

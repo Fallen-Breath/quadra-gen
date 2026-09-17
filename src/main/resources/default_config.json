@@ -14,14 +14,6 @@
           "layers": []
         }
       },
-      "x_negative_z_positive": {
-        "generator": "noise",
-        "clear_generated_content": true
-      },
-      "x_negative_z_negative": {
-        "generator": "noise",
-        "clear_generated_content": false
-      },
       "x_positive_z_negative": {
         "generator": "flat",
         "clear_generated_content": false,
@@ -34,6 +26,14 @@
             }
           ]
         }
+      },
+      "x_negative_z_positive": {
+        "generator": "noise",
+        "clear_generated_content": true
+      },
+      "x_negative_z_negative": {
+        "generator": "noise",
+        "clear_generated_content": false
       }
     }
   },
@@ -49,14 +49,6 @@
           "layers": []
         }
       },
-      "x_negative_z_positive": {
-        "generator": "noise",
-        "clear_generated_content": true
-      },
-      "x_negative_z_negative": {
-        "generator": "noise",
-        "clear_generated_content": false
-      },
       "x_positive_z_negative": {
         "generator": "flat",
         "clear_generated_content": false,
@@ -69,6 +61,14 @@
             }
           ]
         }
+      },
+      "x_negative_z_positive": {
+        "generator": "noise",
+        "clear_generated_content": true
+      },
+      "x_negative_z_negative": {
+        "generator": "noise",
+        "clear_generated_content": false
       }
     }
   }

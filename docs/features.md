@@ -43,9 +43,9 @@ The quadrant origin is fixed at `(0, 0)` and cannot be moved or rotated. Coordin
 | Config key | Coordinate range |
 | --- | --- |
 | `x_positive_z_positive` | `x >= 0, z >= 0` |
+| `x_positive_z_negative` | `x >= 0, z < 0` |
 | `x_negative_z_positive` | `x < 0, z >= 0` |
 | `x_negative_z_negative` | `x < 0, z < 0` |
-| `x_positive_z_negative` | `x >= 0, z < 0` |
 
 The two axes lie exactly on chunk boundaries, so each chunk belongs entirely to one quadrant, and two base terrain types are never spliced within a single chunk.
 

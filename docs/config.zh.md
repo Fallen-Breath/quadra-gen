@@ -78,9 +78,9 @@ Quadra Gen 面向多人服务器设计，因此单人游戏默认不启用。若
     "quadrants": {
         // 四个象限的配置，缺一不可。详见以下各节
         "x_positive_z_positive": {/* 象限配置 */},
+        "x_positive_z_negative": {/* 象限配置 */},
         "x_negative_z_positive": {/* 象限配置 */},
-        "x_negative_z_negative": {/* 象限配置 */},
-        "x_positive_z_negative": {/* 象限配置 */}
+        "x_negative_z_negative": {/* 象限配置 */}
     }
 }
 ```
@@ -108,9 +108,9 @@ Quadra Gen 面向多人服务器设计，因此单人游戏默认不启用。若
 | 键名 | 坐标范围 |
 | --- | --- |
 | `x_positive_z_positive` | `x >= 0, z >= 0` |
+| `x_positive_z_negative` | `x >= 0, z < 0` |
 | `x_negative_z_positive` | `x < 0, z >= 0` |
 | `x_negative_z_negative` | `x < 0, z < 0` |
-| `x_positive_z_negative` | `x >= 0, z < 0` |
 
 X/Z 坐标轴与区块边界重合，因此每个区块只会属于一个象限
 
@@ -119,9 +119,9 @@ X/Z 坐标轴与区块边界重合，因此每个区块只会属于一个象限
 | 象限 | `generator` | `clear_generated_content` | `flat` |
 | --- | --- | --- | --- |
 | `(+X,+Z)` | `flat` | `false` | `minecraft:the_void`，空层 |
+| `(+X,-Z)` | `flat` | `false` | 主世界 `minecraft:plains`，一层白色染色玻璃；下界 `minecraft:nether_wastes`，一层白色染色玻璃 |
 | `(-X,+Z)` | `noise` | `true` | — |
 | `(-X,-Z)` | `noise` | `false` | — |
-| `(+X,-Z)` | `flat` | `false` | 主世界 `minecraft:plains`，一层白色染色玻璃；下界 `minecraft:nether_wastes`，一层白色染色玻璃 |
 
 随包资源使用 `minecraft:nether_wastes`；在 Minecraft 1.14.4–1.15.2 中，加载器会在校验前将这个默认 ID 转换为当时使用的 `minecraft:nether`。
 

@@ -78,9 +78,9 @@ The End and custom dimensions are not supported, and Quadra Gen does not read or
     "quadrants": {
         // the configuration of all four quadrants, all required. See the sections below
         "x_positive_z_positive": {/* Quadrant configuration */},
+        "x_positive_z_negative": {/* Quadrant configuration */},
         "x_negative_z_positive": {/* Quadrant configuration */},
-        "x_negative_z_negative": {/* Quadrant configuration */},
-        "x_positive_z_negative": {/* Quadrant configuration */}
+        "x_negative_z_negative": {/* Quadrant configuration */}
     }
 }
 ```
@@ -108,9 +108,9 @@ The correspondence between keys and coordinate ranges:
 | Key | Coordinate range |
 | --- | --- |
 | `x_positive_z_positive` | `x >= 0, z >= 0` |
+| `x_positive_z_negative` | `x >= 0, z < 0` |
 | `x_negative_z_positive` | `x < 0, z >= 0` |
 | `x_negative_z_negative` | `x < 0, z < 0` |
-| `x_positive_z_negative` | `x >= 0, z < 0` |
 
 The X/Z axes align with chunk boundaries, so each chunk belongs to exactly one quadrant
 
@@ -119,9 +119,9 @@ The default quadrant layout is as follows (the `flat` column corresponds to the 
 | Quadrant | `generator` | `clear_generated_content` | `flat` |
 | --- | --- | --- | --- |
 | `(+X,+Z)` | `flat` | `false` | `minecraft:the_void`, empty layers |
+| `(+X,-Z)` | `flat` | `false` | Overworld: `minecraft:plains`, one layer of white stained glass; Nether: `minecraft:nether_wastes`, one layer of white stained glass |
 | `(-X,+Z)` | `noise` | `true` | — |
 | `(-X,-Z)` | `noise` | `false` | — |
-| `(+X,-Z)` | `flat` | `false` | Overworld: `minecraft:plains`, one layer of white stained glass; Nether: `minecraft:nether_wastes`, one layer of white stained glass |
 
 The bundled resource uses `minecraft:nether_wastes`; on Minecraft 1.14.4–1.15.2, the loader translates this default ID to the historical `minecraft:nether` ID before validation.
 
