@@ -46,12 +46,12 @@ public final class NbtCompat
 		//#endif
 	}
 
-	public static int[] getIntArray(CompoundTag tag, String key)
+	public static CompoundTag getCompoundOrEmpty(CompoundTag tag, String key)
 	{
 		//#if MC >= 1.21.5
-		return tag.getIntArray(key).orElse(new int[0]);
+		return tag.getCompoundOrEmpty(key);
 		//#else
-		//$$ return tag.contains(key) ? tag.getIntArray(key) : new int[0];
+		//$$ return tag.getCompound(key);
 		//#endif
 	}
 }

@@ -108,20 +108,15 @@ public final class ClientSyncQuery
 		}
 
 		Quadrant quadrant = Quadrant.fromCoordinates(pos.getX(), pos.getZ());
-		if (!isFlat(state, quadrant))
+		if (!state.isFlat(quadrant))
 		{
 			return original;
 		}
-		return state.getFlatSeaLevel(quadrant);
+		return state.getSeaLevel(quadrant);
 	}
 
 	private static boolean isFlat(ClientSyncState.State state, double x, double z)
 	{
-		return isFlat(state, Quadrant.fromCoordinates(Mth.floor(x), Mth.floor(z)));
-	}
-
-	private static boolean isFlat(ClientSyncState.State state, Quadrant quadrant)
-	{
-		return (state.getFlatQuadrants() & (1 << quadrant.ordinal())) != 0;
+		return state.isFlat(Quadrant.fromCoordinates(Mth.floor(x), Mth.floor(z)));
 	}
 }

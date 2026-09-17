@@ -24,9 +24,12 @@ import me.fallenbreath.quadragen.compat.NbtCompat;
 import me.fallenbreath.quadragen.core.Quadrant;
 import net.minecraft.nbt.CompoundTag;
 
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+
 public final class ClientSyncState
 {
-	private static final int QUADRANT_COUNT = 4;
 	private static volatile State state = State.inactive();
 
 	private ClientSyncState()
@@ -40,15 +43,10 @@ public final class ClientSyncState
 
 	public static void apply(CompoundTag data)
 	{
-		boolean active = NbtCompat.getBoolean(data, "active", false);
-		int flatQuadrants = NbtCompat.getInt(data, "flat_quadrants", 0) & ((1 << QUADRANT_COUNT) - 1);
-		int[] flatSeaLevels = NbtCompat.getIntArray(data, "flat_sea_levels");
-		int[] normalizedSeaLevels = new int[QUADRANT_COUNT];
-		for (int i = 0; i < normalizedSeaLevels.length && i < flatSeaLevels.length; i++)
-		{
-			normalizedSeaLevels[i] = flatSeaLevels[i];
-		}
-		state = new State(active, flatQuadrants, normalizedSeaLevels);
+		state = new State(
+				NbtCompat.getBoolean(data, "active", false),
+				readQuadrantInfos(NbtCompat.getCompoundOrEmpty(data, "quadrants"))
+		);
 	}
 
 	public static State getState()
@@ -56,22 +54,32 @@ public final class ClientSyncState
 		return state;
 	}
 
+	private static Map<Quadrant, QuadrantInfo> readQuadrantInfos(CompoundTag quadrants)
+	{
+		Map<Quadrant, QuadrantInfo> infos = new EnumMap<Quadrant, QuadrantInfo>(Quadrant.class);
+		for (Quadrant quadrant : Quadrant.values())
+		{
+			CompoundTag info = NbtCompat.getCompoundOrEmpty(quadrants, quadrant.getConfigKey());
+			boolean flat = NbtCompat.getBoolean(info, "is_flat", false);
+			infos.put(quadrant, new QuadrantInfo(flat, flat ? NbtCompat.getInt(info, "sea_level", 0) : 0));
+		}
+		return infos;
+	}
+
 	public static final class State
 	{
 		private final boolean active;
-		private final int flatQuadrants;
-		private final int[] flatSeaLevels;
+		private final Map<Quadrant, QuadrantInfo> quadrants;
 
-		private State(boolean active, int flatQuadrants, int[] flatSeaLevels)
+		private State(boolean active, Map<Quadrant, QuadrantInfo> quadrants)
 		{
 			this.active = active;
-			this.flatQuadrants = flatQuadrants;
-			this.flatSeaLevels = flatSeaLevels;
+			this.quadrants = Collections.unmodifiableMap(quadrants);
 		}
 
 		private static State inactive()
 		{
-			return new State(false, 0, new int[QUADRANT_COUNT]);
+			return new State(false, readQuadrantInfos(new CompoundTag()));
 		}
 
 		public boolean isActive()
@@ -79,19 +87,46 @@ public final class ClientSyncState
 			return this.active;
 		}
 
-		public int getFlatQuadrants()
+		public boolean isFlat(Quadrant quadrant)
 		{
-			return this.flatQuadrants;
+			return this.getInfo(quadrant).isFlat();
 		}
 
-		public int[] getFlatSeaLevels()
+		public int getSeaLevel(Quadrant quadrant)
 		{
-			return this.flatSeaLevels.clone();
+			return this.getInfo(quadrant).getSeaLevel();
 		}
 
-		public int getFlatSeaLevel(Quadrant quadrant)
+		private QuadrantInfo getInfo(Quadrant quadrant)
 		{
-			return this.flatSeaLevels[quadrant.ordinal()];
+			QuadrantInfo info = this.quadrants.get(quadrant);
+			if (info == null)
+			{
+				throw new IllegalArgumentException("Missing quadrant info " + quadrant);
+			}
+			return info;
+		}
+	}
+
+	private static final class QuadrantInfo
+	{
+		private final boolean flat;
+		private final int seaLevel;
+
+		private QuadrantInfo(boolean flat, int seaLevel)
+		{
+			this.flat = flat;
+			this.seaLevel = seaLevel;
+		}
+
+		private boolean isFlat()
+		{
+			return this.flat;
+		}
+
+		private int getSeaLevel()
+		{
+			return this.seaLevel;
 		}
 	}
 }

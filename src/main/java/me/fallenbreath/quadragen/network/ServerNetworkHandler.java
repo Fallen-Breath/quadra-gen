@@ -54,20 +54,20 @@ public final class ServerNetworkHandler
 			return new QuadraGenPacket(QuadraGenNetwork.GET_DIMENSION_STATE_RESPONSE, data);
 		}
 
-		int flatQuadrants = 0;
-		int[] flatSeaLevels = new int[Quadrant.values().length];
+		CompoundTag quadrants = new CompoundTag();
 		for (Quadrant quadrant : Quadrant.values())
 		{
 			QuadrantPlan plan = levelContext.getPlan(quadrant);
+			CompoundTag info = new CompoundTag();
+			info.putBoolean("is_flat", plan.isFlat());
 			if (plan.isFlat())
 			{
-				flatQuadrants |= 1 << quadrant.ordinal();
-				flatSeaLevels[quadrant.ordinal()] = plan.getFlat().getFlatGenerator().getSeaLevel();
+				info.putInt("sea_level", plan.getFlat().getFlatGenerator().getSeaLevel());
 			}
+			quadrants.put(quadrant.getConfigKey(), info);
 		}
 		data.putBoolean("active", true);
-		data.putInt("flat_quadrants", flatQuadrants);
-		data.putIntArray("flat_sea_levels", flatSeaLevels);
+		data.put("quadrants", quadrants);
 		return new QuadraGenPacket(QuadraGenNetwork.GET_DIMENSION_STATE_RESPONSE, data);
 	}
 }
