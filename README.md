@@ -20,9 +20,9 @@ With the default configuration, the four quadrants behave as follows:
 | Quadrant | Default mode | Default result                                                                                                 |
 |----------|--------------|----------------------------------------------------------------------------------------------------------------|
 | `+X, +Z` | Flat         | Empty `minecraft:the_void` Flat terrain                                                                        |
+| `+X, -Z` | Flat         | One layer of white stained glass; `minecraft:plains` in the Overworld, `minecraft:nether_wastes` in the Nether |
 | `-X, +Z` | Noise clear  | Empty terrain that keeps vanilla biomes, theoretical terrain, and structure data                               |
 | `-X, -Z` | Noise        | Vanilla natural terrain of the current dimension                                                               |
-| `+X, -Z` | Flat         | One layer of white stained glass; `minecraft:plains` in the Overworld, `minecraft:nether_wastes` in the Nether |
 
 The Overworld and Nether have independent settings. The End and custom dimensions are not affected.
 
