@@ -118,9 +118,9 @@ X/Z 坐标轴与区块边界重合，因此每个区块只会属于一个象限
 
 | 象限 | `generator` | `clear_generated_content` | `flat` |
 | --- | --- | --- | --- |
-| `(+X,+Z)` | `noise` | `false` | — |
+| `(+X,+Z)` | `flat` | `false` | `minecraft:the_void`，空层 |
 | `(-X,+Z)` | `noise` | `true` | — |
-| `(-X,-Z)` | `flat` | `false` | `minecraft:the_void`，空层 |
+| `(-X,-Z)` | `noise` | `false` | — |
 | `(+X,-Z)` | `flat` | `false` | 主世界 `minecraft:plains`，一层白色染色玻璃；下界 `minecraft:nether_wastes`，一层白色染色玻璃 |
 
 随包资源使用 `minecraft:nether_wastes`；在 Minecraft 1.14.4–1.15.2 中，加载器会在校验前将这个默认 ID 转换为当时使用的 `minecraft:nether`。
