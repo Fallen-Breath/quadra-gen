@@ -20,13 +20,12 @@
 
 package me.fallenbreath.quadragen.network;
 
+import me.fallenbreath.quadragen.QuadraGenMod;
 import me.fallenbreath.quadragen.compat.NbtCompat;
 import me.fallenbreath.quadragen.core.Quadrant;
 import net.minecraft.nbt.CompoundTag;
 
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 
 public final class ClientSyncState
 {
@@ -43,10 +42,10 @@ public final class ClientSyncState
 
 	public static void apply(CompoundTag data)
 	{
-		state = new State(
-				NbtCompat.getBoolean(data, "active", false),
-				readQuadrantInfos(NbtCompat.getCompoundOrEmpty(data, "quadrants"))
-		);
+		boolean active = NbtCompat.getBoolean(data, "active", false);
+		Map<Quadrant, QuadrantInfo> quadrants = readQuadrantInfos(NbtCompat.getCompoundOrEmpty(data, "quadrants"));
+		state = new State(active, quadrants);
+		logState(active, quadrants);
 	}
 
 	public static State getState()
@@ -64,6 +63,29 @@ public final class ClientSyncState
 			infos.put(quadrant, new QuadrantInfo(flat, flat ? NbtCompat.getInt(info, "sea_level", 0) : 0));
 		}
 		return infos;
+	}
+
+	private static void logState(boolean active, Map<Quadrant, QuadrantInfo> quadrants)
+	{
+		if (!active)
+		{
+			QuadraGenMod.LOGGER.info("Quadra Gen client sync: not active in this dimension");
+			return;
+		}
+
+		List<String> entries = new ArrayList<String>();
+		for (Quadrant quadrant : Quadrant.values())
+		{
+			QuadrantInfo info = quadrants.get(quadrant);
+			String type = info.isFlat() ? "flat(sea " + info.getSeaLevel() + ")" : "noise";
+			entries.add(quadrantLabel(quadrant) + "=" + type);
+		}
+		QuadraGenMod.LOGGER.info("Quadra Gen client sync: active, {}", String.join(", ", entries));
+	}
+
+	private static String quadrantLabel(Quadrant quadrant)
+	{
+		return "(" + (quadrant.getXSign() > 0 ? "+X" : "-X") + "," + (quadrant.getZSign() > 0 ? "+Z" : "-Z") + ")";
 	}
 
 	public static final class State
