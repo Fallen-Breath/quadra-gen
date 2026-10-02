@@ -40,8 +40,13 @@ public abstract class AmphibiousNodeEvaluatorMixin
 			method = "getNeighbors",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getSeaLevel()I")
 	)
-	// At this instruction, the compiler frame keeps only the method argument and loop node; ordinal 1 is the loop neighbor.
-	private int useSeaLevelAtNode(int original, @Local(ordinal = 1) Node neighbor)
+	//#if MC >= 26.1.2
+	// The frame retains both vertical candidates, so the loop neighbor has ordinal 3.
+	private int useSeaLevelAtNode(int original, @Local(ordinal = 3) Node neighbor)
+	//#else
+	//$$ // The frame discards both vertical candidates, so the loop neighbor has ordinal 1.
+	//$$ private int useSeaLevelAtNode(int original, @Local(ordinal = 1) Node neighbor)
+	//#endif
 	{
 		Mob mob = ((NodeEvaluatorAccessor)(Object)this).getMob$quadragen();
 		return SeaLevelQuery.getSeaLevelAt(mob.level(), neighbor.x, neighbor.z, original);
