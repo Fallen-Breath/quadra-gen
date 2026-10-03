@@ -23,10 +23,15 @@ package me.fallenbreath.quadragen.mixins.network.advertise;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.AdvertisedWorldTypeQuery;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelType;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
@@ -37,6 +42,17 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin
 {
+	/** Matches {@link net.minecraft.server.level.ServerPlayer#changeDimension(DimensionType)}, including its Math.min lower bound. */
+	@Unique
+	private int clampLegacyPortalCoordinate(double coordinate, double borderMin, double borderMax)
+	{
+		final double coordinateLimit = 2.9999872E7;
+		final double borderInset = 16.0;
+		double min = Math.min(-coordinateLimit, borderMin + borderInset);
+		double max = Math.min(coordinateLimit, borderMax - borderInset);
+		return Mth.floor(Mth.clamp(coordinate, min, max));
+	}
+
 	@ModifyExpressionValue(
 			method = "changeDimension(Lnet/minecraft/world/level/dimension/DimensionType;)Lnet/minecraft/world/entity/Entity;",
 			at = @At(
@@ -46,8 +62,31 @@ public abstract class ServerPlayerMixin
 	)
 	private LevelType advertiseWorldType_modifyLevelType1(LevelType original, @Local(ordinal = 1) ServerLevel level)
 	{
-		// Accepted compromise: portal AUTO uses departure X/Z to preserve vanilla packet timing.
-		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, (ServerPlayer)(Object)this, original);
+		ServerPlayer self = (ServerPlayer)(Object)this;
+		if (level.getDimension().getType() == DimensionType.THE_END)
+		{
+			// Match the End destination in {@link net.minecraft.server.level.ServerPlayer#changeDimension(DimensionType)}.
+			//#if MC >= 1.15.2
+			double x = self.getX();
+			double z = self.getZ();
+			//#else
+			//$$ double x = self.x;
+			//$$ double z = self.z;
+			//#endif
+			// The player's dimension field already points to the destination; its level still identifies the source.
+			if (self.getLevel().getDimension().getType() == DimensionType.OVERWORLD)
+			{
+				BlockPos spawn = level.getDimensionSpecificSpawn();
+				x = spawn.getX();
+				z = spawn.getZ();
+			}
+			WorldBorder border = level.getWorldBorder();
+			x = this.clampLegacyPortalCoordinate(x, border.getMinX(), border.getMaxX());
+			z = this.clampLegacyPortalCoordinate(z, border.getMinZ(), border.getMaxZ());
+			return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, x, z, original);
+		}
+		// Accepted compromise: Nether portal AUTO uses departure X/Z to preserve vanilla packet timing.
+		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, self, original);
 	}
 
 	@ModifyExpressionValue(
@@ -62,5 +101,4 @@ public abstract class ServerPlayerMixin
 	{
 		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, x, z, original);
 	}
-
 }

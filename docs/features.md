@@ -207,7 +207,7 @@ When the mod is absent on the server, or the dimension is disabled or unsupporte
 
 Each dimension advertises a world type to its clients through `advertised_world_type`. `flat` always advertises Flat, `noise` always advertises Noise, and `auto` advertises according to the quadrant the player is in at that moment: the two Flat modes advertise Flat, and the two Noise modes advertise Noise. The value is computed at login, respawn, and dimension change, and stays unchanged afterwards.
 
-For cross-dimension portal travel in Minecraft 1.14.4–1.20.6, `auto` uses the departure X/Z to select the quadrant type in the destination dimension; the appearance on a vanilla client may differ from the landing quadrant. This is a compromise in the current implementation.
+For cross-dimension Nether portal travel in Minecraft 1.14.4–1.20.6, `auto` uses the departure X/Z to select the quadrant type in the destination dimension; the appearance on a vanilla client may differ from the landing quadrant. This is a compromise in the current implementation.
 
 This advertisement affects clients only. Generation, mob spawning, and sea-level checks on the server do not depend on it.
 

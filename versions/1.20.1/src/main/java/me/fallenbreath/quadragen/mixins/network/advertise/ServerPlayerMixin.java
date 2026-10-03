@@ -23,8 +23,10 @@ package me.fallenbreath.quadragen.mixins.network.advertise;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.AdvertisedWorldTypeQuery;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -45,7 +47,13 @@ public abstract class ServerPlayerMixin
 	)
 	private boolean advertiseWorldType_modifyLevelType1(boolean original, @Local(argsOnly = true) ServerLevel level)
 	{
-		// Accepted compromise: portal AUTO uses departure X/Z to preserve vanilla packet timing.
+		if (level.dimension() == Level.END)
+		{
+			// Match the End branch of {@link net.minecraft.world.entity.Entity#findDimensionEntryPoint(ServerLevel)}.
+			BlockPos spawn = ServerLevel.END_SPAWN_POINT;
+			return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, spawn.getX() + 0.5, spawn.getZ() + 0.5, original);
+		}
+		// Accepted compromise: Nether portal AUTO uses departure X/Z to preserve vanilla packet timing.
 		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, (ServerPlayer)(Object)this, original);
 	}
 

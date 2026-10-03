@@ -36,6 +36,9 @@ import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 //#elseif MC >= 1.21.1
 //$$ import net.minecraft.world.level.portal.DimensionTransition;
+//#else
+//$$ import net.minecraft.core.BlockPos;
+//$$ import net.minecraft.world.level.Level;
 //#endif
 
 /**
@@ -50,9 +53,6 @@ public abstract class ServerPlayerMixin
 	private CommonPlayerSpawnInfo advertiseWorldType_modifyCommonSpawnInfo(CommonPlayerSpawnInfo original, ServerLevel level)
 	{
 		ServerPlayer self = (ServerPlayer)(Object)this;
-		//#if MC < 1.21.1
-		//$$ // Accepted compromise: portal AUTO uses departure X/Z to preserve vanilla packet timing.
-		//#endif
 		return AdvertisedWorldTypeQuery.withWorldType(level, self.getX(), self.getZ(), original);
 	}
 
@@ -66,7 +66,7 @@ public abstract class ServerPlayerMixin
 			//#endif
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;createCommonSpawnInfo(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/network/protocol/game/CommonPlayerSpawnInfo;")
 	)
-	private CommonPlayerSpawnInfo advertiseWorldType_useTeleportDestination(CommonPlayerSpawnInfo original,
+	private CommonPlayerSpawnInfo advertiseWorldType_useTransitionDestination(CommonPlayerSpawnInfo original,
 			//#if MC >= 1.21.3
 			@Local(argsOnly = true) TeleportTransition transition
 			//#else
@@ -91,6 +91,22 @@ public abstract class ServerPlayerMixin
 	//$$ 		@Local(argsOnly = true) ServerLevel level, @Local(argsOnly = true, ordinal = 0) double x, @Local(argsOnly = true, ordinal = 2) double z)
 	//$$ {
 	//$$ 	return AdvertisedWorldTypeQuery.withWorldType(level, x, z, original);
+	//$$ }
+	//$$
+	//$$ @ModifyExpressionValue(
+	//$$ 		method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;",
+	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;createCommonSpawnInfo(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/network/protocol/game/CommonPlayerSpawnInfo;")
+	//$$ )
+	//$$ private CommonPlayerSpawnInfo advertiseWorldType_useLegacyEndDestination(CommonPlayerSpawnInfo original, @Local(argsOnly = true) ServerLevel level)
+	//$$ {
+	//$$ 	if (level.dimension() == Level.END)
+	//$$ 	{
+	//$$ 		// Match the End branch of {@link net.minecraft.world.entity.Entity#findDimensionEntryPoint(ServerLevel)}.
+	//$$ 		BlockPos spawn = ServerLevel.END_SPAWN_POINT;
+	//$$ 		return AdvertisedWorldTypeQuery.withWorldType(level, spawn.getX() + 0.5, spawn.getZ() + 0.5, original);
+	//$$ 	}
+	//$$ 	// Accepted compromise: Nether portal AUTO uses departure X/Z to preserve vanilla packet timing.
+	//$$ 	return original;
 	//$$ }
 	//#endif
 }
