@@ -24,7 +24,6 @@ import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,13 +33,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 //#endif
 
+//#if MC >= 1.16.5
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+//#else
+//$$ import net.minecraft.world.level.levelgen.OverworldLevelSource;
+//#endif
+
 /**
- * mc >  1.15.2 : subproject 26.2 (main project)  <--------
- * mc <= 1.15.2 : subproject 1.15.2
- * <p>
- * Worldgen mob spawning is implemented by NoiseBasedChunkGenerator in this interval.
+ * Before 1.16.5, only OverworldLevelSource overrides worldgen mob spawning; Nether inherits the no-op base method.
  */
+//#if MC >= 1.16.5
 @Mixin(NoiseBasedChunkGenerator.class)
+//#else
+//$$ @Mixin(OverworldLevelSource.class)
+//#endif
 public abstract class WorldgenMobGenerationMixin
 {
 	@Inject(method = "spawnOriginalMobs", at = @At("HEAD"), cancellable = true)

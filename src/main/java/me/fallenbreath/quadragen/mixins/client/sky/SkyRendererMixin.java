@@ -34,11 +34,6 @@ import net.minecraft.client.renderer.SkyRenderer;
 //$$ import net.minecraft.client.renderer.LevelRenderer;
 //#endif
 
-/**
- *          mc >  1.21.4: subproject 26.2 (main project)  <--------
- * 1.21.1 < mc <= 1.21.4: subproject 1.21.4
- *          mc <= 1.21.1: subproject 1.21.1
- */
 //#if MC >= 1.21.10
 @Mixin(SkyRenderer.class)
 //#else
@@ -49,7 +44,7 @@ public abstract class SkyRendererMixin
 	@ModifyExpressionValue(
 			//#if MC >= 1.21.10
 			method = "shouldRenderDarkDisc(FLnet/minecraft/client/multiplayer/ClientLevel;)Z",
-			//#elseif MC >= 1.21.4
+			//#elseif MC >= 1.21.3
 			//$$ method = "shouldRenderDarkDisc(F)Z",
 			//#elseif MC >= 1.20.6
 			//$$ method = "renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",

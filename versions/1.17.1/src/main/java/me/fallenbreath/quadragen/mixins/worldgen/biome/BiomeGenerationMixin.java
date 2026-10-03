@@ -32,9 +32,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- *          mc >  26.2  : subproject 26.3
- * 1.17.1 < mc <= 26.2  : subproject 26.2 (main project)
- *          mc <= 1.17.1: subproject 1.17.1  <--------
+ * mc >  1.17.1: subproject 26.2 (main project)
+ * mc <= 1.17.1: subproject 1.17.1  <--------
  * <p>
  * Biome generation is implemented by ChunkGenerator in this interval.
  */

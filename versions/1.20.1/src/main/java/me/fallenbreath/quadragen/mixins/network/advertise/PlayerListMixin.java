@@ -28,10 +28,13 @@ import net.minecraft.server.players.PlayerList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+//#if MC < 1.16.5
+//$$ import net.minecraft.world.level.LevelType;
+//#endif
+
 /**
- *           mc >  1.20.1: subproject 26.2 (main project)
- * 1.16.5 <= mc <= 1.20.1: subproject 1.20.1  <--------
- *           mc <  1.16.5: subproject 1.15.2
+ * mc >  1.20.1: subproject 26.2 (main project)
+ * mc <= 1.20.1: subproject 1.20.1  <--------
  */
 @Mixin(PlayerList.class)
 public abstract class PlayerListMixin
@@ -40,22 +43,42 @@ public abstract class PlayerListMixin
 			method = "placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;)V",
 			at = @At(
 					value = "INVOKE",
+					//#if MC >= 1.16.5
 					target = "Lnet/minecraft/server/level/ServerLevel;isFlat()Z"
+					//#else
+					//$$ target = "Lnet/minecraft/world/level/storage/LevelData;getGeneratorType()Lnet/minecraft/world/level/LevelType;"
+					//#endif
 			)
 	)
+	//#if MC >= 1.16.5
 	private boolean advertiseWorldType_modifyFlatFlag(boolean original, @Local(argsOnly = true) ServerPlayer player)
+	//#else
+	//$$ private LevelType advertiseWorldType_modifyFlatFlag(LevelType original, @Local(argsOnly = true) ServerPlayer player)
+	//#endif
 	{
 		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(player.serverLevel(), player, original);
 	}
 
 	@ModifyExpressionValue(
+			//#if MC >= 1.16.5
 			method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;",
+			//#else
+			//$$ method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/dimension/DimensionType;Z)Lnet/minecraft/server/level/ServerPlayer;",
+			//#endif
 			at = @At(
 					value = "INVOKE",
+					//#if MC >= 1.16.5
 					target = "Lnet/minecraft/server/level/ServerLevel;isFlat()Z"
+					//#else
+					//$$ target = "Lnet/minecraft/world/level/storage/LevelData;getGeneratorType()Lnet/minecraft/world/level/LevelType;"
+					//#endif
 			)
 	)
+	//#if MC >= 1.16.5
 	private boolean advertiseWorldType_modifyRespawnFlatFlag(boolean original, @Local(ordinal = 1) ServerPlayer player)
+	//#else
+	//$$ private LevelType advertiseWorldType_modifyRespawnFlatFlag(LevelType original, @Local(ordinal = 1) ServerPlayer player)
+	//#endif
 	{
 		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(player.serverLevel(), player, original);
 	}

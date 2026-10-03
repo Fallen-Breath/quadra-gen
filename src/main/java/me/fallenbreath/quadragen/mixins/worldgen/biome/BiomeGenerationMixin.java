@@ -25,7 +25,6 @@ import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,6 +32,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.concurrent.CompletableFuture;
+
+//#if MC >= 26.3
+//$$ import net.minecraft.world.level.chunk.ChunkGenerator;
+//#else
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+//#endif
 
 //#if 1.18.2 <= MC && MC < 1.19.4
 //$$ import net.minecraft.core.Registry;
@@ -51,13 +56,16 @@ import net.minecraft.world.level.levelgen.RandomState;
 //#endif
 
 /**
- *          mc >  26.2  : subproject 26.3
- * 1.17.1 < mc <= 26.2  : subproject 26.2 (main project)  <--------
- *          mc <= 1.17.1: subproject 1.17.1
+ * mc >  1.17.1: subproject 26.2 (main project)  <--------
+ * mc <= 1.17.1: subproject 1.17.1
  * <p>
- * Biome generation is implemented by NoiseBasedChunkGenerator in this interval.
+ * 26.3 implements biome generation in ChunkGenerator; earlier versions use NoiseBasedChunkGenerator.
  */
+//#if MC >= 26.3
+//$$ @Mixin(ChunkGenerator.class)
+//#else
 @Mixin(NoiseBasedChunkGenerator.class)
+//#endif
 public abstract class BiomeGenerationMixin
 {
 	@Inject(

@@ -24,9 +24,8 @@ import me.fallenbreath.quadragen.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- *          mc >  1.20.1: subproject 26.2 (main project)  <--------
- * 1.16.5 <= mc <= 1.20.1: subproject 1.20.1
- *          mc <= 1.15.2: subproject 1.15.2
+ * mc >  1.20.1: subproject 26.2 (main project)  <--------
+ * mc <= 1.20.1: subproject 1.20.1
  */
 @Mixin(DummyClass.class)
 public abstract class PlayerListMixin

@@ -29,42 +29,48 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- *          mc >  1.21.5: subproject 26.2 (main project)
- * 1.15.2 < mc <= 1.21.5: subproject 1.21.5  <--------
- *          mc <= 1.15.2: subproject 1.15.2
+ * mc >  1.21.5: subproject 26.2 (main project)
+ * mc <= 1.21.5: subproject 1.21.5  <--------
  * <p>
- * 1.21.5 still uses {@code ClientLevel.ClientLevelData#getClearColorScale()} for void fog.
+ * Void fog uses the clear-color scale in this interval; versions before 1.16.5 obtain it from Dimension.
  */
 @Mixin(FogRenderer.class)
 public abstract class FogRendererMixin
 {
 	@ModifyExpressionValue(
-			//#if MC >= 1.21.5
+			//#if MC >= 1.21.3
 			method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
-			//#elseif MC >= 1.21.3
-			//$$ method = "computeFogColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)Lorg/joml/Vector4f;",
-			//#else
+			//#elseif MC >= 1.15.2
 			//$$ method = "setupColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)V",
+			//#else
+			//$$ method = "setupClearColor(Lnet/minecraft/client/Camera;F)V",
 			//#endif
 			at = @At(
 					value = "INVOKE",
 					//#if MC >= 1.18.2
 					target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()F"
-					//#else
+					//#elseif MC >= 1.16.5
 					//$$ target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getClearColorScale()D"
+					//#else
+					//$$ target = "Lnet/minecraft/world/level/dimension/Dimension;getClearColorScale()D"
 					//#endif
 			)
 	)
 	//#if MC >= 1.18.2
 	private static float useQuadrantClearColorScale(float original, @Local(argsOnly = true) Camera camera)
-	//#else
+	//#elseif MC >= 1.15.2
 	//$$ private static double useQuadrantClearColorScale(double original, @Local(argsOnly = true) Camera camera)
+	//#else
+	//$$ private double useQuadrantClearColorScale(double original, @Local(argsOnly = true) Camera camera)
 	//#endif
 	{
-		//#if MC >= 1.18.2
-		return ClientSyncQuery.getClearColorScale(original, camera.getPosition().x, camera.getPosition().z);
-		//#else
-		//$$ return ClientSyncQuery.getClearColorScale((float) original, camera.getPosition().x, camera.getPosition().z);
-		//#endif
+		return ClientSyncQuery.getClearColorScale(
+				//#if MC >= 1.16.5 && MC < 1.18.2
+				//$$ (float) original,
+				//#else
+				original,
+				//#endif
+				camera.getPosition().x, camera.getPosition().z
+		);
 	}
 }

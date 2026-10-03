@@ -37,9 +37,14 @@ import net.minecraft.core.QuartPos;
 //#if MC >= 1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Climate;
 //#else
 //$$ import net.minecraft.world.level.biome.Biome;
+//#endif
+
+//#if MC >= 26.3
+//$$ import net.minecraft.world.level.biome.BiomeResolver;
+//#elseif MC >= 1.18.2
+import net.minecraft.world.level.biome.Climate;
 //#endif
 
 //#if MC >= 1.19.4
@@ -49,9 +54,8 @@ import java.util.Set;
 //#endif
 
 /**
- *          mc >  26.2  : subproject 26.3
- * 1.15.2 < mc <= 26.2  : subproject 26.2 (main project)  <--------
- *          mc <= 1.15.2: subproject 1.15.2
+ * mc >  1.15.2: subproject 26.2 (main project)  <--------
+ * mc <= 1.15.2: subproject 1.15.2
  * <p>
  * Adjusts only the biome values consumed by vanilla locate searches.
  */
@@ -60,7 +64,11 @@ public abstract class BiomeSourceMixin
 {
 	//#if MC >= 1.19.4
 	@ModifyExpressionValue(
+			//#if MC >= 26.3
+			//$$ method = "findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;",
+			//#else
 			method = "findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/biome/Climate$Sampler;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;",
+			//#endif
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/BiomeSource;possibleBiomes()Ljava/util/Set;")
 	)
 	private Set<Holder<Biome>> extendLocateCandidates(Set<Holder<Biome>> original)
@@ -86,7 +94,9 @@ public abstract class BiomeSourceMixin
 
 	@WrapOperation(
 			method =
-			//#if MC >= 1.19.4
+			//#if MC >= 26.3
+			//$$ "findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;",
+			//#elseif MC >= 1.19.4
 			"findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/biome/Climate$Sampler;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;",
 			//#elseif MC >= 1.18.2
 			//$$ "findBiomeHorizontal(IIIIILjava/util/function/Predicate;Ljava/util/Random;ZLnet/minecraft/world/level/biome/Climate$Sampler;)Lcom/mojang/datafixers/util/Pair;",
@@ -96,7 +106,9 @@ public abstract class BiomeSourceMixin
 			at = @At(
 					value = "INVOKE",
 					target =
-					//#if MC >= 1.18.2
+					//#if MC >= 26.3
+					//$$ "Lnet/minecraft/world/level/biome/BiomeResolver;getNoiseBiome(III)Lnet/minecraft/core/Holder;"
+					//#elseif MC >= 1.18.2
 					"Lnet/minecraft/world/level/biome/BiomeSource;getNoiseBiome(IIILnet/minecraft/world/level/biome/Climate$Sampler;)Lnet/minecraft/core/Holder;"
 					//#else
 					//$$ "Lnet/minecraft/world/level/biome/BiomeSource;getNoiseBiome(III)Lnet/minecraft/world/level/biome/Biome;"
@@ -109,11 +121,15 @@ public abstract class BiomeSourceMixin
 			//#else
 			//$$ Biome useQuadrantBiome(
 			//#endif
+			//#if MC >= 26.3
+			//$$ BiomeResolver source,
+			//#else
 			BiomeSource source,
+			//#endif
 			int quartX,
 			int quartY,
 			int quartZ,
-			//#if MC >= 1.18.2
+			//#if MC >= 1.18.2 && MC < 26.3
 			Climate.Sampler sampler,
 			//#endif
 			Operation<
@@ -124,7 +140,9 @@ public abstract class BiomeSourceMixin
 					//#endif
 					> original)
 	{
-		//#if MC >= 1.18.2
+		//#if MC >= 26.3
+		//$$ Holder<Biome> biome = original.call(source, quartX, quartY, quartZ);
+		//#elseif MC >= 1.18.2
 		Holder<Biome> biome = original.call(source, quartX, quartY, quartZ, sampler);
 		//#else
 		//$$ Biome biome = original.call(source, quartX, quartY, quartZ);
