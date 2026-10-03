@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.At;
  * mc >  1.15.2: subproject 26.2 (main project)
  * mc <= 1.15.2: subproject 1.15.2  <--------
  * <p>
- * The original Flat generator omits PatrolSpawner, so the shared Noise generator must reject resolved Flat targets.
+ * The original Flat generator omits PatrolSpawner, so the shared Noise generator must reject initial Flat targets.
  */
 @Mixin(PatrolSpawner.class)
 public abstract class PatrolSpawnerMixin
@@ -47,6 +47,7 @@ public abstract class PatrolSpawnerMixin
 			@Local(argsOnly = true) ServerLevel level,
 			@Local BlockPos.MutableBlockPos target)
 	{
+		// Only the initial candidate is filtered; minor axis crossings by later patrol members are acceptable.
 		return chunksLoaded && CustomSpawnerPolicy.usesNoiseGeneratorAt(level, target);
 	}
 }

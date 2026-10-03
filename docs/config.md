@@ -7,7 +7,7 @@ English | [中文](config.zh.md)
 Quadra Gen's configuration file is located at `config/quadragen/config.json`. If the file does not exist, the mod creates a default configuration automatically at startup.
 The bundled default is available as [`src/main/resources/default_config.json`](../src/main/resources/default_config.json).
 
-The configuration is read once at server startup. Changes take effect after restarting the server; hot reload is not supported. Unknown fields are ignored. Missing fields, wrong types, or invalid values for fields understood by Quadra Gen cause the mod to report an error and refuse to load.
+The configuration is read once at server startup. Changes take effect after restarting the server; hot reload is not supported. Unknown fields are ignored. If the configuration cannot be read, required fields are missing, or values do not meet the constraints below, the mod reports an error and refuses to load.
 
 ### Activation conditions
 

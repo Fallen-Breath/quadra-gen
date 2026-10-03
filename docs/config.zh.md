@@ -7,7 +7,7 @@
 Quadra Gen 的配置文件位于 `config/quadragen/config.json`。若文件不存在，Mod 会将随包提供的默认配置复制到该位置。
 随 Mod 打包的默认配置位于 [`src/main/resources/default_config.json`](../src/main/resources/default_config.json)。
 
-配置仅在服务器启动时读取一次，修改后需要重启服务器才会生效，不支持热重载。未知字段会被忽略；Mod 自己理解的字段如果缺失、类型错误或取值非法，仍会导致报错并拒绝加载。
+配置仅在服务器启动时读取一次，修改后需要重启服务器才会生效，不支持热重载。未知字段会被忽略；配置无法读取、缺失必填字段或不满足下文规定的取值约束时，会报错并拒绝加载。
 
 ### 生效条件
 
