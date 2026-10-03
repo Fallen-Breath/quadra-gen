@@ -20,7 +20,7 @@
 
 package me.fallenbreath.quadragen.mixins.client.level;
 
-import me.fallenbreath.quadragen.compat.DummyClass;
+import me.fallenbreath.quadragen.utils.compat.DummyClass;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**

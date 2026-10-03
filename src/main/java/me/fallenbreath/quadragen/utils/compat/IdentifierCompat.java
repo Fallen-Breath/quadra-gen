@@ -18,8 +18,23 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.utils.compat;
 
-public class DummyClass
+import net.minecraft.resources.Identifier;
+
+public final class IdentifierCompat
 {
+	private IdentifierCompat()
+	{
+	}
+
+	public static Identifier tryParse(String value)
+	{
+		return Identifier.tryParse(value);
+	}
+
+	public static boolean isValid(String value)
+	{
+		return IdentifierCompat.tryParse(value) != null;
+	}
 }

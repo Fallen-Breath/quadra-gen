@@ -20,10 +20,10 @@
 
 package me.fallenbreath.quadragen.runtime;
 
-import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.config.AdvertisedWorldType;
+import me.fallenbreath.quadragen.utils.compat.ChunkPosCompat;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 

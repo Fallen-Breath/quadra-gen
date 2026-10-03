@@ -40,7 +40,7 @@ import net.minecraft.world.level.WorldGenLevel;
 //#endif
 
 //#if 1.17.1 <= MC && MC < 1.18.2
-//$$ import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+//$$ import me.fallenbreath.quadragen.utils.compat.ChunkPosCompat;
 //$$ import net.minecraft.SharedConstants;
 //#endif
 

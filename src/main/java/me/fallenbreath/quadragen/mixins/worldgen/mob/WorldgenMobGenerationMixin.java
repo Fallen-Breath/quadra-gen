@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if MC >= 1.17.1
-import me.fallenbreath.quadragen.compat.ChunkPosCompat;
+import me.fallenbreath.quadragen.utils.compat.ChunkPosCompat;
 //#endif
 
 //#if MC >= 1.16.5

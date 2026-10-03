@@ -21,7 +21,6 @@
 package me.fallenbreath.quadragen.runtime;
 
 import me.fallenbreath.quadragen.QuadraGenMod;
-import me.fallenbreath.quadragen.compat.LevelHeightCompat;
 import me.fallenbreath.quadragen.config.ConfigValidationException;
 import me.fallenbreath.quadragen.config.ConfigValueResolver;
 import me.fallenbreath.quadragen.config.DimensionConfig;
@@ -36,6 +35,7 @@ import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.access.GeneratorContextAccess;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
+import me.fallenbreath.quadragen.utils.compat.LevelHeightCompat;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -52,7 +52,7 @@ import net.minecraft.core.Holder;
 //#endif
 
 //#if MC >= 1.16.5
-import me.fallenbreath.quadragen.compat.ResourceKeyCompat;
+import me.fallenbreath.quadragen.utils.compat.ResourceKeyCompat;
 //#else
 //$$ import net.minecraft.world.level.levelgen.NetherLevelSource;
 //$$ import net.minecraft.world.level.levelgen.OverworldLevelSource;

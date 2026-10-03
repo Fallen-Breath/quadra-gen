@@ -20,7 +20,7 @@
 
 package me.fallenbreath.quadragen.core;
 
-import me.fallenbreath.quadragen.compat.LevelHeightCompat;
+import me.fallenbreath.quadragen.utils.compat.LevelHeightCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;

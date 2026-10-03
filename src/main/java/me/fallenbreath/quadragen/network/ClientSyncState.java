@@ -21,8 +21,8 @@
 package me.fallenbreath.quadragen.network;
 
 import me.fallenbreath.quadragen.QuadraGenMod;
-import me.fallenbreath.quadragen.compat.NbtCompat;
 import me.fallenbreath.quadragen.core.Quadrant;
+import me.fallenbreath.quadragen.utils.compat.NbtCompat;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;

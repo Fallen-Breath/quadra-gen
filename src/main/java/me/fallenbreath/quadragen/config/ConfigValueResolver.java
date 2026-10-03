@@ -20,8 +20,8 @@
 
 package me.fallenbreath.quadragen.config;
 
-import me.fallenbreath.quadragen.compat.IdentifierCompat;
-import me.fallenbreath.quadragen.compat.RegistryCompat;
+import me.fallenbreath.quadragen.utils.compat.IdentifierCompat;
+import me.fallenbreath.quadragen.utils.compat.RegistryCompat;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;

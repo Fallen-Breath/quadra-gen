@@ -18,7 +18,7 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.utils.compat;
 
 //#if MC >= 1.17.1
 import net.minecraft.world.level.LevelHeightAccessor;

@@ -18,23 +18,22 @@
  * along with Quadra Gen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.fallenbreath.quadragen.compat;
+package me.fallenbreath.quadragen.utils.compat;
 
-import net.minecraft.resources.Identifier;
+//#if MC >= 1.16.5
+import net.minecraft.resources.ResourceKey;
+//#endif
 
-public final class IdentifierCompat
+public final class ResourceKeyCompat
 {
-	private IdentifierCompat()
+	private ResourceKeyCompat()
 	{
 	}
 
-	public static Identifier tryParse(String value)
+	//#if MC >= 1.16.5
+	public static String identifier(ResourceKey<?> key)
 	{
-		return Identifier.tryParse(value);
+		return key.identifier().toString();
 	}
-
-	public static boolean isValid(String value)
-	{
-		return IdentifierCompat.tryParse(value) != null;
-	}
+	//#endif
 }

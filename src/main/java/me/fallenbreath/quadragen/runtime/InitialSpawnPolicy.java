@@ -20,11 +20,11 @@
 
 package me.fallenbreath.quadragen.runtime;
 
-import me.fallenbreath.quadragen.compat.ChunkPosCompat;
 import me.fallenbreath.quadragen.core.DimensionKind;
 import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
+import me.fallenbreath.quadragen.utils.compat.ChunkPosCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

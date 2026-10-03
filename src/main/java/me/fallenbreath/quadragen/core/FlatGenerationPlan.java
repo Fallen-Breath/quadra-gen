@@ -20,7 +20,7 @@
 
 package me.fallenbreath.quadragen.core;
 
-import me.fallenbreath.quadragen.compat.LevelHeightCompat;
+import me.fallenbreath.quadragen.utils.compat.LevelHeightCompat;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
