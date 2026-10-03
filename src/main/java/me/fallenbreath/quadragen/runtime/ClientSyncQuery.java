@@ -65,10 +65,9 @@ public final class ClientSyncQuery
 			return original;
 		}
 
-		// Vanilla {@link net.minecraft.client.multiplayer.ClientLevel.ClientLevelData#voidDarknessOnsetRange}
+		// Vanilla 1.21.8+: {@link net.minecraft.client.multiplayer.ClientLevel.ClientLevelData#voidDarknessOnsetRange()}
 		// returns 1.0F for Flat and 32.0F for Noise.
-		// The active Quadra dimension is Noise-based, so preserve its vanilla result instead of copying 32.0F here.
-		return isFlat(state, x, z) ? 1.0F : original;
+		return isFlat(state, x, z) ? 1.0F : 32.0F;
 	}
 
 	//#if MC < 1.16.5
@@ -90,7 +89,9 @@ public final class ClientSyncQuery
 			return original;
 		}
 		//#if MC >= 1.16.5
-		return isFlat(state, x, z) ? 1.0F : original;
+		// Vanilla 1.16.5-1.21.5: {@link net.minecraft.client.multiplayer.ClientLevel.ClientLevelData#getClearColorScale()}
+		// returns 1.0 for Flat and 0.03125 (1/32) for Noise.
+		return isFlat(state, x, z) ? 1.0F : 0.03125F;
 		//#else
 		//$$ return isFlat(state, x, z) ? 1.0D : original;
 		//#endif
