@@ -56,7 +56,7 @@ public final class ConfigLoader
 			{
 				QuadraGenConfig config = GSON.fromJson(reader, QuadraGenConfig.class);
 				//#if MC < 1.16.5
-				normalizeLegacyNetherBiome(config);
+				//$$ normalizeLegacyNetherBiome(config);
 				//#endif
 				ConfigValidator.validate(config);
 				return config;
@@ -77,20 +77,20 @@ public final class ConfigLoader
 	}
 
 	//#if MC < 1.16.5
-	private static void normalizeLegacyNetherBiome(QuadraGenConfig config)
-	{
-		if (config == null || config.nether == null || config.nether.quadrants == null)
-		{
-			return;
-		}
-		for (QuadrantConfig quadrant : config.nether.quadrants.values())
-		{
-			if (quadrant != null && quadrant.flat != null && "minecraft:nether_wastes".equals(quadrant.flat.biome))
-			{
-				quadrant.flat.biome = "minecraft:nether";
-			}
-		}
-	}
+	//$$ private static void normalizeLegacyNetherBiome(QuadraGenConfig config)
+	//$$ {
+	//$$ 	if (config == null || config.nether == null || config.nether.quadrants == null)
+	//$$ 	{
+	//$$ 		return;
+	//$$ 	}
+	//$$ 	for (QuadrantConfig quadrant : config.nether.quadrants.values())
+	//$$ 	{
+	//$$ 		if (quadrant != null && quadrant.flat != null && "minecraft:nether_wastes".equals(quadrant.flat.biome))
+	//$$ 		{
+	//$$ 			quadrant.flat.biome = "minecraft:nether";
+	//$$ 		}
+	//$$ 	}
+	//$$ }
 	//#endif
 
 	private static void copyDefault(Path configPath) throws IOException
