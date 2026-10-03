@@ -22,62 +22,60 @@ package me.fallenbreath.quadragen.mixins.worldgen.biome;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.datafixers.util.Pair;
 import me.fallenbreath.quadragen.runtime.BiomeLocateContext;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Random;
 import java.util.function.Predicate;
 
 /**
  *          mc >  26.2  : subproject 26.3
- * 1.18.2 < mc <= 26.2  : subproject 26.2 (main project)  <--------
+ * 1.18.2 < mc <= 26.2  : subproject 26.2 (main project)
  * 1.17.1 < mc <= 1.18.2: subproject 1.18.2
- * 1.15.2 < mc <= 1.17.1: subproject 1.17.1
+ * 1.15.2 < mc <= 1.17.1: subproject 1.17.1  <--------
  *          mc <= 1.15.2: subproject 1.15.2
  * <p>
- * Scopes the vanilla ServerLevel delegation while BiomeSourceMixin adapts sampled biomes.
+ * 1.16.5 and 1.17.1 locate a raw Biome through BiomeSource.findBiomeHorizontal.
  */
 @Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin
+public abstract class ServerLevel_BiomeLocateMixin
 {
 	@WrapOperation(
-			method = "findClosestBiome3d(Ljava/util/function/Predicate;Lnet/minecraft/core/BlockPos;III)Lcom/mojang/datafixers/util/Pair;",
+			method = "findNearestBiome(Lnet/minecraft/world/level/biome/Biome;Lnet/minecraft/core/BlockPos;II)Lnet/minecraft/core/BlockPos;",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/world/level/biome/BiomeSource;findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/biome/Climate$Sampler;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;"
+					target = "Lnet/minecraft/world/level/biome/BiomeSource;findBiomeHorizontal(IIIIILjava/util/function/Predicate;Ljava/util/Random;Z)Lnet/minecraft/core/BlockPos;"
 			)
 	)
-	private Pair<BlockPos, Holder<Biome>> scopeLocateBiome(
+	private BlockPos scopeLocateBiome(
 			BiomeSource source,
-			BlockPos origin,
+			int x,
+			int y,
+			int z,
 			int maxSearchRadius,
-			int sampleResolutionHorizontal,
-			int sampleResolutionVertical,
-			Predicate<Holder<Biome>> biomeTest,
-			Climate.Sampler sampler,
-			LevelReader level,
-			Operation<Pair<BlockPos, Holder<Biome>>> original
+			int sampleResolution,
+			Predicate<Biome> biomeTest,
+			Random random,
+			boolean findClosest,
+			Operation<BlockPos> original
 	)
 	{
 		LevelContext context = ((ServerLevelContextAccess)this).getLevelContext$quadragen();
 		if (context == null)
 		{
-			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, sampler, level);
+			return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest);
 		}
 		BiomeLocateContext.install(context);
 		try
 		{
-			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, sampler, level);
+			return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest);
 		}
 		finally
 		{

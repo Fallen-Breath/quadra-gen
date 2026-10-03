@@ -32,29 +32,29 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.function.Predicate;
 
 /**
- *          mc >  26.2  : subproject 26.3  <--------
- * 1.18.2 < mc <= 26.2  : subproject 26.2 (main project)
+ *          mc >  26.2  : subproject 26.3
+ * 1.18.2 < mc <= 26.2  : subproject 26.2 (main project)  <--------
  * 1.17.1 < mc <= 1.18.2: subproject 1.18.2
  * 1.15.2 < mc <= 1.17.1: subproject 1.17.1
  *          mc <= 1.15.2: subproject 1.15.2
  * <p>
- * 26.3 passes RandomState to BiomeSource locate instead of the Climate sampler used before it.
+ * Scopes the vanilla ServerLevel delegation while BiomeSourceMixin adapts sampled biomes.
  */
 @Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin
+public abstract class ServerLevel_BiomeLocateMixin
 {
 	@WrapOperation(
 			method = "findClosestBiome3d(Ljava/util/function/Predicate;Lnet/minecraft/core/BlockPos;III)Lcom/mojang/datafixers/util/Pair;",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/world/level/biome/BiomeSource;findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;"
+					target = "Lnet/minecraft/world/level/biome/BiomeSource;findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/biome/Climate$Sampler;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;"
 			)
 	)
 	private Pair<BlockPos, Holder<Biome>> scopeLocateBiome(
@@ -64,7 +64,7 @@ public abstract class ServerLevelMixin
 			int sampleResolutionHorizontal,
 			int sampleResolutionVertical,
 			Predicate<Holder<Biome>> biomeTest,
-			RandomState randomState,
+			Climate.Sampler sampler,
 			LevelReader level,
 			Operation<Pair<BlockPos, Holder<Biome>>> original
 	)
@@ -72,12 +72,12 @@ public abstract class ServerLevelMixin
 		LevelContext context = ((ServerLevelContextAccess)this).getLevelContext$quadragen();
 		if (context == null)
 		{
-			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, randomState, level);
+			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, sampler, level);
 		}
 		BiomeLocateContext.install(context);
 		try
 		{
-			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, randomState, level);
+			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, sampler, level);
 		}
 		finally
 		{

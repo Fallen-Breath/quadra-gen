@@ -48,7 +48,7 @@ import java.util.function.Predicate;
  * 1.18.2 keeps biome locate as a horizontal search and passes a climate sampler.
  */
 @Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin
+public abstract class ServerLevel_BiomeLocateMixin
 {
 	@WrapOperation(
 			method = "findNearestBiome(Ljava/util/function/Predicate;Lnet/minecraft/core/BlockPos;II)Lcom/mojang/datafixers/util/Pair;",

@@ -33,6 +33,6 @@ import org.spongepowered.asm.mixin.Mixin;
  * These versions have no server biome-locate entry point.
  */
 @Mixin(DummyClass.class)
-public abstract class ServerLevelMixin
+public abstract class ServerLevel_BiomeLocateMixin
 {
 }
