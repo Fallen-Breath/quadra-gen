@@ -22,49 +22,69 @@ package me.fallenbreath.quadragen.mixins.worldgen.biome;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.datafixers.util.Pair;
 import me.fallenbreath.quadragen.runtime.BiomeLocateContext;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.function.Predicate;
 
+//#if MC >= 26.3
+//$$ import net.minecraft.world.level.levelgen.RandomState;
+//#elseif MC >= 1.18.2
+import net.minecraft.world.level.biome.Climate;
+//#endif
+
+//#if MC >= 1.19.4
+import net.minecraft.world.level.LevelReader;
+//#else
+//$$ import java.util.Random;
+//#endif
+
+//#if MC >= 1.18.2
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.Holder;
+//#endif
+
 /**
- *          mc >  26.2  : subproject 26.3
- * 1.18.2 < mc <= 26.2  : subproject 26.2 (main project)  <--------
- * 1.17.1 < mc <= 1.18.2: subproject 1.18.2
- * 1.15.2 < mc <= 1.17.1: subproject 1.17.1
- *          mc <= 1.15.2: subproject 1.15.2
+ * mc >  1.15.2: subproject 26.2 (main project)  <--------
+ * mc <= 1.15.2: subproject 1.15.2
  * <p>
  * Scopes the vanilla ServerLevel delegation while BiomeSourceMixin adapts sampled biomes.
  */
 @Mixin(ServerLevel.class)
 public abstract class ServerLevel_BiomeLocateMixin
 {
+	//#if MC >= 1.19.4
 	@WrapOperation(
 			method = "findClosestBiome3d(Ljava/util/function/Predicate;Lnet/minecraft/core/BlockPos;III)Lcom/mojang/datafixers/util/Pair;",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/world/level/biome/BiomeSource;findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/biome/Climate$Sampler;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;"
+					target =
+					//#if MC >= 26.3
+					//$$ "Lnet/minecraft/world/level/biome/BiomeSource;findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;"
+					//#else
+					"Lnet/minecraft/world/level/biome/BiomeSource;findClosestBiome3d(Lnet/minecraft/core/BlockPos;IIILjava/util/function/Predicate;Lnet/minecraft/world/level/biome/Climate$Sampler;Lnet/minecraft/world/level/LevelReader;)Lcom/mojang/datafixers/util/Pair;"
+					//#endif
 			)
 	)
-	private Pair<BlockPos, Holder<Biome>> scopeLocateBiome(
+	private Pair<BlockPos, Holder<Biome>> scopeLocateBiome3d(
 			BiomeSource source,
 			BlockPos origin,
 			int maxSearchRadius,
 			int sampleResolutionHorizontal,
 			int sampleResolutionVertical,
 			Predicate<Holder<Biome>> biomeTest,
-			Climate.Sampler sampler,
+			//#if MC >= 26.3
+			//$$ RandomState samplingContext,
+			//#else
+			Climate.Sampler samplingContext,
+			//#endif
 			LevelReader level,
 			Operation<Pair<BlockPos, Holder<Biome>>> original
 	)
@@ -72,16 +92,85 @@ public abstract class ServerLevel_BiomeLocateMixin
 		LevelContext context = ((ServerLevelContextAccess)this).getLevelContext$quadragen();
 		if (context == null)
 		{
-			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, sampler, level);
+			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, samplingContext, level);
 		}
 		BiomeLocateContext.install(context);
 		try
 		{
-			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, sampler, level);
+			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, samplingContext, level);
 		}
 		finally
 		{
 			BiomeLocateContext.clear();
 		}
 	}
+	//#else
+	//$$ @WrapOperation(
+	//$$ 		method =
+			//#if MC >= 1.18.2
+			//$$ "findNearestBiome(Ljava/util/function/Predicate;Lnet/minecraft/core/BlockPos;II)Lcom/mojang/datafixers/util/Pair;",
+			//#else
+			//$$ "findNearestBiome(Lnet/minecraft/world/level/biome/Biome;Lnet/minecraft/core/BlockPos;II)Lnet/minecraft/core/BlockPos;",
+			//#endif
+	//$$ 		at = @At(
+	//$$ 				value = "INVOKE",
+	//$$ 				target =
+					//#if MC >= 1.18.2
+					//$$ "Lnet/minecraft/world/level/biome/BiomeSource;findBiomeHorizontal(IIIIILjava/util/function/Predicate;Ljava/util/Random;ZLnet/minecraft/world/level/biome/Climate$Sampler;)Lcom/mojang/datafixers/util/Pair;"
+					//#else
+					//$$ "Lnet/minecraft/world/level/biome/BiomeSource;findBiomeHorizontal(IIIIILjava/util/function/Predicate;Ljava/util/Random;Z)Lnet/minecraft/core/BlockPos;"
+					//#endif
+	//$$ 		)
+	//$$ )
+	//$$ private
+			//#if MC >= 1.18.2
+			//$$ Pair<BlockPos, Holder<Biome>> scopeLocateBiomeHorizontal(
+			//#else
+			//$$ BlockPos scopeLocateBiomeHorizontal(
+			//#endif
+	//$$ 		BiomeSource source,
+	//$$ 		int x,
+	//$$ 		int y,
+	//$$ 		int z,
+	//$$ 		int maxSearchRadius,
+	//$$ 		int sampleResolution,
+			//#if MC >= 1.18.2
+			//$$ Predicate<Holder<Biome>> biomeTest,
+			//#else
+			//$$ Predicate<Biome> biomeTest,
+			//#endif
+	//$$ 		Random random,
+	//$$ 		boolean findClosest,
+			//#if MC >= 1.18.2
+			//$$ Climate.Sampler sampler,
+			//$$ Operation<Pair<BlockPos, Holder<Biome>>> original
+			//#else
+			//$$ Operation<BlockPos> original
+			//#endif
+	//$$ )
+	//$$ {
+	//$$ 	LevelContext context = ((ServerLevelContextAccess)this).getLevelContext$quadragen();
+	//$$ 	if (context == null)
+	//$$ 	{
+			//#if MC >= 1.18.2
+			//$$ return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest, sampler);
+			//#else
+			//$$ return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest);
+			//#endif
+	//$$ 	}
+	//$$ 	BiomeLocateContext.install(context);
+	//$$ 	try
+	//$$ 	{
+			//#if MC >= 1.18.2
+			//$$ return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest, sampler);
+			//#else
+			//$$ return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest);
+			//#endif
+	//$$ 	}
+	//$$ 	finally
+	//$$ 	{
+	//$$ 		BiomeLocateContext.clear();
+	//$$ 	}
+	//$$ }
+	//#endif
 }
