@@ -20,15 +20,35 @@
 
 package me.fallenbreath.quadragen.runtime;
 
+import net.minecraft.world.level.biome.Biome;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+//#if MC >= 1.18.2
+import net.minecraft.core.Holder;
+//#endif
+
 public final class BiomeLocateContext
 {
 	private static final ThreadLocal<BiomeLocateContext> CURRENT = new ThreadLocal<BiomeLocateContext>();
 
+	//#if MC >= 1.18.2
+	private final Set<Holder<Biome>> candidates;
+	//#else
+	//$$ private final Set<Biome> candidates;
+	//#endif
 	private final LevelContext levelContext;
 
-	private BiomeLocateContext(LevelContext levelContext)
+	//#if MC >= 1.18.2
+	private BiomeLocateContext(LevelContext levelContext, Set<Holder<Biome>> candidates)
+	//#else
+	//$$ private BiomeLocateContext(LevelContext levelContext, Set<Biome> candidates)
+	//#endif
 	{
 		this.levelContext = levelContext;
+		this.candidates = Collections.unmodifiableSet(new LinkedHashSet<>(candidates));
 	}
 
 	public static BiomeLocateContext current()
@@ -36,14 +56,36 @@ public final class BiomeLocateContext
 		return CURRENT.get();
 	}
 
-	public static void install(LevelContext levelContext)
+	//#if MC >= 1.18.2
+	public static BiomeLocateContext install(LevelContext levelContext, Set<Holder<Biome>> candidates)
+	//#else
+	//$$ public static BiomeLocateContext install(LevelContext levelContext, Set<Biome> candidates)
+	//#endif
 	{
-		CURRENT.set(new BiomeLocateContext(levelContext));
+		BiomeLocateContext previous = CURRENT.get();
+		CURRENT.set(new BiomeLocateContext(levelContext, candidates));
+		return previous;
 	}
 
-	public static void clear()
+	public static void restore(BiomeLocateContext previous)
 	{
-		CURRENT.remove();
+		if (previous == null)
+		{
+			CURRENT.remove();
+		}
+		else
+		{
+			CURRENT.set(previous);
+		}
+	}
+
+	//#if MC >= 1.18.2
+	public Set<Holder<Biome>> getCandidates()
+	//#else
+	//$$ public Set<Biome> getCandidates()
+	//#endif
+	{
+		return this.candidates;
 	}
 
 	public LevelContext getLevelContext()

@@ -23,15 +23,18 @@ package me.fallenbreath.quadragen.mixins.worldgen.biome;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.fallenbreath.quadragen.runtime.BiomeLocateContext;
+import me.fallenbreath.quadragen.runtime.BiomeLocateHelper;
 import me.fallenbreath.quadragen.runtime.LevelContext;
 import me.fallenbreath.quadragen.runtime.access.ServerLevelContextAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.FixedBiomeSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Set;
 import java.util.function.Predicate;
 
 //#if MC >= 26.3
@@ -90,18 +93,28 @@ public abstract class ServerLevel_BiomeLocateMixin
 	)
 	{
 		LevelContext context = ((ServerLevelContextAccess)this).getLevelContext$quadragen();
-		if (context == null)
+		// FixedBiomeSource bypasses the search loop adapted by BiomeSourceMixin.
+		if (context == null || source instanceof FixedBiomeSource || maxSearchRadius < 0 || sampleResolutionHorizontal <= 0 || sampleResolutionVertical <= 0)
 		{
 			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, samplingContext, level);
 		}
-		BiomeLocateContext.install(context);
+		Set<Holder<Biome>> candidates = BiomeLocateHelper.getCandidates(
+				context,
+				BiomeLocateHelper.getSearchQuadrants(origin.getX(), origin.getZ(), maxSearchRadius, sampleResolutionHorizontal),
+				source.possibleBiomes()
+		);
+		if (BiomeLocateHelper.canReturnNotFound(candidates, biomeTest))
+		{
+			return null;
+		}
+		BiomeLocateContext previous = BiomeLocateContext.install(context, candidates);
 		try
 		{
 			return original.call(source, origin, maxSearchRadius, sampleResolutionHorizontal, sampleResolutionVertical, biomeTest, samplingContext, level);
 		}
 		finally
 		{
-			BiomeLocateContext.clear();
+			BiomeLocateContext.restore(previous);
 		}
 	}
 	//#else
@@ -150,7 +163,8 @@ public abstract class ServerLevel_BiomeLocateMixin
 	//$$ )
 	//$$ {
 	//$$ 	LevelContext context = ((ServerLevelContextAccess)this).getLevelContext$quadragen();
-	//$$ 	if (context == null)
+	//$$ 	// FixedBiomeSource bypasses the search loop adapted by BiomeSourceMixin.
+	//$$ 	if (context == null || source instanceof FixedBiomeSource || maxSearchRadius < 0 || sampleResolution <= 0 || !findClosest)
 	//$$ 	{
 			//#if MC >= 1.18.2
 			//$$ return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest, sampler);
@@ -158,7 +172,20 @@ public abstract class ServerLevel_BiomeLocateMixin
 			//$$ return original.call(source, x, y, z, maxSearchRadius, sampleResolution, biomeTest, random, findClosest);
 			//#endif
 	//$$ 	}
-	//$$ 	BiomeLocateContext.install(context);
+		//#if MC >= 1.18.2
+		//$$ Set<Holder<Biome>> candidates = BiomeLocateHelper.getCandidates(
+		//#else
+		//$$ Set<Biome> candidates = BiomeLocateHelper.getCandidates(
+		//#endif
+	//$$ 			context,
+	//$$ 			BiomeLocateHelper.getSearchQuadrants(x, z, maxSearchRadius, sampleResolution),
+	//$$ 			source.possibleBiomes()
+	//$$ 	);
+	//$$ 	if (BiomeLocateHelper.canReturnNotFound(candidates, biomeTest))
+	//$$ 	{
+	//$$ 		return null;
+	//$$ 	}
+	//$$ 	BiomeLocateContext previous = BiomeLocateContext.install(context, candidates);
 	//$$ 	try
 	//$$ 	{
 			//#if MC >= 1.18.2
@@ -169,7 +196,7 @@ public abstract class ServerLevel_BiomeLocateMixin
 	//$$ 	}
 	//$$ 	finally
 	//$$ 	{
-	//$$ 		BiomeLocateContext.clear();
+	//$$ 		BiomeLocateContext.restore(previous);
 	//$$ 	}
 	//$$ }
 	//#endif

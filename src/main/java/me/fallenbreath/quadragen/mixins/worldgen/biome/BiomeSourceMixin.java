@@ -22,7 +22,6 @@ package me.fallenbreath.quadragen.mixins.worldgen.biome;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import me.fallenbreath.quadragen.core.Quadrant;
 import me.fallenbreath.quadragen.core.QuadrantPlan;
 import me.fallenbreath.quadragen.runtime.BiomeLocateContext;
 import me.fallenbreath.quadragen.runtime.LevelContext;
@@ -49,7 +48,6 @@ import net.minecraft.world.level.biome.Climate;
 
 //#if MC >= 1.19.4
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import java.util.LinkedHashSet;
 import java.util.Set;
 //#endif
 
@@ -71,24 +69,14 @@ public abstract class BiomeSourceMixin
 			//#endif
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/BiomeSource;possibleBiomes()Ljava/util/Set;")
 	)
-	private Set<Holder<Biome>> extendLocateCandidates(Set<Holder<Biome>> original)
+	private Set<Holder<Biome>> useLocateCandidates(Set<Holder<Biome>> original)
 	{
 		BiomeLocateContext locateContext = BiomeLocateContext.current();
 		if (locateContext == null)
 		{
 			return original;
 		}
-		LevelContext context = locateContext.getLevelContext();
-		Set<Holder<Biome>> candidates = new LinkedHashSet<Holder<Biome>>(original);
-		for (Quadrant quadrant : Quadrant.values())
-		{
-			QuadrantPlan plan = context.getPlan(quadrant);
-			if (plan.isFlat())
-			{
-				candidates.add(plan.getFlat().getBiome());
-			}
-		}
-		return candidates;
+		return locateContext.getCandidates();
 	}
 	//#endif
 
@@ -140,21 +128,23 @@ public abstract class BiomeSourceMixin
 					//#endif
 					> original)
 	{
-		//#if MC >= 26.3
-		//$$ Holder<Biome> biome = original.call(source, quartX, quartY, quartZ);
-		//#elseif MC >= 1.18.2
-		Holder<Biome> biome = original.call(source, quartX, quartY, quartZ, sampler);
-		//#else
-		//$$ Biome biome = original.call(source, quartX, quartY, quartZ);
-		//#endif
 		BiomeLocateContext locateContext = BiomeLocateContext.current();
-		if (locateContext == null)
+		if (locateContext != null)
 		{
-			return biome;
+			LevelContext context = locateContext.getLevelContext();
+			QuadrantPlan plan = context.getPlanAt(this.toBlockCoordinate(quartX), this.toBlockCoordinate(quartZ));
+			if (plan.isFlat())
+			{
+				return plan.getFlat().getBiome();
+			}
 		}
-		LevelContext context = locateContext.getLevelContext();
-		QuadrantPlan plan = context.getPlanAt(this.toBlockCoordinate(quartX), this.toBlockCoordinate(quartZ));
-		return plan.isFlat() ? plan.getFlat().getBiome() : biome;
+		//#if MC >= 26.3
+		//$$ return original.call(source, quartX, quartY, quartZ);
+		//#elseif MC >= 1.18.2
+		return original.call(source, quartX, quartY, quartZ, sampler);
+		//#else
+		//$$ return original.call(source, quartX, quartY, quartZ);
+		//#endif
 	}
 
 	private int toBlockCoordinate(int quartCoordinate)
