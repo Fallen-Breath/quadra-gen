@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "me.fallenbreath.quadragen.mixins",
+  "plugin": "me.fallenbreath.quadragen.utils.mixin.QuadraGenMixinPlugin",
   "compatibilityLevel": "{{COMPATIBILITY_LEVEL}}",
   "mixins": [
     "lifecycle.ServerLevelMixin",
@@ -12,6 +13,7 @@
     "sealevel.AgeableWaterCreatureMixin",
     "sealevel.AmphibiousNodeEvaluatorMixin",
     "sealevel.BiomeMixin",
+    "sealevel.Biome_TemperatureCacheMixin",
     "sealevel.DrownedGoToBeachGoalMixin",
     "sealevel.DrownedMixin",
     "sealevel.DrownedSwimUpGoalMixin",

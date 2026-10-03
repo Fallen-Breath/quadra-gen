@@ -22,35 +22,39 @@ package me.fallenbreath.quadragen.mixins.sealevel;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.fallenbreath.quadragen.runtime.SeaLevelQuery;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelReader;
+import it.unimi.dsi.fastutil.longs.Long2FloatLinkedOpenHashMap;
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
+import me.fallenbreath.quadragen.utils.mixin.testers.LithiumTemperatureCacheTester;
 import net.minecraft.world.level.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
  * mc >  1.21.1: subproject 26.2 (main project)
  * mc <= 1.21.1: subproject 1.21.1
  */
+@Restriction(conflict = @Condition(type = Condition.Type.TESTER, tester = LithiumTemperatureCacheTester.class))
 @Mixin(Biome.class)
-public abstract class BiomeMixin
+public abstract class Biome_TemperatureCacheMixin
 {
-	@ModifyExpressionValue(
-			method = "shouldFreeze(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Z)Z",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelReader;getSeaLevel()I")
-	)
-	private int useSeaLevelAtFreezeCheck(int original, @Local(argsOnly = true) LevelReader level, @Local(argsOnly = true) BlockPos pos)
-	{
-		return SeaLevelQuery.getSeaLevelAt(level, pos, original);
-	}
+	@Unique
+	private final ThreadLocal<Integer> cachedSeaLevel$quadragen = new ThreadLocal<>();
 
 	@ModifyExpressionValue(
-			method = "shouldSnow",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelReader;getSeaLevel()I")
+			method = "getTemperature(Lnet/minecraft/core/BlockPos;I)F",
+			at = @At(value = "INVOKE", target = "Ljava/lang/ThreadLocal;get()Ljava/lang/Object;", remap = false)
 	)
-	private int useSeaLevelAtSnowCheck(int original, @Local(argsOnly = true) LevelReader level, @Local(argsOnly = true) BlockPos pos)
+	private Object validateTemperatureCache(Object original, @Local(argsOnly = true) int seaLevel)
 	{
-		return SeaLevelQuery.getSeaLevelAt(level, pos, original);
+		Integer previous = this.cachedSeaLevel$quadragen.get();
+		if (previous == null || previous.intValue() != seaLevel)
+		{
+			// {@link net.minecraft.world.level.biome.Biome#getTemperature} keys its per-thread cache by position alone.
+			((Long2FloatLinkedOpenHashMap)original).clear();
+			this.cachedSeaLevel$quadragen.set(seaLevel);
+		}
+		return original;
 	}
 }
