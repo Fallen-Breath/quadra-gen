@@ -22,11 +22,13 @@ package me.fallenbreath.quadragen.mixins.sealevel;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import it.unimi.dsi.fastutil.longs.Long2FloatLinkedOpenHashMap;
 import me.fallenbreath.quadragen.runtime.SeaLevelQuery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
@@ -36,6 +38,9 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(Biome.class)
 public abstract class BiomeMixin
 {
+	@Unique
+	private final ThreadLocal<Integer> cachedSeaLevel$quadragen = new ThreadLocal<>();
+
 	@ModifyExpressionValue(
 			method = "shouldFreeze(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Z)Z",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelReader;getSeaLevel()I")
@@ -52,5 +57,21 @@ public abstract class BiomeMixin
 	private int useSeaLevelAtSnowCheck(int original, @Local(argsOnly = true) LevelReader level, @Local(argsOnly = true) BlockPos pos)
 	{
 		return SeaLevelQuery.getSeaLevelAt(level, pos, original);
+	}
+
+	@ModifyExpressionValue(
+			method = "getTemperature(Lnet/minecraft/core/BlockPos;I)F",
+			at = @At(value = "INVOKE", target = "Ljava/lang/ThreadLocal;get()Ljava/lang/Object;", remap = false)
+	)
+	private Object validateTemperatureCache(Object original, @Local(argsOnly = true) int seaLevel)
+	{
+		Integer previous = this.cachedSeaLevel$quadragen.get();
+		if (previous == null || previous.intValue() != seaLevel)
+		{
+			// {@link net.minecraft.world.level.biome.Biome#getTemperature} keys its per-thread cache by position alone.
+			((Long2FloatLinkedOpenHashMap)original).clear();
+			this.cachedSeaLevel$quadragen.set(seaLevel);
+		}
+		return original;
 	}
 }
