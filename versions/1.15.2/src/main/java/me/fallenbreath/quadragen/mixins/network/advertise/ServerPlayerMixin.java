@@ -46,6 +46,7 @@ public abstract class ServerPlayerMixin
 	)
 	private LevelType advertiseWorldType_modifyLevelType1(LevelType original, @Local(ordinal = 1) ServerLevel level)
 	{
+		// Accepted compromise: portal AUTO uses departure X/Z to preserve vanilla packet timing.
 		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, (ServerPlayer)(Object)this, original);
 	}
 
@@ -56,9 +57,10 @@ public abstract class ServerPlayerMixin
 					target = "Lnet/minecraft/world/level/storage/LevelData;getGeneratorType()Lnet/minecraft/world/level/LevelType;"
 			)
 	)
-	private LevelType advertiseWorldType_modifyLevelType2(LevelType original, ServerLevel level)
+	private LevelType advertiseWorldType_modifyLevelType2(LevelType original,
+			@Local(argsOnly = true) ServerLevel level, @Local(argsOnly = true, ordinal = 0) double x, @Local(argsOnly = true, ordinal = 2) double z)
 	{
-		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, (ServerPlayer)(Object)this, original);
+		return AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, x, z, original);
 	}
 
 }

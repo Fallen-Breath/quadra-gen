@@ -20,7 +20,9 @@
 
 package me.fallenbreath.quadragen.mixins.network.advertise;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.quadragen.runtime.AdvertisedWorldTypeQuery;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
 import net.minecraft.server.level.ServerLevel;
@@ -28,10 +30,18 @@ import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+//#if MC >= 1.21.3
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.phys.Vec3;
+//#elseif MC >= 1.21.1
+//$$ import net.minecraft.world.level.portal.DimensionTransition;
+//#endif
+
 /**
- *          mc >  1.20.1: subproject 26.2 (main project)  <--------
+ *           mc >  1.20.1: subproject 26.2 (main project)  <--------
  * 1.16.5 <= mc <= 1.20.1: subproject 1.20.1
- *          mc <= 1.15.2: subproject 1.15.2
+ *           mc <= 1.15.2: subproject 1.15.2
  */
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin
@@ -40,14 +50,47 @@ public abstract class ServerPlayerMixin
 	private CommonPlayerSpawnInfo advertiseWorldType_modifyCommonSpawnInfo(CommonPlayerSpawnInfo original, ServerLevel level)
 	{
 		ServerPlayer self = (ServerPlayer)(Object)this;
-		boolean flat = AdvertisedWorldTypeQuery.shouldAdvertiseFlat(level, self, original.isFlat());
-		return new CommonPlayerSpawnInfo(
-				original.dimensionType(), original.dimension(), original.seed(), original.gameType(),
-				original.previousGameType(), original.isDebug(), flat, original.lastDeathLocation(),
-				original.portalCooldown()
-				//#if MC >= 1.21.2
-				, original.seaLevel()
-				//#endif
-		);
+		//#if MC < 1.21.1
+		//$$ // Accepted compromise: portal AUTO uses departure X/Z to preserve vanilla packet timing.
+		//#endif
+		return AdvertisedWorldTypeQuery.withWorldType(level, self.getX(), self.getZ(), original);
 	}
+
+	//#if MC >= 1.21.1
+	/** Uses the destination passed to vanilla teleport, including relative coordinates in newer versions. */
+	@ModifyExpressionValue(
+			//#if MC >= 1.21.3
+			method = "teleport(Lnet/minecraft/world/level/portal/TeleportTransition;)Lnet/minecraft/server/level/ServerPlayer;",
+			//#else
+			//$$ method = "changeDimension(Lnet/minecraft/world/level/portal/DimensionTransition;)Lnet/minecraft/world/entity/Entity;",
+			//#endif
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;createCommonSpawnInfo(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/network/protocol/game/CommonPlayerSpawnInfo;")
+	)
+	private CommonPlayerSpawnInfo advertiseWorldType_useTeleportDestination(CommonPlayerSpawnInfo original,
+			//#if MC >= 1.21.3
+			@Local(argsOnly = true) TeleportTransition transition
+			//#else
+			//$$ @Local(argsOnly = true) DimensionTransition transition
+			//#endif
+	)
+	{
+		//#if MC >= 1.21.3
+		// Match {@link net.minecraft.world.entity.Entity#teleportSetPosition(PositionMoveRotation, java.util.Set)}.
+		Vec3 destination = PositionMoveRotation.calculateAbsolute(PositionMoveRotation.of((ServerPlayer)(Object)this), PositionMoveRotation.of(transition), transition.relatives()).position();
+		return AdvertisedWorldTypeQuery.withWorldType(transition.newLevel(), destination.x, destination.z, original);
+		//#else
+		//$$ return AdvertisedWorldTypeQuery.withWorldType(transition.newLevel(), transition.pos().x, transition.pos().z, original);
+		//#endif
+	}
+	//#else
+	//$$ @ModifyExpressionValue(
+	//$$ 		method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V",
+	//$$ 		at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;createCommonSpawnInfo(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/network/protocol/game/CommonPlayerSpawnInfo;")
+	//$$ )
+	//$$ private CommonPlayerSpawnInfo advertiseWorldType_useCommandDestination(CommonPlayerSpawnInfo original,
+	//$$ 		@Local(argsOnly = true) ServerLevel level, @Local(argsOnly = true, ordinal = 0) double x, @Local(argsOnly = true, ordinal = 2) double z)
+	//$$ {
+	//$$ 	return AdvertisedWorldTypeQuery.withWorldType(level, x, z, original);
+	//$$ }
+	//#endif
 }
