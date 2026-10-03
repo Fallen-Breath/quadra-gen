@@ -93,7 +93,9 @@ public final class ClientSyncQuery
 		// returns 1.0 for Flat and 0.03125 (1/32) for Noise.
 		return isFlat(state, x, z) ? 1.0F : 0.03125F;
 		//#else
-		//$$ return isFlat(state, x, z) ? 1.0D : original;
+		//$$ // Vanilla 1.14.4-1.15.2: {@link net.minecraft.world.level.dimension.Dimension#getClearColorScale()}
+		//$$ // returns 1.0D for Flat and 0.03125D (1/32) for Noise.
+		//$$ return isFlat(state, x, z) ? 1.0D : 0.03125D;
 		//#endif
 	}
 

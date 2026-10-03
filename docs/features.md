@@ -199,7 +199,7 @@ A client receives one dimension-level sea level, so the client-side checks that 
 
 A client without the mod receives a single advertised world type for the dimension, so it presents one client-side appearance for the whole dimension: Flat or Noise according to that type, with no switching at the quadrant axes until the next login, respawn, or dimension change.
 
-The advertised world type decides the client-side Flat or Noise appearance, such as the horizon and the dark disc of the sky, and the void fog from 1.16.5. The sea level stays the natural one of the dimension: the save still records the underlying world type of the dimension as the vanilla Noise one, so a vanilla client inside a Flat quadrant keeps the natural sea level for its local precipitation and freezing checks (see 9.3).
+The advertised world type decides the client-side Flat or Noise appearance, such as the horizon, the dark disc of the sky, and void fog. The sea level stays the natural one of the dimension: the save still records the underlying world type of the dimension as the vanilla Noise one, so a vanilla client inside a Flat quadrant keeps the natural sea level for its local precipitation and freezing checks (see 9.3).
 
 When the mod is absent on the server, or the dimension is disabled or unsupported, the advertised world type is the vanilla one, and clients behave as in an ordinary vanilla world.
 
@@ -218,7 +218,7 @@ The synchronized state carries whether the dimension is actually managed, which 
 | Client-side appearance | Versions |
 | --- | --- |
 | Horizon and dark disc of the sky | All supported versions |
-| Void fog | 1.16.5 and above |
+| Void fog | All supported versions |
 | Precipitation | 1.21.3 and above |
 
 This per-quadrant behavior applies only to a dimension that is actually managed. A client on a server without the mod, or on a disabled or unsupported dimension, falls back to the behavior described in 10.1.
@@ -302,7 +302,6 @@ Except for the version differences listed below, all versions provide the same f
 | Biome locating | None in 1.14.4–1.15.2; 2D in 1.16.5–1.18.2; 3D in 1.19.4 and above | See 6.2 |
 | Reserved chunks at the axes for the initial spawn | 16 in 1.14.4–1.17.1; 5 in 1.18.2 and above | See section 12 |
 | Runtime sea level | Per quadrant from 1.21.3; also covers the Nautilus from 1.21.11 | See 9.2 |
-| Client void fog | 1.16.5 and above | See 10.3 |
 | Client precipitation | 1.21.3 and above | See 10.3 |
 | Neighbor biome reference in surface generation | 26.2 and above | See section 8 |
 | Special spawners and slime suppression | 1.14.4–1.15.2 | See 11.3 |
